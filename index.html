@@ -323,11 +323,13 @@
 <div class="header">
   <div class="wordmark">Yap<span>Lab</span></div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <button class="theme-toggle" id="cloudToggleBtn" onclick="openCloudModal()">
-      <span class="connection-dot offline" id="cloudIndicatorDot"></span>
-      <svg id="cloudIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-right:2px;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-      <span id="cloudStatusLabel">Local-Only</span>
-    </button>
+    <div id="userHeaderInfo" style="display:none; align-items:center; gap:8px;">
+      <span id="userHeaderEmail" style="font-size:12px; color:var(--muted); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+      <button class="theme-toggle" onclick="authAction('signOut')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Log Out
+      </button>
+    </div>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
       <svg id="themeIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <span id="themeLabel">Light</span>
@@ -504,68 +506,32 @@
 
 </div>
 
-<!-- Supabase Sync Modal -->
-<div class="modal-overlay" id="cloudModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Cloud Synchronization</div>
-      <button class="modal-close" onclick="closeCloudModal()">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
+<!-- Fullscreen Auth Wall -->
+<div id="authWall" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:2000; padding:20px;">
+  <div class="modal-card" style="max-width:380px; width:100%; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+    <div style="text-align:center; margin-bottom:8px;">
+      <div class="wordmark" style="font-size:28px;">Yap<span>Lab</span></div>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;">Speech practice & script builder</div>
     </div>
     
     <div class="modal-tabs">
-      <button class="modal-tab active" id="tabConnBtn" onclick="switchModalTab('conn')">Connection</button>
-      <button class="modal-tab" id="tabAuthBtn" onclick="switchModalTab('auth')">Account</button>
+      <button class="modal-tab active" id="authWallTabSignInBtn" onclick="switchAuthWallTab('signIn')">Sign In</button>
+      <button class="modal-tab" id="authWallTabSignUpBtn" onclick="switchAuthWallTab('signUp')">Sign Up</button>
     </div>
 
-    <div class="modal-body">
-      <!-- Status Message Area -->
-      <div class="modal-status" id="modalStatus"></div>
-
-      <!-- CONNECTION TAB PANEL -->
-      <div id="panelConn" class="modal-section" style="display:flex; flex-direction:column; gap:12px;">
-        <div class="modal-section">
-          <label class="modal-label" for="dbUrl">Supabase Project URL</label>
-          <input class="modal-input" id="dbUrl" type="text" placeholder="https://your-project.supabase.co">
-        </div>
-        <div class="modal-section">
-          <label class="modal-label" for="dbKey">Supabase Anon Key</label>
-          <input class="modal-input" id="dbKey" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-        </div>
-        <button class="btn btn-primary" onclick="connectSupabase()" style="justify-content:center; margin-top:8px;">Connect Database</button>
+    <div class="modal-body" style="gap:12px;">
+      <div class="modal-status" id="authWallStatus"></div>
+      
+      <div class="modal-section">
+        <label class="modal-label" for="authWallEmail">Email Address</label>
+        <input class="modal-input" id="authWallEmail" type="email" placeholder="you@example.com">
       </div>
-
-      <!-- AUTH TAB PANEL -->
-      <div id="panelAuth" class="modal-section" style="display:none; flex-direction:column; gap:12px;">
-        <!-- Logged Out View -->
-        <div id="authLoggedOut" style="display:flex; flex-direction:column; gap:12px;">
-          <div class="modal-section">
-            <label class="modal-label" for="authEmail">Email Address</label>
-            <input class="modal-input" id="authEmail" type="email" placeholder="you@example.com">
-          </div>
-          <div class="modal-section">
-            <label class="modal-label" for="authPassword">Password</label>
-            <input class="modal-input" id="authPassword" type="password" placeholder="••••••••">
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
-            <button class="btn btn-secondary" onclick="authAction('signIn')" style="justify-content:center;">Sign In</button>
-            <button class="btn btn-primary" onclick="authAction('signUp')" style="justify-content:center;">Sign Up</button>
-          </div>
-        </div>
-
-        <!-- Logged In View -->
-        <div id="authLoggedIn" style="display:none; flex-direction:column; gap:14px; text-align:center; padding:10px 0;">
-          <div style="font-size:14px; color:var(--text);">Logged in as <strong id="loggedInUserEmail" style="color:var(--accent);">user@example.com</strong></div>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <button class="btn btn-primary" onclick="triggerManualSync()" style="justify-content:center;">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" id="syncSpinner"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
-              Sync Data Now
-            </button>
-            <button class="btn btn-secondary" onclick="authAction('signOut')" style="justify-content:center;">Log Out</button>
-          </div>
-        </div>
+      <div class="modal-section">
+        <label class="modal-label" for="authWallPassword">Password</label>
+        <input class="modal-input" id="authWallPassword" type="password" placeholder="••••••••">
       </div>
+      
+      <button class="btn btn-primary" id="authWallSubmitBtn" onclick="submitAuthWall()" style="justify-content:center; margin-top:10px; font-weight:600;">Sign In</button>
     </div>
   </div>
 </div>
@@ -598,10 +564,11 @@ const FEEDBACK = {
 const FILLER_WORDS = ["um","uh","like","you know","basically","literally","right","so","actually","kind of","sort of"];
 
 // ── SUPABASE STATE ────────────────────────────────────────────────────────────
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 let supabaseClient = null;
 let supabaseUser = null;
-let activeModalTab = 'conn';
-let syncInProgress = false;
+let activeAuthWallTab = 'signIn';
 
 // ── PRACTICE STATE ────────────────────────────────────────────────────────────
 let selectedDur=60,timerSec=60,timerMax=60,interval=null,isRunning=false;
@@ -621,56 +588,10 @@ const LS_BOOKMARKS = 'yaplab_bookmarks_v1';
 const LS_STATS = 'yaplab_stats_v1';
 const LS_HISTORY = 'yaplab_history_v1';
 
-function saveLearn() {
-  try {
-    const payload = JSON.stringify({ items: learnItems, counter: learnIdCounter, savedAt: Date.now() });
-    localStorage.setItem(LS_KEY, payload);
-  } catch(e) {
-    try { localStorage.removeItem('yaplab_learn_v1'); localStorage.setItem(LS_KEY, JSON.stringify({ items: learnItems, counter: learnIdCounter })); } catch(e2) {}
-  }
-}
-
-function loadLearn() {
-  try {
-    const raw = localStorage.getItem(LS_KEY) || localStorage.getItem('yaplab_learn_v1');
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    learnItems = (data.items || []).map(item=>({
-      ...item,
-      sections: item.sections
-        ? item.sections
-        : (item.notes ? [{id:Date.now()+Math.random(),label:'Notes',placeholder:'',text:item.notes}] : [])
-    }));
-    learnIdCounter = data.counter || learnItems.length;
-    saveLearn();
-  } catch(e) { learnItems = []; }
-}
-
-function savePracticeLocal() {
-  try {
-    localStorage.setItem(LS_BOOKMARKS, JSON.stringify(bookmarks));
-    localStorage.setItem(LS_STATS, JSON.stringify({ reps, completed, bestSec }));
-    localStorage.setItem(LS_HISTORY, JSON.stringify(sessionHistory));
-  } catch(e) {}
-}
-
-function loadPracticeLocal() {
-  try {
-    const rawBookmarks = localStorage.getItem(LS_BOOKMARKS);
-    if (rawBookmarks) bookmarks = JSON.parse(rawBookmarks);
-
-    const rawStats = localStorage.getItem(LS_STATS);
-    if (rawStats) {
-      const stats = JSON.parse(rawStats);
-      reps = stats.reps || 0;
-      completed = stats.completed || 0;
-      bestSec = stats.bestSec || 0;
-    }
-
-    const rawHistory = localStorage.getItem(LS_HISTORY);
-    if (rawHistory) sessionHistory = JSON.parse(rawHistory);
-  } catch(e) {}
-}
+function saveLearn() {}
+function loadLearn() {}
+function savePracticeLocal() {}
+function loadPracticeLocal() {}
 
 function updateStatsDisplay() {
   document.getElementById('statReps').textContent = reps;
@@ -1373,32 +1294,17 @@ function toggleTheme(){
   applyTheme();
 }
 
-// ── SUPABASE SYSTEM & SYNC FUNCTIONS ───────────────────────────────────────────
-function openCloudModal() {
-  document.getElementById('cloudModal').classList.add('open');
-  const savedUrl = localStorage.getItem('yaplab_supabase_url') || '';
-  const savedKey = localStorage.getItem('yaplab_supabase_key') || '';
-  document.getElementById('dbUrl').value = savedUrl;
-  document.getElementById('dbKey').value = savedKey;
-  showModalStatus('', '');
-  updateCloudUI();
+// ── SUPABASE AUTH WALL & SYNC FUNCTIONS ────────────────────────────────────────
+function switchAuthWallTab(tab) {
+  activeAuthWallTab = tab;
+  document.getElementById('authWallTabSignInBtn').classList.toggle('active', tab === 'signIn');
+  document.getElementById('authWallTabSignUpBtn').classList.toggle('active', tab === 'signUp');
+  document.getElementById('authWallSubmitBtn').textContent = tab === 'signIn' ? 'Sign In' : 'Sign Up';
+  showAuthWallStatus('', '');
 }
 
-function closeCloudModal() {
-  document.getElementById('cloudModal').classList.remove('open');
-}
-
-function switchModalTab(tab) {
-  activeModalTab = tab;
-  document.getElementById('tabConnBtn').classList.toggle('active', tab === 'conn');
-  document.getElementById('tabAuthBtn').classList.toggle('active', tab === 'auth');
-  document.getElementById('panelConn').style.display = tab === 'conn' ? 'flex' : 'none';
-  document.getElementById('panelAuth').style.display = tab === 'auth' ? 'flex' : 'none';
-  showModalStatus('', '');
-}
-
-function showModalStatus(type, msg) {
-  const el = document.getElementById('modalStatus');
+function showAuthWallStatus(type, msg) {
+  const el = document.getElementById('authWallStatus');
   el.className = 'modal-status';
   if (type) {
     el.classList.add(type);
@@ -1406,163 +1312,121 @@ function showModalStatus(type, msg) {
   }
 }
 
-async function connectSupabase() {
-  const url = document.getElementById('dbUrl').value.trim();
-  const key = document.getElementById('dbKey').value.trim();
-
-  if (!url || !key) {
-    showModalStatus('error', 'Please fill in both the Supabase URL and Anon Key.');
-    return;
-  }
-
-  showModalStatus('info', 'Connecting to Supabase...');
-  try {
-    const client = supabase.createClient(url, key);
-    const { data, error } = await client.auth.getSession();
-    if (error) throw error;
-    
-    localStorage.setItem('yaplab_supabase_url', url);
-    localStorage.setItem('yaplab_supabase_key', key);
-    supabaseClient = client;
-    
-    showModalStatus('success', 'Connected successfully! You can now manage your account.');
-    updateCloudUI();
-    
-    setTimeout(() => {
-      switchModalTab('auth');
-    }, 1000);
-  } catch (e) {
-    console.error(e);
-    showModalStatus('error', 'Failed to connect: ' + e.message);
-    localStorage.removeItem('yaplab_supabase_url');
-    localStorage.removeItem('yaplab_supabase_key');
-    supabaseClient = null;
-    updateCloudUI();
-  }
-}
-
-function updateCloudUI() {
-  const btn = document.getElementById('cloudToggleBtn');
-  const dot = document.getElementById('cloudIndicatorDot');
-  const label = document.getElementById('cloudStatusLabel');
-  const authTabBtn = document.getElementById('tabAuthBtn');
-
-  if (!supabaseClient) {
-    dot.className = 'connection-dot offline';
-    label.textContent = 'Local-Only';
-    authTabBtn.disabled = true;
-    authTabBtn.style.opacity = '0.5';
-    authTabBtn.style.cursor = 'not-allowed';
-    document.getElementById('authLoggedOut').style.display = 'flex';
-    document.getElementById('authLoggedIn').style.display = 'none';
-  } else if (!supabaseUser) {
-    dot.className = 'connection-dot auth';
-    label.textContent = 'Offline Sync';
-    authTabBtn.disabled = false;
-    authTabBtn.style.opacity = '1';
-    authTabBtn.style.cursor = 'pointer';
-    document.getElementById('authLoggedOut').style.display = 'flex';
-    document.getElementById('authLoggedIn').style.display = 'none';
-  } else {
-    dot.className = 'connection-dot online';
-    label.textContent = supabaseUser.email.split('@')[0];
-    authTabBtn.disabled = false;
-    authTabBtn.style.opacity = '1';
-    authTabBtn.style.cursor = 'pointer';
-    document.getElementById('authLoggedOut').style.display = 'none';
-    document.getElementById('authLoggedIn').style.display = 'flex';
-    document.getElementById('loggedInUserEmail').textContent = supabaseUser.email;
-  }
+function submitAuthWall() {
+  authAction(activeAuthWallTab);
 }
 
 async function authAction(action) {
-  if (!supabaseClient) return;
-  
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value.trim();
-
-  if (action !== 'signOut' && (!email || !password)) {
-    showModalStatus('error', 'Please enter your email and password.');
+  if (!supabaseClient) {
+    showAuthWallStatus('error', 'Supabase is not initialized. Please configure your credentials in the code.');
     return;
   }
 
-  showModalStatus('info', 'Processing...');
+  if (action === 'signOut') {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    }
+    supabaseUser = null;
+    document.getElementById('authWall').style.display = 'flex';
+    document.querySelector('.main').style.display = 'none';
+    document.getElementById('userHeaderInfo').style.display = 'none';
+    
+    // Clear data
+    learnItems = [];
+    bookmarks = [];
+    reps = 0;
+    completed = 0;
+    bestSec = 0;
+    sessionHistory = [];
+    
+    // Render empty UI
+    updateStatsDisplay();
+    renderBookmarks();
+    renderHistory();
+    renderLearnList();
+    updateLearnStats();
+    showAuthWallStatus('success', 'Logged out successfully.');
+    return;
+  }
+
+  const email = document.getElementById('authWallEmail').value.trim();
+  const password = document.getElementById('authWallPassword').value.trim();
+
+  if (!email || !password) {
+    showAuthWallStatus('error', 'Please enter your email and password.');
+    return;
+  }
+
+  showAuthWallStatus('info', 'Processing...');
   try {
     if (action === 'signUp') {
       const { data, error } = await supabaseClient.auth.signUp({ email, password });
       if (error) throw error;
       if (data.user && data.session) {
         supabaseUser = data.user;
-        showModalStatus('success', 'Registered and signed in successfully!');
-        updateCloudUI();
-        await syncAllData();
+        showAuthWallStatus('success', 'Registered and signed in successfully!');
+        transitionToApp();
       } else {
-        showModalStatus('success', 'Registration successful! Please check your email for a confirmation link.');
+        showAuthWallStatus('success', 'Registration successful! Please check your email for a confirmation link.');
       }
     } else if (action === 'signIn') {
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) throw error;
       supabaseUser = data.user;
-      showModalStatus('success', 'Signed in successfully!');
-      updateCloudUI();
-      await syncAllData();
-    } else if (action === 'signOut') {
-      const { error } = await supabaseClient.auth.signOut();
-      if (error) throw error;
-      supabaseUser = null;
-      showModalStatus('success', 'Logged out successfully.');
-      updateCloudUI();
-      
-      // Load local data again
-      loadLearn();
-      loadPracticeLocal();
-      renderBookmarks();
-      renderHistory();
-      updateStatsDisplay();
-      renderLearnList();
-      updateLearnStats();
+      showAuthWallStatus('success', 'Signed in successfully!');
+      transitionToApp();
     }
   } catch (e) {
     console.error(e);
-    showModalStatus('error', e.message);
+    showAuthWallStatus('error', e.message);
   }
 }
 
-async function triggerManualSync() {
-  if (syncInProgress) return;
-  const spinner = document.getElementById('syncSpinner');
-  spinner.classList.add('spinning');
-  showModalStatus('info', 'Syncing data with cloud...');
-  try {
-    await syncAllData();
-    showModalStatus('success', 'All data synced successfully!');
-  } catch (e) {
-    console.error(e);
-    showModalStatus('error', 'Sync failed: ' + e.message);
-  } finally {
-    spinner.classList.remove('spinning');
-  }
+async function transitionToApp() {
+  document.getElementById('authWall').style.display = 'none';
+  document.querySelector('.main').style.display = 'flex';
+  document.getElementById('userHeaderInfo').style.display = 'flex';
+  document.getElementById('userHeaderEmail').textContent = supabaseUser.email;
+
+  // Clear inputs
+  document.getElementById('authWallEmail').value = '';
+  document.getElementById('authWallPassword').value = '';
+
+  // Clear any existing localStorage data (bypass local only completely)
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(LS_BOOKMARKS);
+  localStorage.removeItem(LS_STATS);
+  localStorage.removeItem(LS_HISTORY);
+
+  // Sync data directly
+  await syncAllData();
 }
 
 async function initSupabaseAtStartup() {
-  const url = localStorage.getItem('yaplab_supabase_url');
-  const key = localStorage.getItem('yaplab_supabase_key');
-  if (url && key) {
-    try {
-      supabaseClient = supabase.createClient(url, key);
-      const { data } = await supabaseClient.auth.getSession();
-      if (data && data.session) {
-        supabaseUser = data.session.user;
-        await syncAllData();
-      }
-      updateCloudUI();
-    } catch(e) {
-      console.error('Failed to initialize Supabase client:', e);
-      supabaseClient = null;
-      updateCloudUI();
+  if (SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY" || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    document.getElementById('authWall').style.display = 'flex';
+    document.querySelector('.main').style.display = 'none';
+    document.getElementById('userHeaderInfo').style.display = 'none';
+    showAuthWallStatus('error', 'Please configure your SUPABASE_URL and SUPABASE_ANON_KEY at the top of the script tag in index.html to deploy.');
+    return;
+  }
+
+  try {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session) {
+      supabaseUser = data.session.user;
+      await transitionToApp();
+    } else {
+      document.getElementById('authWall').style.display = 'flex';
+      document.querySelector('.main').style.display = 'none';
+      document.getElementById('userHeaderInfo').style.display = 'none';
     }
-  } else {
-    updateCloudUI();
+  } catch(e) {
+    console.error('Failed to initialize Supabase client:', e);
+    showAuthWallStatus('error', 'Failed to connect: ' + e.message);
   }
 }
 
@@ -1578,7 +1442,6 @@ function triggerCloudSave() {
 
 async function syncAllData() {
   if (!supabaseClient || !supabaseUser) return;
-  syncInProgress = true;
   try {
     await Promise.all([
       syncLearnItems(),
@@ -1586,8 +1449,8 @@ async function syncAllData() {
       syncStats(),
       syncHistory()
     ]);
-  } finally {
-    syncInProgress = false;
+  } catch(e) {
+    console.error('Data loading/sync failed:', e);
   }
 }
 
@@ -1683,7 +1546,6 @@ async function syncLearnItems() {
   const maxId = learnItems.reduce((max, item) => item.id > max ? item.id : max, 0);
   learnIdCounter = Math.max(learnIdCounter, maxId);
 
-  saveLearn();
   renderLearnList();
   updateLearnStats();
 }
@@ -1728,7 +1590,6 @@ async function syncBookmarks() {
   }
 
   bookmarks = mergedBookmarks;
-  savePracticeLocal();
   renderBookmarks();
 }
 
@@ -1748,7 +1609,6 @@ async function syncStats() {
     bestSec = Math.max(bestSec, remote.best_sec);
   }
 
-  savePracticeLocal();
   updateStatsDisplay();
 
   await supabaseClient
@@ -1819,7 +1679,6 @@ async function syncHistory() {
   }
 
   sessionHistory = merged;
-  savePracticeLocal();
   renderHistory();
 }
 
