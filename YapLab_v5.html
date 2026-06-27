@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -262,6 +263,53 @@
   .title-edit-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:2px 4px; display:flex; align-items:center; flex-shrink:0; transition:color 0.15s; }
   .title-edit-btn:hover { color:var(--accent); }
 
+  /* Supabase Modal & Sync Styles */
+  .modal-overlay {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center;
+    z-index:1000; padding:16px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    width:100%; max-width:440px; padding:24px; display:flex; flex-direction:column; gap:16px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.5); animation:modalSlide 0.25s ease-out;
+  }
+  @keyframes modalSlide {
+    from { transform:translateY(20px); opacity:0; }
+    to { transform:translateY(0); opacity:1; }
+  }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; }
+  .modal-title { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:var(--text); }
+  .modal-close { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:4px; display:flex; align-items:center; transition:color 0.15s; }
+  .modal-close:hover { color:var(--text); }
+  .modal-body { display:flex; flex-direction:column; gap:14px; }
+  .modal-section { display:flex; flex-direction:column; gap:6px; }
+  .modal-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
+  .modal-input {
+    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    padding:8px 12px; font-family:'Inter',sans-serif; font-size:13px; color:var(--text);
+    outline:none; transition:border-color 0.15s;
+  }
+  .modal-input:focus { border-color:var(--accent); }
+  .modal-status { font-size:12px; padding:8px 12px; border-radius:6px; display:none; line-height:1.4; word-break:break-word; }
+  .modal-status.info { display:block; background:var(--accent-dim); color:var(--accent); border:1px solid rgba(200,241,53,0.2); }
+  .modal-status.error { display:block; background:rgba(255,92,92,0.1); color:var(--danger); border:1px solid rgba(255,92,92,0.2); }
+  .modal-status.success { display:block; background:rgba(74,222,128,0.1); color:var(--easy); border:1px solid rgba(74,222,128,0.2); }
+  .modal-footer { display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:14px; margin-top:4px; }
+  .modal-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:4px; }
+  .modal-tab {
+    flex:1; text-align:center; background:transparent; border:none; border-bottom:2px solid transparent;
+    color:var(--muted); font-size:13px; font-weight:500; padding:8px 0; cursor:pointer; transition:all 0.15s;
+  }
+  .modal-tab.active { color:var(--text); border-bottom-color:var(--accent); font-weight:600; }
+  @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+  .spinning { animation:spin 1s linear infinite; }
+  .connection-dot { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:4px; vertical-align:middle; }
+  .connection-dot.online { background:var(--easy); }
+  .connection-dot.offline { background:var(--muted); }
+  .connection-dot.auth { background:var(--warn); }
   @media (max-width:480px) {
     .timer-display { font-size:52px; }
     .topic-text { font-size:20px; }
@@ -275,6 +323,11 @@
 <div class="header">
   <div class="wordmark">Yap<span>Lab</span></div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <button class="theme-toggle" id="cloudToggleBtn" onclick="openCloudModal()">
+      <span class="connection-dot offline" id="cloudIndicatorDot"></span>
+      <svg id="cloudIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-right:2px;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+      <span id="cloudStatusLabel">Local-Only</span>
+    </button>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
       <svg id="themeIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <span id="themeLabel">Light</span>
@@ -451,6 +504,72 @@
 
 </div>
 
+<!-- Supabase Sync Modal -->
+<div class="modal-overlay" id="cloudModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Cloud Synchronization</div>
+      <button class="modal-close" onclick="closeCloudModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabConnBtn" onclick="switchModalTab('conn')">Connection</button>
+      <button class="modal-tab" id="tabAuthBtn" onclick="switchModalTab('auth')">Account</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Status Message Area -->
+      <div class="modal-status" id="modalStatus"></div>
+
+      <!-- CONNECTION TAB PANEL -->
+      <div id="panelConn" class="modal-section" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="modal-section">
+          <label class="modal-label" for="dbUrl">Supabase Project URL</label>
+          <input class="modal-input" id="dbUrl" type="text" placeholder="https://your-project.supabase.co">
+        </div>
+        <div class="modal-section">
+          <label class="modal-label" for="dbKey">Supabase Anon Key</label>
+          <input class="modal-input" id="dbKey" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+        <button class="btn btn-primary" onclick="connectSupabase()" style="justify-content:center; margin-top:8px;">Connect Database</button>
+      </div>
+
+      <!-- AUTH TAB PANEL -->
+      <div id="panelAuth" class="modal-section" style="display:none; flex-direction:column; gap:12px;">
+        <!-- Logged Out View -->
+        <div id="authLoggedOut" style="display:flex; flex-direction:column; gap:12px;">
+          <div class="modal-section">
+            <label class="modal-label" for="authEmail">Email Address</label>
+            <input class="modal-input" id="authEmail" type="email" placeholder="you@example.com">
+          </div>
+          <div class="modal-section">
+            <label class="modal-label" for="authPassword">Password</label>
+            <input class="modal-input" id="authPassword" type="password" placeholder="••••••••">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
+            <button class="btn btn-secondary" onclick="authAction('signIn')" style="justify-content:center;">Sign In</button>
+            <button class="btn btn-primary" onclick="authAction('signUp')" style="justify-content:center;">Sign Up</button>
+          </div>
+        </div>
+
+        <!-- Logged In View -->
+        <div id="authLoggedIn" style="display:none; flex-direction:column; gap:14px; text-align:center; padding:10px 0;">
+          <div style="font-size:14px; color:var(--text);">Logged in as <strong id="loggedInUserEmail" style="color:var(--accent);">user@example.com</strong></div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <button class="btn btn-primary" onclick="triggerManualSync()" style="justify-content:center;">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" id="syncSpinner"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
+              Sync Data Now
+            </button>
+            <button class="btn btn-secondary" onclick="authAction('signOut')" style="justify-content:center;">Log Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── TOPICS DATA ───────────────────────────────────────────────────────────────
 const TOPICS = {
@@ -478,6 +597,12 @@ const FEEDBACK = {
 };
 const FILLER_WORDS = ["um","uh","like","you know","basically","literally","right","so","actually","kind of","sort of"];
 
+// ── SUPABASE STATE ────────────────────────────────────────────────────────────
+let supabaseClient = null;
+let supabaseUser = null;
+let activeModalTab = 'conn';
+let syncInProgress = false;
+
 // ── PRACTICE STATE ────────────────────────────────────────────────────────────
 let selectedDur=60,timerSec=60,timerMax=60,interval=null,isRunning=false;
 let currentTopic=null,currentCat=null,currentDiff=null;
@@ -492,20 +617,21 @@ let learnIdCounter=0;
 
 // ── LOCALSTORAGE ──────────────────────────────────────────────────────────────
 const LS_KEY = 'yaplab_learn_v3';
+const LS_BOOKMARKS = 'yaplab_bookmarks_v1';
+const LS_STATS = 'yaplab_stats_v1';
+const LS_HISTORY = 'yaplab_history_v1';
 
 function saveLearn() {
   try {
     const payload = JSON.stringify({ items: learnItems, counter: learnIdCounter, savedAt: Date.now() });
     localStorage.setItem(LS_KEY, payload);
   } catch(e) {
-    // storage full — try clearing old keys first
     try { localStorage.removeItem('yaplab_learn_v1'); localStorage.setItem(LS_KEY, JSON.stringify({ items: learnItems, counter: learnIdCounter })); } catch(e2) {}
   }
 }
 
 function loadLearn() {
   try {
-    // try current version first, fall back to v1
     const raw = localStorage.getItem(LS_KEY) || localStorage.getItem('yaplab_learn_v1');
     if (!raw) return;
     const data = JSON.parse(raw);
@@ -516,13 +642,71 @@ function loadLearn() {
         : (item.notes ? [{id:Date.now()+Math.random(),label:'Notes',placeholder:'',text:item.notes}] : [])
     }));
     learnIdCounter = data.counter || learnItems.length;
-    // immediately re-save under current key to lock it in
     saveLearn();
   } catch(e) { learnItems = []; }
 }
 
+function savePracticeLocal() {
+  try {
+    localStorage.setItem(LS_BOOKMARKS, JSON.stringify(bookmarks));
+    localStorage.setItem(LS_STATS, JSON.stringify({ reps, completed, bestSec }));
+    localStorage.setItem(LS_HISTORY, JSON.stringify(sessionHistory));
+  } catch(e) {}
+}
+
+function loadPracticeLocal() {
+  try {
+    const rawBookmarks = localStorage.getItem(LS_BOOKMARKS);
+    if (rawBookmarks) bookmarks = JSON.parse(rawBookmarks);
+
+    const rawStats = localStorage.getItem(LS_STATS);
+    if (rawStats) {
+      const stats = JSON.parse(rawStats);
+      reps = stats.reps || 0;
+      completed = stats.completed || 0;
+      bestSec = stats.bestSec || 0;
+    }
+
+    const rawHistory = localStorage.getItem(LS_HISTORY);
+    if (rawHistory) sessionHistory = JSON.parse(rawHistory);
+  } catch(e) {}
+}
+
+function updateStatsDisplay() {
+  document.getElementById('statReps').textContent = reps;
+  document.getElementById('statStreak').textContent = completed;
+  if (bestSec > 0) {
+    const bm = Math.floor(bestSec / 60), bs = bestSec % 60;
+    document.getElementById('statBest').textContent = bestSec >= 60 ? `${bm}m${String(bs).padStart(2, '0')}s` : `${bestSec}s`;
+  } else {
+    document.getElementById('statBest').textContent = '—';
+  }
+  updateUnlock();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  if (!sessionHistory.length) {
+    list.innerHTML = '<div class="history-empty">No sessions yet. Start your first rep.</div>';
+    return;
+  }
+  sessionHistory.forEach(h => {
+    const em = Math.floor(h.elapsed / 60), es = h.elapsed % 60;
+    const timeStr = h.elapsed >= 60 ? `${em}:${String(es).padStart(2, '0')}` : `0:${String(h.elapsed).padStart(2, '0')}`;
+    const fs = h.fillers !== undefined ? ` · ${h.fillers} fillers` : '';
+    const item = document.createElement('div');
+    item.className = 'history-item fadeIn';
+    item.innerHTML = `<span class="history-topic">${h.topic}</span><div class="history-right"><span class="history-filler">${fs}</span><span class="history-time">${timeStr}</span></div>`;
+    list.appendChild(item);
+  });
+}
+
 // save before the tab closes
-window.addEventListener('beforeunload', saveLearn);
+window.addEventListener('beforeunload', () => {
+  saveLearn();
+  savePracticeLocal();
+});
 
 // ── TAB SWITCHING ─────────────────────────────────────────────────────────────
 function switchTab(tab) {
@@ -612,6 +796,7 @@ function toggleBookmark(){
   const idx=bookmarks.findIndex(b=>b.t===currentTopic);
   if(idx>-1)bookmarks.splice(idx,1); else bookmarks.push({t:currentTopic,c:currentCat,d:currentDiff});
   updateBookmarkBtn(); renderBookmarks();
+  savePracticeLocal();
 }
 function updateBookmarkBtn(){
   const isSaved=bookmarks.some(b=>b.t===currentTopic);
@@ -647,7 +832,7 @@ function loadBookmark(i){
   document.getElementById('bookmarkBtn').style.display='flex';
   updateBookmarkBtn();
 }
-function removeBookmark(i){ bookmarks.splice(i,1); if(currentTopic)updateBookmarkBtn(); renderBookmarks(); }
+function removeBookmark(i){ bookmarks.splice(i,1); if(currentTopic)updateBookmarkBtn(); renderBookmarks(); savePracticeLocal(); }
 
 // ── FILLER ────────────────────────────────────────────────────────────────────
 function initFiller(){
@@ -772,8 +957,9 @@ function logSession(topic,elapsed){
   const item=document.createElement('div');item.className='history-item fadeIn';
   item.innerHTML=`<span class="history-topic">${topic}</span><div class="history-right"><span class="history-filler">${fs}</span><span class="history-time">${timeStr}</span></div>`;
   list.insertBefore(item,list.firstChild);
-  sessionHistory.unshift({topic,elapsed});
+  sessionHistory.unshift({topic,elapsed,fillers:tf});
   if(sessionHistory.length>10){list.removeChild(list.lastChild);sessionHistory.pop();}
+  savePracticeLocal();
 }
 
 // ── LEARN TAB ─────────────────────────────────────────────────────────────────
@@ -835,9 +1021,10 @@ function addLearnItem(){
   const input=document.getElementById('learnInput');
   const title=input.value.trim(); if(!title){input.focus();return;}
   const cat=document.getElementById('learnCatSelect').value;
-  learnItems.unshift({id:++learnIdCounter,title,category:cat,status:'unread',sections:[]});
+  learnItems.unshift({id:++learnIdCounter,title,category:cat,status:'unread',sections:[],updatedAt:Date.now()});
   input.value='';
   saveLearn(); renderLearnList(); updateLearnStats();
+  triggerCloudSave();
 }
 document.getElementById('learnInput').addEventListener('keydown',e=>{if(e.key==='Enter')addLearnItem();});
 
@@ -851,12 +1038,17 @@ function setLearnFilter(filter,btn){
 function cycleStatus(id){
   const item=learnItems.find(i=>i.id===id); if(!item)return;
   item.status={unread:'read',read:'ready',ready:'unread'}[item.status];
+  item.updatedAt=Date.now();
   saveLearn(); renderLearnList(); updateLearnStats();
+  triggerCloudSave();
 }
 
-function deleteLearnItem(id){
+async function deleteLearnItem(id){
   learnItems=learnItems.filter(i=>i.id!==id);
   saveLearn(); renderLearnList(); updateLearnStats();
+  if(supabaseClient && supabaseUser) {
+    try { await supabaseClient.from('learn_items').delete().eq('id', id); } catch(e) {}
+  }
 }
 
 function toggleScript(id){
@@ -882,31 +1074,39 @@ function addSection(itemId, labelOverride, placeholderOverride){
   if(!item.sections) item.sections=[];
   const idx=item.sections.length+1;
   item.sections.push({id:Date.now()+Math.random(),label:labelOverride||'Section '+idx,placeholder:placeholderOverride||'',text:''});
+  item.updatedAt=Date.now();
   saveLearn();
   renderScriptSections(itemId);
+  triggerCloudSave();
 }
 
-function deleteSection(itemId, secId){
+async function deleteSection(itemId, secId){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   item.sections=item.sections.filter(s=>s.id!==secId);
+  item.updatedAt=Date.now();
   saveLearn();
   renderScriptSections(itemId);
+  triggerCloudSave();
 }
 
 function updateSectionLabel(itemId, secId, value){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   const sec=item.sections.find(s=>s.id===secId); if(!sec)return;
   sec.label=value;
+  item.updatedAt=Date.now();
   saveLearn();
+  triggerCloudSave();
 }
 
 function updateSectionText(itemId, secId, value){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   const sec=item.sections.find(s=>s.id===secId); if(!sec)return;
   sec.text=value;
+  item.updatedAt=Date.now();
   saveLearn();
   updateSectionStats(itemId, secId, value);
   updateTotalBar(itemId);
+  triggerCloudSave();
 }
 
 function updateSectionStats(itemId, secId, text){
@@ -933,8 +1133,10 @@ function loadTemplate(itemId, tplKey){
     if(!confirm('This will replace your current sections. Continue?'))return;
   }
   item.sections=tpl.sections.map((s,idx)=>({id:Date.now()+idx,label:s.label,placeholder:s.placeholder,text:''}));
+  item.updatedAt=Date.now();
   saveLearn();
   renderScriptSections(itemId);
+  triggerCloudSave();
 }
 
 // ── DRAG TO REORDER ───────────────────────────────────────────────────────────
@@ -964,8 +1166,10 @@ function onDrop(e, itemId, secId){
   if(fromIdx<0||toIdx<0) return;
   const [moved]=item.sections.splice(fromIdx,1);
   item.sections.splice(toIdx,0,moved);
+  item.updatedAt=Date.now();
   saveLearn();
   renderScriptSections(itemId);
+  triggerCloudSave();
 }
 function onDragEnd(e){
   document.querySelectorAll('.script-section').forEach(el=>el.classList.remove('dragging','drag-over'));
@@ -1113,8 +1317,10 @@ function saveEditTitle(id){
   const inp=document.getElementById('title-input-'+id); if(!inp)return;
   const val=inp.value.trim();
   if(val) item.title=val;
+  item.updatedAt=Date.now();
   saveLearn();
   renderLearnList(); updateLearnStats();
+  triggerCloudSave();
 }
 
 function cancelEditTitle(id){
@@ -1167,13 +1373,467 @@ function toggleTheme(){
   applyTheme();
 }
 
+// ── SUPABASE SYSTEM & SYNC FUNCTIONS ───────────────────────────────────────────
+function openCloudModal() {
+  document.getElementById('cloudModal').classList.add('open');
+  const savedUrl = localStorage.getItem('yaplab_supabase_url') || '';
+  const savedKey = localStorage.getItem('yaplab_supabase_key') || '';
+  document.getElementById('dbUrl').value = savedUrl;
+  document.getElementById('dbKey').value = savedKey;
+  showModalStatus('', '');
+  updateCloudUI();
+}
+
+function closeCloudModal() {
+  document.getElementById('cloudModal').classList.remove('open');
+}
+
+function switchModalTab(tab) {
+  activeModalTab = tab;
+  document.getElementById('tabConnBtn').classList.toggle('active', tab === 'conn');
+  document.getElementById('tabAuthBtn').classList.toggle('active', tab === 'auth');
+  document.getElementById('panelConn').style.display = tab === 'conn' ? 'flex' : 'none';
+  document.getElementById('panelAuth').style.display = tab === 'auth' ? 'flex' : 'none';
+  showModalStatus('', '');
+}
+
+function showModalStatus(type, msg) {
+  const el = document.getElementById('modalStatus');
+  el.className = 'modal-status';
+  if (type) {
+    el.classList.add(type);
+    el.textContent = msg;
+  }
+}
+
+async function connectSupabase() {
+  const url = document.getElementById('dbUrl').value.trim();
+  const key = document.getElementById('dbKey').value.trim();
+
+  if (!url || !key) {
+    showModalStatus('error', 'Please fill in both the Supabase URL and Anon Key.');
+    return;
+  }
+
+  showModalStatus('info', 'Connecting to Supabase...');
+  try {
+    const client = supabase.createClient(url, key);
+    const { data, error } = await client.auth.getSession();
+    if (error) throw error;
+    
+    localStorage.setItem('yaplab_supabase_url', url);
+    localStorage.setItem('yaplab_supabase_key', key);
+    supabaseClient = client;
+    
+    showModalStatus('success', 'Connected successfully! You can now manage your account.');
+    updateCloudUI();
+    
+    setTimeout(() => {
+      switchModalTab('auth');
+    }, 1000);
+  } catch (e) {
+    console.error(e);
+    showModalStatus('error', 'Failed to connect: ' + e.message);
+    localStorage.removeItem('yaplab_supabase_url');
+    localStorage.removeItem('yaplab_supabase_key');
+    supabaseClient = null;
+    updateCloudUI();
+  }
+}
+
+function updateCloudUI() {
+  const btn = document.getElementById('cloudToggleBtn');
+  const dot = document.getElementById('cloudIndicatorDot');
+  const label = document.getElementById('cloudStatusLabel');
+  const authTabBtn = document.getElementById('tabAuthBtn');
+
+  if (!supabaseClient) {
+    dot.className = 'connection-dot offline';
+    label.textContent = 'Local-Only';
+    authTabBtn.disabled = true;
+    authTabBtn.style.opacity = '0.5';
+    authTabBtn.style.cursor = 'not-allowed';
+    document.getElementById('authLoggedOut').style.display = 'flex';
+    document.getElementById('authLoggedIn').style.display = 'none';
+  } else if (!supabaseUser) {
+    dot.className = 'connection-dot auth';
+    label.textContent = 'Offline Sync';
+    authTabBtn.disabled = false;
+    authTabBtn.style.opacity = '1';
+    authTabBtn.style.cursor = 'pointer';
+    document.getElementById('authLoggedOut').style.display = 'flex';
+    document.getElementById('authLoggedIn').style.display = 'none';
+  } else {
+    dot.className = 'connection-dot online';
+    label.textContent = supabaseUser.email.split('@')[0];
+    authTabBtn.disabled = false;
+    authTabBtn.style.opacity = '1';
+    authTabBtn.style.cursor = 'pointer';
+    document.getElementById('authLoggedOut').style.display = 'none';
+    document.getElementById('authLoggedIn').style.display = 'flex';
+    document.getElementById('loggedInUserEmail').textContent = supabaseUser.email;
+  }
+}
+
+async function authAction(action) {
+  if (!supabaseClient) return;
+  
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value.trim();
+
+  if (action !== 'signOut' && (!email || !password)) {
+    showModalStatus('error', 'Please enter your email and password.');
+    return;
+  }
+
+  showModalStatus('info', 'Processing...');
+  try {
+    if (action === 'signUp') {
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) throw error;
+      if (data.user && data.session) {
+        supabaseUser = data.user;
+        showModalStatus('success', 'Registered and signed in successfully!');
+        updateCloudUI();
+        await syncAllData();
+      } else {
+        showModalStatus('success', 'Registration successful! Please check your email for a confirmation link.');
+      }
+    } else if (action === 'signIn') {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      supabaseUser = data.user;
+      showModalStatus('success', 'Signed in successfully!');
+      updateCloudUI();
+      await syncAllData();
+    } else if (action === 'signOut') {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+      supabaseUser = null;
+      showModalStatus('success', 'Logged out successfully.');
+      updateCloudUI();
+      
+      // Load local data again
+      loadLearn();
+      loadPracticeLocal();
+      renderBookmarks();
+      renderHistory();
+      updateStatsDisplay();
+      renderLearnList();
+      updateLearnStats();
+    }
+  } catch (e) {
+    console.error(e);
+    showModalStatus('error', e.message);
+  }
+}
+
+async function triggerManualSync() {
+  if (syncInProgress) return;
+  const spinner = document.getElementById('syncSpinner');
+  spinner.classList.add('spinning');
+  showModalStatus('info', 'Syncing data with cloud...');
+  try {
+    await syncAllData();
+    showModalStatus('success', 'All data synced successfully!');
+  } catch (e) {
+    console.error(e);
+    showModalStatus('error', 'Sync failed: ' + e.message);
+  } finally {
+    spinner.classList.remove('spinning');
+  }
+}
+
+async function initSupabaseAtStartup() {
+  const url = localStorage.getItem('yaplab_supabase_url');
+  const key = localStorage.getItem('yaplab_supabase_key');
+  if (url && key) {
+    try {
+      supabaseClient = supabase.createClient(url, key);
+      const { data } = await supabaseClient.auth.getSession();
+      if (data && data.session) {
+        supabaseUser = data.session.user;
+        await syncAllData();
+      }
+      updateCloudUI();
+    } catch(e) {
+      console.error('Failed to initialize Supabase client:', e);
+      supabaseClient = null;
+      updateCloudUI();
+    }
+  } else {
+    updateCloudUI();
+  }
+}
+
+let cloudSaveTimeout = null;
+function triggerCloudSave() {
+  if (supabaseClient && supabaseUser) {
+    clearTimeout(cloudSaveTimeout);
+    cloudSaveTimeout = setTimeout(() => {
+      syncLearnItems().catch(err => console.error('Auto-sync failed:', err));
+    }, 1500);
+  }
+}
+
+async function syncAllData() {
+  if (!supabaseClient || !supabaseUser) return;
+  syncInProgress = true;
+  try {
+    await Promise.all([
+      syncLearnItems(),
+      syncBookmarks(),
+      syncStats(),
+      syncHistory()
+    ]);
+  } finally {
+    syncInProgress = false;
+  }
+}
+
+async function syncLearnItems() {
+  if (!supabaseClient || !supabaseUser) return;
+  const { data: remoteItems, error } = await supabaseClient.from('learn_items').select('*');
+  if (error) throw error;
+
+  let localItems = [...learnItems];
+  let mergedItems = [];
+  let itemsToUpdateRemote = [];
+  let itemsToInsertRemote = [];
+
+  const remoteMap = new Map();
+  remoteItems.forEach(item => {
+    remoteMap.set(item.title.toLowerCase().trim(), item);
+  });
+
+  localItems.forEach(local => {
+    const key = local.title.toLowerCase().trim();
+    const remote = remoteMap.get(key);
+
+    if (remote) {
+      const localTime = local.updatedAt ? new Date(local.updatedAt).getTime() : 0;
+      const remoteTime = remote.updated_at ? new Date(remote.updated_at).getTime() : 0;
+
+      if (localTime >= remoteTime) {
+        local.id = remote.id; 
+        mergedItems.push(local);
+        itemsToUpdateRemote.push(local);
+      } else {
+        mergedItems.push({
+          id: remote.id,
+          title: remote.title,
+          category: remote.category,
+          status: remote.status,
+          sections: remote.sections || [],
+          updatedAt: remoteTime
+        });
+      }
+      remoteMap.delete(key);
+    } else {
+      itemsToInsertRemote.push(local);
+    }
+  });
+
+  remoteMap.forEach(remote => {
+    mergedItems.push({
+      id: remote.id,
+      title: remote.title,
+      category: remote.category,
+      status: remote.status,
+      sections: remote.sections || [],
+      updatedAt: remote.updated_at ? new Date(remote.updated_at).getTime() : Date.now()
+    });
+  });
+
+  for (let local of itemsToInsertRemote) {
+    const { data, error: insErr } = await supabaseClient
+      .from('learn_items')
+      .insert({
+        user_id: supabaseUser.id,
+        title: local.title,
+        category: local.category,
+        status: local.status,
+        sections: local.sections,
+        updated_at: local.updatedAt ? new Date(local.updatedAt).toISOString() : new Date().toISOString()
+      })
+      .select();
+    
+    if (insErr) console.error('Error inserting remote item:', insErr);
+    if (data && data[0]) {
+      local.id = data[0].id;
+      mergedItems = mergedItems.map(item => item.title === local.title ? { ...item, id: data[0].id } : item);
+    }
+  }
+
+  for (let local of itemsToUpdateRemote) {
+    const { error: updErr } = await supabaseClient
+      .from('learn_items')
+      .update({
+        category: local.category,
+        status: local.status,
+        sections: local.sections,
+        updated_at: local.updatedAt ? new Date(local.updatedAt).toISOString() : new Date().toISOString()
+      })
+      .eq('id', local.id);
+    
+    if (updErr) console.error('Error updating remote item:', updErr);
+  }
+
+  learnItems = mergedItems;
+  const maxId = learnItems.reduce((max, item) => item.id > max ? item.id : max, 0);
+  learnIdCounter = Math.max(learnIdCounter, maxId);
+
+  saveLearn();
+  renderLearnList();
+  updateLearnStats();
+}
+
+async function syncBookmarks() {
+  if (!supabaseClient || !supabaseUser) return;
+  const { data: remoteBookmarks, error } = await supabaseClient.from('bookmarks').select('*');
+  if (error) throw error;
+
+  const remoteMap = new Map();
+  remoteBookmarks.forEach(b => remoteMap.set(b.topic.toLowerCase().trim(), b));
+
+  let mergedBookmarks = [...bookmarks];
+  let itemsToInsert = [];
+
+  mergedBookmarks.forEach(local => {
+    const key = local.t.toLowerCase().trim();
+    if (remoteMap.has(key)) {
+      remoteMap.delete(key);
+    } else {
+      itemsToInsert.push(local);
+    }
+  });
+
+  remoteMap.forEach(remote => {
+    mergedBookmarks.push({
+      t: remote.topic,
+      c: remote.category,
+      d: remote.difficulty
+    });
+  });
+
+  for (let local of itemsToInsert) {
+    await supabaseClient
+      .from('bookmarks')
+      .insert({
+        user_id: supabaseUser.id,
+        topic: local.t,
+        category: local.c,
+        difficulty: local.d
+      });
+  }
+
+  bookmarks = mergedBookmarks;
+  savePracticeLocal();
+  renderBookmarks();
+}
+
+async function syncStats() {
+  if (!supabaseClient || !supabaseUser) return;
+  const { data: remote, error } = await supabaseClient
+    .from('practice_stats')
+    .select('*')
+    .eq('user_id', supabaseUser.id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (remote) {
+    reps = Math.max(reps, remote.reps);
+    completed = Math.max(completed, remote.completed);
+    bestSec = Math.max(bestSec, remote.best_sec);
+  }
+
+  savePracticeLocal();
+  updateStatsDisplay();
+
+  await supabaseClient
+    .from('practice_stats')
+    .upsert({
+      user_id: supabaseUser.id,
+      reps: reps,
+      completed: completed,
+      best_sec: bestSec,
+      updated_at: new Date().toISOString()
+    });
+}
+
+async function syncHistory() {
+  if (!supabaseClient || !supabaseUser) return;
+  const { data: remote, error } = await supabaseClient
+    .from('session_history')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (error) throw error;
+
+  const historyMap = new Map();
+  sessionHistory.forEach(h => {
+    historyMap.set(h.topic + '-' + h.elapsed, {
+      topic: h.topic,
+      elapsed: h.elapsed,
+      fillers: h.fillers,
+      createdAt: h.createdAt || Date.now()
+    });
+  });
+
+  remote.forEach(r => {
+    const key = r.topic + '-' + r.elapsed_seconds;
+    const time = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+    if (!historyMap.has(key)) {
+      historyMap.set(key, {
+        topic: r.topic,
+        elapsed: r.elapsed_seconds,
+        fillers: undefined,
+        createdAt: time
+      });
+    }
+  });
+
+  const merged = Array.from(historyMap.values())
+    .sort((a,b) => b.createdAt - a.createdAt)
+    .slice(0, 10);
+
+  const remoteKeys = new Set(remote.map(r => r.topic + '-' + r.elapsed_seconds));
+  for (let local of sessionHistory) {
+    const key = local.topic + '-' + local.elapsed;
+    if (!remoteKeys.has(key)) {
+      try {
+        await supabaseClient
+          .from('session_history')
+          .insert({
+            user_id: supabaseUser.id,
+            topic: local.topic,
+            elapsed_seconds: local.elapsed,
+            created_at: local.createdAt ? new Date(local.createdAt).toISOString() : new Date().toISOString()
+          });
+      } catch (e) {
+        console.error('Error syncing history item to Supabase:', e);
+      }
+    }
+  }
+
+  sessionHistory = merged;
+  savePracticeLocal();
+  renderHistory();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   applyTheme();
   loadLearn();
+  loadPracticeLocal();
+  initSupabaseAtStartup();
   updateDisplay();
   initFiller();
   renderBookmarks();
+  renderHistory();
+  updateStatsDisplay();
   renderLearnList();
   updateLearnStats();
 });
