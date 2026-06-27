@@ -706,6 +706,7 @@ let recognition=null,micAllowed=false,fillerCounts={},lastFillerCounts={};
 let learnItems=[];
 let learnFilter='all';
 let learnIdCounter=0;
+let openScriptIds = new Set();
 
 // ── LOCALSTORAGE ──────────────────────────────────────────────────────────────
 const LS_KEY = 'yaplab_learn_v3';
@@ -1251,9 +1252,17 @@ async function deleteLearnItem(id){
 
 function toggleScript(id){
   const area=document.getElementById('script-area-'+id); if(!area)return;
-  area.classList.toggle('open');
-  const tog=document.getElementById('script-toggle-'+id);
-  if(tog)tog.textContent=area.classList.contains('open')?'▲ Hide script':'▼ Write script';
+  const opening = !area.classList.contains('open');
+  if (opening) {
+    area.classList.add('open');
+    openScriptIds.add(id);
+    const tog=document.getElementById('script-toggle-'+id);
+    if(tog) tog.textContent='▲ Hide script';
+  } else {
+    area.classList.remove('open');
+    openScriptIds.delete(id);
+    renderLearnList();
+  }
 }
 
 function esc(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1422,6 +1431,7 @@ function renderScriptSections(itemId){
 }
 
 function renderLearnList(){
+  learnItems.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
   const list=document.getElementById('learnList');
   const filtered=learnFilter==='all'?learnItems:learnItems.filter(i=>i.status===learnFilter);
   if(!filtered.length){
@@ -1434,6 +1444,7 @@ function renderLearnList(){
   filtered.forEach(item=>{
     if(!item.sections) item.sections=[];
     const hasScript=item.sections.length>0;
+    const isOpen=openScriptIds.has(item.id);
     const totalWc=item.sections.reduce((a,s)=>a+wordCount(s.text),0);
     const div=document.createElement('div'); div.className='learn-item fadeIn';
     div.innerHTML=`
@@ -1452,9 +1463,9 @@ function renderLearnList(){
       <div class="learn-item-meta">
         <span class="learn-cat-pill">${CAT_LABELS[item.category]||item.category}</span>
         ${hasScript?`<span style="font-size:10px;color:var(--accent);font-weight:600;">${item.sections.length} sections · ${totalWc>0?'~'+formatDur(totalWc):'0 words'}</span>`:''}
-        <button class="notes-toggle" id="script-toggle-${item.id}" onclick="toggleScript(${item.id})">${hasScript?'▼ View script':'▼ Write script'}</button>
+        <button class="notes-toggle" id="script-toggle-${item.id}" onclick="toggleScript(${item.id})">${isOpen ? '▲ Hide script' : (hasScript ? '▼ View script' : '▼ Write script')}</button>
       </div>
-      <div class="notes-area" id="script-area-${item.id}">
+      <div class="notes-area ${isOpen ? 'open' : ''}" id="script-area-${item.id}">
         <div class="script-toolbar">
           <span class="script-toolbar-label">Template:</span>
           ${Object.entries(TEMPLATES).map(([k,t])=>`<button class="template-btn" onclick="loadTemplate(${item.id},'${k}')">${t.label}</button>`).join('')}
@@ -1748,7 +1759,7 @@ async function syncLearnItems() {
   const { data: remoteItems, error } = await supabaseClient
     .from('learn_items')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('updated_at', { ascending: false });
   if (error) throw error;
 
   learnItems = remoteItems.map(remote => ({
