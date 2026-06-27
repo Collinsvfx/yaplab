@@ -564,8 +564,8 @@ const FEEDBACK = {
 const FILLER_WORDS = ["um","uh","like","you know","basically","literally","right","so","actually","kind of","sort of"];
 
 // ── SUPABASE STATE ────────────────────────────────────────────────────────────
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "INJECT_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "INJECT_SUPABASE_ANON_KEY";
 let supabaseClient = null;
 let supabaseUser = null;
 let activeAuthWallTab = 'signIn';
@@ -1405,11 +1405,11 @@ async function transitionToApp() {
 }
 
 async function initSupabaseAtStartup() {
-  if (SUPABASE_URL === "YOUR_SUPABASE_URL" || SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY" || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  if (SUPABASE_URL === "INJECT_SUPABASE_URL" || SUPABASE_ANON_KEY === "INJECT_SUPABASE_ANON_KEY" || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
     document.getElementById('authWall').style.display = 'flex';
     document.querySelector('.main').style.display = 'none';
     document.getElementById('userHeaderInfo').style.display = 'none';
-    showAuthWallStatus('error', 'Please configure your SUPABASE_URL and SUPABASE_ANON_KEY at the top of the script tag in index.html to deploy.');
+    showAuthWallStatus('error', 'Please configure your SUPABASE_URL and SUPABASE_ANON_KEY environment variables on Vercel to deploy.');
     return;
   }
 
