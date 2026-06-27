@@ -6,7 +6,7 @@
 <title>YapLab — Speech Practice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,14 +25,14 @@
     --tab-active-text: #ffffff;
   }
   /* theme toggle */
-  .theme-toggle { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; color:var(--muted); display:flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; font-size:12px; font-weight:500; transition:all 0.15s; flex-shrink:0; }
+  .theme-toggle { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; color:var(--muted); display:flex; align-items:center; gap:6px; font-family:'Plus Jakarta Sans',sans-serif; font-size:12px; font-weight:500; transition:all 0.15s; flex-shrink:0; }
   .theme-toggle:hover { border-color:var(--accent); color:var(--text); }
-  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:15px; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:32px 16px 64px; }
+  body { background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans',sans-serif; font-size:15px; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:32px 16px 120px; }
   .header { width:100%; max-width:720px; display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:14px; }
   .wordmark { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; letter-spacing:-0.5px; color:var(--text); }
   .wordmark span { color:var(--accent); }
   .tab-nav { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:4px; }
-  .tab-btn { font-family:'Inter',sans-serif; font-size:13px; font-weight:500; padding:6px 18px; border-radius:7px; border:none; cursor:pointer; color:var(--muted); background:transparent; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
+  .tab-btn { font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:500; padding:6px 18px; border-radius:7px; border:none; cursor:pointer; color:var(--muted); background:transparent; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
   .tab-btn:hover { color:var(--text); }
   .tab-btn.active { background:var(--accent); color:var(--tab-active-text); font-weight:600; }
   .main { width:100%; max-width:720px; display:flex; flex-direction:column; gap:20px; }
@@ -183,13 +183,37 @@
   .learn-stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
 
   .add-item-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; }
-  .add-row { display:flex; gap:10px; flex-wrap:wrap; }
-  .add-input { flex:1; min-width:180px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; font-family:'Inter',sans-serif; font-size:14px; color:var(--text); outline:none; transition:border-color 0.15s; }
+  .add-row { display:flex; gap:10px; flex-wrap:wrap; width: 100%; }
+  .add-row > * { height: 40px; }
+  .add-input { flex:2; min-width:180px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; color:var(--text); outline:none; transition:border-color 0.15s; }
   .add-input:focus { border-color:var(--accent); }
   .add-input::placeholder { color:var(--muted); }
-  .add-select { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 12px; font-family:'Inter',sans-serif; font-size:13px; color:var(--text); outline:none; cursor:pointer; transition:border-color 0.15s; }
-  .add-select:focus { border-color:var(--accent); }
-  .add-select option { background:var(--surface2); }
+  
+  .add-select {
+    flex: 1; min-width: 120px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--surface2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23777777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>") no-repeat right 12px center;
+    background-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 36px 9px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .add-select:focus {
+    border-color: var(--accent);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23c8f135' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  }
+  :root.light .add-select:focus {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%237ab800' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  }
+  .add-select option { background:var(--surface); color:var(--text); }
+  .add-row .btn-primary { flex: 1.2; min-width: 120px; justify-content: center; font-size: 13px; font-weight: 600; padding: 0 20px; }
 
   .learn-list-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
   .learn-list-header { padding:18px 24px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -259,7 +283,7 @@
   /* title editing */
   .learn-item-title-wrap { flex:1; display:flex; align-items:center; gap:6px; min-width:0; }
   .learn-item-title { font-size:14px; font-weight:500; color:var(--text); flex:1; line-height:1.4; word-break:break-word; }
-  .title-edit-input { flex:1; background:var(--surface2); border:1px solid var(--accent); border-radius:6px; padding:4px 8px; font-family:'Inter',sans-serif; font-size:14px; font-weight:500; color:var(--text); outline:none; min-width:0; }
+  .title-edit-input { flex:1; background:var(--surface2); border:1px solid var(--accent); border-radius:6px; padding:4px 8px; font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:500; color:var(--text); outline:none; min-width:0; }
   .title-edit-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:2px 4px; display:flex; align-items:center; flex-shrink:0; transition:color 0.15s; }
   .title-edit-btn:hover { color:var(--accent); }
 
@@ -289,7 +313,7 @@
   .modal-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
   .modal-input {
     background:var(--surface2); border:1px solid var(--border); border-radius:8px;
-    padding:8px 12px; font-family:'Inter',sans-serif; font-size:13px; color:var(--text);
+    padding:8px 12px; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; color:var(--text);
     outline:none; transition:border-color 0.15s;
   }
   .modal-input:focus { border-color:var(--accent); }
@@ -316,35 +340,44 @@
     .stats-row { grid-template-columns:1fr 1fr; }
     .header { flex-wrap:wrap; gap:12px; }
   }
+
+  /* Bottom Nav Styling */
+  .bottom-nav {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    width: calc(100% - 32px); max-width: 480px;
+    background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(16px);
+    border: 1px solid var(--border); border-radius: 20px;
+    display: flex; justify-content: space-around; padding: 8px 12px;
+    z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+  }
+  :root.light .bottom-nav {
+    background: rgba(255, 255, 255, 0.85);
+  }
+  .bottom-nav-item {
+    background: transparent; border: none; outline: none;
+    color: var(--muted); padding: 8px 16px; border-radius: 12px;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 500;
+    transition: all 0.2s ease; flex: 1;
+  }
+  .bottom-nav-item:hover { color: var(--text); }
+  .bottom-nav-item.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .bottom-nav-item svg {
+    transition: transform 0.2s ease;
+  }
+  .bottom-nav-item.active svg {
+    transform: scale(1.15);
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="wordmark">Yap<span>Lab</span></div>
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <div id="userHeaderInfo" style="display:none; align-items:center; gap:8px;">
-      <span id="userHeaderEmail" style="font-size:12px; color:var(--muted); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
-      <button class="theme-toggle" onclick="authAction('signOut')">
-        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        Log Out
-      </button>
-    </div>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
-      <svg id="themeIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <span id="themeLabel">Light</span>
-    </button>
-    <div class="tab-nav">
-      <button class="tab-btn active" id="tabPracticeBtn" onclick="switchTab('practice')">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        Practice
-      </button>
-      <button class="tab-btn" id="tabLearnBtn" onclick="switchTab('learn')">
-        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        Learn
-      </button>
-    </div>
-  </div>
+<div class="header" style="justify-content:center;">
+  <div class="wordmark" style="font-size:28px;">Yap<span>Lab</span></div>
 </div>
 
 <div class="main">
@@ -482,7 +515,7 @@
           <option value="impromptu">Impromptu</option>
           <option value="other">Other</option>
         </select>
-        <button class="btn btn-primary" onclick="addLearnItem()" style="padding:9px 18px;font-size:13px;">
+        <button class="btn btn-primary" onclick="addLearnItem()">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add
         </button>
       </div>
@@ -500,6 +533,32 @@
       </div>
       <div class="learn-list" id="learnList">
         <div class="learn-empty"><strong>Nothing here yet</strong>Add a topic above to start your reading list.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div class="tab-panel" id="panelSettings">
+    <div class="add-item-card" style="gap: 16px; align-items: center; text-align: center; padding: 32px 24px;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--accent-dim); display: flex; align-items: center; justify-content: center; color: var(--accent); margin-bottom: 8px;">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
+      </div>
+      <div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--text);">Account Details</div>
+        <div id="settingsUserEmail" style="font-size: 14px; color: var(--muted); margin-top: 4px;">user@example.com</div>
+      </div>
+      
+      <hr style="width: 100%; border: none; border-top: 1px solid var(--border); margin: 8px 0;">
+      
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-secondary" id="settingsThemeToggle" onclick="toggleTheme()" style="justify-content: center; width: 100%;">
+          <svg id="settingsThemeIcon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span id="settingsThemeLabel">Light Mode</span>
+        </button>
+        <button class="btn btn-primary" onclick="authAction('signOut')" style="justify-content: center; width: 100%; background: var(--danger); border-color: var(--danger); color: #fff;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Log Out
+        </button>
       </div>
     </div>
   </div>
@@ -534,6 +593,22 @@
       <button class="btn btn-primary" id="authWallSubmitBtn" onclick="submitAuthWall()" style="justify-content:center; margin-top:10px; font-weight:600;">Sign In</button>
     </div>
   </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav" id="bottomNav" style="display: none;">
+  <button class="bottom-nav-item active" id="btnNavPractice" onclick="switchTab('practice')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span>Practice</span>
+  </button>
+  <button class="bottom-nav-item" id="btnNavLearn" onclick="switchTab('learn')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    <span>Learn</span>
+  </button>
+  <button class="bottom-nav-item" id="btnNavSettings" onclick="switchTab('settings')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Settings</span>
+  </button>
 </div>
 
 <script>
@@ -632,10 +707,14 @@ window.addEventListener('beforeunload', () => {
 // ── TAB SWITCHING ─────────────────────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   const name = tab.charAt(0).toUpperCase()+tab.slice(1);
   document.getElementById('panel'+name).classList.add('active');
-  document.getElementById('tab'+name+'Btn').classList.add('active');
+
+  // Update bottom nav active classes
+  document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+  if (tab === 'practice') document.getElementById('btnNavPractice').classList.add('active');
+  if (tab === 'learn') document.getElementById('btnNavLearn').classList.add('active');
+  if (tab === 'settings') document.getElementById('btnNavSettings').classList.add('active');
 }
 
 // ── DIFFICULTY FILTER ─────────────────────────────────────────────────────────
@@ -712,12 +791,37 @@ function newTopic(){
 }
 
 // ── BOOKMARKS ─────────────────────────────────────────────────────────────────
-function toggleBookmark(){
+async function toggleBookmark(){
   if(!currentTopic)return;
   const idx=bookmarks.findIndex(b=>b.t===currentTopic);
-  if(idx>-1)bookmarks.splice(idx,1); else bookmarks.push({t:currentTopic,c:currentCat,d:currentDiff});
-  updateBookmarkBtn(); renderBookmarks();
-  savePracticeLocal();
+  if(supabaseClient && supabaseUser) {
+    try {
+      if (idx>-1) {
+        const { error } = await supabaseClient
+          .from('bookmarks')
+          .delete()
+          .eq('user_id', supabaseUser.id)
+          .eq('topic', currentTopic);
+        if (error) throw error;
+        bookmarks.splice(idx,1);
+      } else {
+        const { error } = await supabaseClient
+          .from('bookmarks')
+          .insert({
+            user_id: supabaseUser.id,
+            topic: currentTopic,
+            category: currentCat,
+            difficulty: currentDiff
+          });
+        if (error) throw error;
+        bookmarks.push({t:currentTopic,c:currentCat,d:currentDiff});
+      }
+      updateBookmarkBtn();
+      renderBookmarks();
+    } catch (e) {
+      console.error('Failed to toggle bookmark:', e);
+    }
+  }
 }
 function updateBookmarkBtn(){
   const isSaved=bookmarks.some(b=>b.t===currentTopic);
@@ -753,7 +857,24 @@ function loadBookmark(i){
   document.getElementById('bookmarkBtn').style.display='flex';
   updateBookmarkBtn();
 }
-function removeBookmark(i){ bookmarks.splice(i,1); if(currentTopic)updateBookmarkBtn(); renderBookmarks(); savePracticeLocal(); }
+async function removeBookmark(i){
+  const b=bookmarks[i]; if(!b)return;
+  if(supabaseClient && supabaseUser){
+    try {
+      const { error } = await supabaseClient
+        .from('bookmarks')
+        .delete()
+        .eq('user_id', supabaseUser.id)
+        .eq('topic', b.t);
+      if(error) throw error;
+      bookmarks.splice(i,1);
+      if(currentTopic)updateBookmarkBtn();
+      renderBookmarks();
+    } catch(e) {
+      console.error(e);
+    }
+  }
+}
 
 // ── FILLER ────────────────────────────────────────────────────────────────────
 function initFiller(){
@@ -861,7 +982,7 @@ function showFeedback(isComplete,sec){
   else note.classList.remove('show');
   document.getElementById('feedbackWrap').classList.add('show');
 }
-function logSession(topic,elapsed){
+async function logSession(topic,elapsed){
   if(elapsed<3)return;
   reps++;const done=elapsed>=timerMax;if(done)completed++;if(elapsed>bestSec)bestSec=elapsed;
   document.getElementById('statReps').textContent=reps;
@@ -880,7 +1001,31 @@ function logSession(topic,elapsed){
   list.insertBefore(item,list.firstChild);
   sessionHistory.unshift({topic,elapsed,fillers:tf});
   if(sessionHistory.length>10){list.removeChild(list.lastChild);sessionHistory.pop();}
-  savePracticeLocal();
+  
+  if (supabaseClient && supabaseUser) {
+    try {
+      await Promise.all([
+        supabaseClient
+          .from('practice_stats')
+          .upsert({
+            user_id: supabaseUser.id,
+            reps: reps,
+            completed: completed,
+            best_sec: bestSec,
+            updated_at: new Date().toISOString()
+          }),
+        supabaseClient
+          .from('session_history')
+          .insert({
+            user_id: supabaseUser.id,
+            topic: topic,
+            elapsed_seconds: elapsed
+          })
+      ]);
+    } catch(e) {
+      console.error('Failed to save session to database:', e);
+    }
+  }
 }
 
 // ── LEARN TAB ─────────────────────────────────────────────────────────────────
@@ -938,14 +1083,71 @@ const TEMPLATES = {
   }
 };
 
-function addLearnItem(){
+let scriptSaveTimeout = null;
+function triggerScriptSave(itemId) {
+  clearTimeout(scriptSaveTimeout);
+  scriptSaveTimeout = setTimeout(() => {
+    saveSectionsToSupabase(itemId);
+  }, 1000);
+}
+
+async function saveSectionsToSupabase(itemId) {
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  if (supabaseClient && supabaseUser) {
+    try {
+      const { error } = await supabaseClient
+        .from('learn_items')
+        .update({
+          sections: item.sections,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', itemId);
+      if (error) throw error;
+    } catch(e) {
+      console.error('Failed to save script:', e);
+    }
+  }
+}
+
+async function addLearnItem(){
   const input=document.getElementById('learnInput');
   const title=input.value.trim(); if(!title){input.focus();return;}
   const cat=document.getElementById('learnCatSelect').value;
-  learnItems.unshift({id:++learnIdCounter,title,category:cat,status:'unread',sections:[],updatedAt:Date.now()});
-  input.value='';
-  saveLearn(); renderLearnList(); updateLearnStats();
-  triggerCloudSave();
+  input.disabled = true;
+  
+  if (supabaseClient && supabaseUser) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('learn_items')
+        .insert({
+          user_id: supabaseUser.id,
+          title,
+          category: cat,
+          status: 'unread',
+          sections: [],
+          updated_at: new Date().toISOString()
+        })
+        .select();
+      if (error) throw error;
+      if (data && data[0]) {
+        learnItems.unshift({
+          id: data[0].id,
+          title: data[0].title,
+          category: data[0].category,
+          status: data[0].status,
+          sections: data[0].sections || [],
+          updatedAt: new Date(data[0].updated_at).getTime()
+        });
+        renderLearnList();
+        updateLearnStats();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      input.disabled = false;
+      input.value = '';
+    }
+  }
 }
 document.getElementById('learnInput').addEventListener('keydown',e=>{if(e.key==='Enter')addLearnItem();});
 
@@ -956,19 +1158,44 @@ function setLearnFilter(filter,btn){
   renderLearnList();
 }
 
-function cycleStatus(id){
+async function cycleStatus(id){
   const item=learnItems.find(i=>i.id===id); if(!item)return;
-  item.status={unread:'read',read:'ready',ready:'unread'}[item.status];
-  item.updatedAt=Date.now();
-  saveLearn(); renderLearnList(); updateLearnStats();
-  triggerCloudSave();
+  const nextStatus = {unread:'read',read:'ready',ready:'unread'}[item.status];
+  
+  if (supabaseClient && supabaseUser) {
+    try {
+      const { error } = await supabaseClient
+        .from('learn_items')
+        .update({
+          status: nextStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      if (error) throw error;
+      item.status = nextStatus;
+      item.updatedAt = Date.now();
+      renderLearnList();
+      updateLearnStats();
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }
 
 async function deleteLearnItem(id){
-  learnItems=learnItems.filter(i=>i.id!==id);
-  saveLearn(); renderLearnList(); updateLearnStats();
-  if(supabaseClient && supabaseUser) {
-    try { await supabaseClient.from('learn_items').delete().eq('id', id); } catch(e) {}
+  if (supabaseClient && supabaseUser) {
+    try {
+      const { error } = await supabaseClient
+        .from('learn_items')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      learnItems=learnItems.filter(i=>i.id!==id);
+      renderLearnList();
+      updateLearnStats();
+    } catch(e) {
+      console.error(e);
+    }
   }
 }
 
@@ -990,24 +1217,22 @@ function formatDur(words){
   return s>0?`${m}m ${s}s`:`${m}m`;
 }
 
-function addSection(itemId, labelOverride, placeholderOverride){
+async function addSection(itemId, labelOverride, placeholderOverride){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   if(!item.sections) item.sections=[];
   const idx=item.sections.length+1;
   item.sections.push({id:Date.now()+Math.random(),label:labelOverride||'Section '+idx,placeholder:placeholderOverride||'',text:''});
   item.updatedAt=Date.now();
-  saveLearn();
   renderScriptSections(itemId);
-  triggerCloudSave();
+  await saveSectionsToSupabase(itemId);
 }
 
 async function deleteSection(itemId, secId){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   item.sections=item.sections.filter(s=>s.id!==secId);
   item.updatedAt=Date.now();
-  saveLearn();
   renderScriptSections(itemId);
-  triggerCloudSave();
+  await saveSectionsToSupabase(itemId);
 }
 
 function updateSectionLabel(itemId, secId, value){
@@ -1015,8 +1240,7 @@ function updateSectionLabel(itemId, secId, value){
   const sec=item.sections.find(s=>s.id===secId); if(!sec)return;
   sec.label=value;
   item.updatedAt=Date.now();
-  saveLearn();
-  triggerCloudSave();
+  triggerScriptSave(itemId);
 }
 
 function updateSectionText(itemId, secId, value){
@@ -1024,10 +1248,9 @@ function updateSectionText(itemId, secId, value){
   const sec=item.sections.find(s=>s.id===secId); if(!sec)return;
   sec.text=value;
   item.updatedAt=Date.now();
-  saveLearn();
   updateSectionStats(itemId, secId, value);
   updateTotalBar(itemId);
-  triggerCloudSave();
+  triggerScriptSave(itemId);
 }
 
 function updateSectionStats(itemId, secId, text){
@@ -1047,7 +1270,7 @@ function updateTotalBar(itemId){
   if(tdurEl) tdurEl.textContent=totalWc>0?'~'+formatDur(totalWc):'—';
 }
 
-function loadTemplate(itemId, tplKey){
+async function loadTemplate(itemId, tplKey){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   const tpl=TEMPLATES[tplKey]; if(!tpl)return;
   if(item.sections&&item.sections.length>0){
@@ -1055,9 +1278,8 @@ function loadTemplate(itemId, tplKey){
   }
   item.sections=tpl.sections.map((s,idx)=>({id:Date.now()+idx,label:s.label,placeholder:s.placeholder,text:''}));
   item.updatedAt=Date.now();
-  saveLearn();
   renderScriptSections(itemId);
-  triggerCloudSave();
+  await saveSectionsToSupabase(itemId);
 }
 
 // ── DRAG TO REORDER ───────────────────────────────────────────────────────────
@@ -1077,7 +1299,7 @@ function onDragOver(e, itemId, secId){
   e.currentTarget.classList.add('drag-over');
 }
 function onDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
-function onDrop(e, itemId, secId){
+async function onDrop(e, itemId, secId){
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
   if(secId===dragSrcSecId||itemId!==dragSrcItemId) return;
@@ -1088,9 +1310,8 @@ function onDrop(e, itemId, secId){
   const [moved]=item.sections.splice(fromIdx,1);
   item.sections.splice(toIdx,0,moved);
   item.updatedAt=Date.now();
-  saveLearn();
   renderScriptSections(itemId);
-  triggerCloudSave();
+  await saveSectionsToSupabase(itemId);
 }
 function onDragEnd(e){
   document.querySelectorAll('.script-section').forEach(el=>el.classList.remove('dragging','drag-over'));
@@ -1233,15 +1454,29 @@ function startEditTitle(id){
   });
 }
 
-function saveEditTitle(id){
+async function saveEditTitle(id){
   const item=learnItems.find(i=>i.id===id); if(!item)return;
   const inp=document.getElementById('title-input-'+id); if(!inp)return;
   const val=inp.value.trim();
-  if(val) item.title=val;
-  item.updatedAt=Date.now();
-  saveLearn();
-  renderLearnList(); updateLearnStats();
-  triggerCloudSave();
+  if(!val) return;
+  
+  if (supabaseClient && supabaseUser) {
+    try {
+      const { error } = await supabaseClient
+        .from('learn_items')
+        .update({
+          title: val,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      if (error) throw error;
+      item.title = val;
+      item.updatedAt = Date.now();
+      renderLearnList(); updateLearnStats();
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }
 
 function cancelEditTitle(id){
@@ -1259,12 +1494,12 @@ const THEME_KEY='yaplab_theme';
 let isLight = localStorage.getItem(THEME_KEY)==='light';
 
 function applyTheme(){
-  const icon = document.getElementById('themeIcon');
-  const label = document.getElementById('themeLabel');
+  const icon = document.getElementById('settingsThemeIcon');
+  const label = document.getElementById('settingsThemeLabel');
   if(!icon||!label) return;
   if(isLight){
     document.documentElement.classList.add('light');
-    label.textContent='Dark';
+    label.textContent='Dark Mode';
     while(icon.firstChild) icon.removeChild(icon.firstChild);
     const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
     c.setAttribute('cx','12');c.setAttribute('cy','12');c.setAttribute('r','5');
@@ -1279,7 +1514,7 @@ function applyTheme(){
     });
   } else {
     document.documentElement.classList.remove('light');
-    label.textContent='Light';
+    label.textContent='Light Mode';
     while(icon.firstChild) icon.removeChild(icon.firstChild);
     const p=document.createElementNS('http://www.w3.org/2000/svg','path');
     p.setAttribute('d','M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
@@ -1331,7 +1566,7 @@ async function authAction(action) {
     supabaseUser = null;
     document.getElementById('authWall').style.display = 'flex';
     document.querySelector('.main').style.display = 'none';
-    document.getElementById('userHeaderInfo').style.display = 'none';
+    document.getElementById('bottomNav').style.display = 'none';
     
     // Clear data
     learnItems = [];
@@ -1387,8 +1622,11 @@ async function authAction(action) {
 async function transitionToApp() {
   document.getElementById('authWall').style.display = 'none';
   document.querySelector('.main').style.display = 'flex';
-  document.getElementById('userHeaderInfo').style.display = 'flex';
-  document.getElementById('userHeaderEmail').textContent = supabaseUser.email;
+  document.getElementById('bottomNav').style.display = 'flex';
+  document.getElementById('settingsUserEmail').textContent = supabaseUser.email;
+
+  // Set default tab to practice
+  switchTab('practice');
 
   // Clear inputs
   document.getElementById('authWallEmail').value = '';
@@ -1408,7 +1646,7 @@ async function initSupabaseAtStartup() {
   if (SUPABASE_URL === "INJECT_SUPABASE_URL" || SUPABASE_ANON_KEY === "INJECT_SUPABASE_ANON_KEY" || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
     document.getElementById('authWall').style.display = 'flex';
     document.querySelector('.main').style.display = 'none';
-    document.getElementById('userHeaderInfo').style.display = 'none';
+    document.getElementById('bottomNav').style.display = 'none';
     showAuthWallStatus('error', 'Please configure your SUPABASE_URL and SUPABASE_ANON_KEY environment variables on Vercel to deploy.');
     return;
   }
@@ -1422,7 +1660,7 @@ async function initSupabaseAtStartup() {
     } else {
       document.getElementById('authWall').style.display = 'flex';
       document.querySelector('.main').style.display = 'none';
-      document.getElementById('userHeaderInfo').style.display = 'none';
+      document.getElementById('bottomNav').style.display = 'none';
     }
   } catch(e) {
     console.error('Failed to initialize Supabase client:', e);
@@ -1456,93 +1694,21 @@ async function syncAllData() {
 
 async function syncLearnItems() {
   if (!supabaseClient || !supabaseUser) return;
-  const { data: remoteItems, error } = await supabaseClient.from('learn_items').select('*');
+  const { data: remoteItems, error } = await supabaseClient
+    .from('learn_items')
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) throw error;
 
-  let localItems = [...learnItems];
-  let mergedItems = [];
-  let itemsToUpdateRemote = [];
-  let itemsToInsertRemote = [];
+  learnItems = remoteItems.map(remote => ({
+    id: remote.id,
+    title: remote.title,
+    category: remote.category,
+    status: remote.status,
+    sections: remote.sections || [],
+    updatedAt: remote.updated_at ? new Date(remote.updated_at).getTime() : Date.now()
+  }));
 
-  const remoteMap = new Map();
-  remoteItems.forEach(item => {
-    remoteMap.set(item.title.toLowerCase().trim(), item);
-  });
-
-  localItems.forEach(local => {
-    const key = local.title.toLowerCase().trim();
-    const remote = remoteMap.get(key);
-
-    if (remote) {
-      const localTime = local.updatedAt ? new Date(local.updatedAt).getTime() : 0;
-      const remoteTime = remote.updated_at ? new Date(remote.updated_at).getTime() : 0;
-
-      if (localTime >= remoteTime) {
-        local.id = remote.id; 
-        mergedItems.push(local);
-        itemsToUpdateRemote.push(local);
-      } else {
-        mergedItems.push({
-          id: remote.id,
-          title: remote.title,
-          category: remote.category,
-          status: remote.status,
-          sections: remote.sections || [],
-          updatedAt: remoteTime
-        });
-      }
-      remoteMap.delete(key);
-    } else {
-      itemsToInsertRemote.push(local);
-    }
-  });
-
-  remoteMap.forEach(remote => {
-    mergedItems.push({
-      id: remote.id,
-      title: remote.title,
-      category: remote.category,
-      status: remote.status,
-      sections: remote.sections || [],
-      updatedAt: remote.updated_at ? new Date(remote.updated_at).getTime() : Date.now()
-    });
-  });
-
-  for (let local of itemsToInsertRemote) {
-    const { data, error: insErr } = await supabaseClient
-      .from('learn_items')
-      .insert({
-        user_id: supabaseUser.id,
-        title: local.title,
-        category: local.category,
-        status: local.status,
-        sections: local.sections,
-        updated_at: local.updatedAt ? new Date(local.updatedAt).toISOString() : new Date().toISOString()
-      })
-      .select();
-    
-    if (insErr) console.error('Error inserting remote item:', insErr);
-    if (data && data[0]) {
-      local.id = data[0].id;
-      mergedItems = mergedItems.map(item => item.title === local.title ? { ...item, id: data[0].id } : item);
-    }
-  }
-
-  for (let local of itemsToUpdateRemote) {
-    const { error: updErr } = await supabaseClient
-      .from('learn_items')
-      .update({
-        category: local.category,
-        status: local.status,
-        sections: local.sections,
-        updated_at: local.updatedAt ? new Date(local.updatedAt).toISOString() : new Date().toISOString()
-      })
-      .eq('id', local.id);
-    
-    if (updErr) console.error('Error updating remote item:', updErr);
-  }
-
-  learnItems = mergedItems;
   const maxId = learnItems.reduce((max, item) => item.id > max ? item.id : max, 0);
   learnIdCounter = Math.max(learnIdCounter, maxId);
 
@@ -1552,44 +1718,17 @@ async function syncLearnItems() {
 
 async function syncBookmarks() {
   if (!supabaseClient || !supabaseUser) return;
-  const { data: remoteBookmarks, error } = await supabaseClient.from('bookmarks').select('*');
+  const { data: remoteBookmarks, error } = await supabaseClient
+    .from('bookmarks')
+    .select('*');
   if (error) throw error;
 
-  const remoteMap = new Map();
-  remoteBookmarks.forEach(b => remoteMap.set(b.topic.toLowerCase().trim(), b));
+  bookmarks = remoteBookmarks.map(remote => ({
+    t: remote.topic,
+    c: remote.category,
+    d: remote.difficulty
+  }));
 
-  let mergedBookmarks = [...bookmarks];
-  let itemsToInsert = [];
-
-  mergedBookmarks.forEach(local => {
-    const key = local.t.toLowerCase().trim();
-    if (remoteMap.has(key)) {
-      remoteMap.delete(key);
-    } else {
-      itemsToInsert.push(local);
-    }
-  });
-
-  remoteMap.forEach(remote => {
-    mergedBookmarks.push({
-      t: remote.topic,
-      c: remote.category,
-      d: remote.difficulty
-    });
-  });
-
-  for (let local of itemsToInsert) {
-    await supabaseClient
-      .from('bookmarks')
-      .insert({
-        user_id: supabaseUser.id,
-        topic: local.t,
-        category: local.c,
-        difficulty: local.d
-      });
-  }
-
-  bookmarks = mergedBookmarks;
   renderBookmarks();
 }
 
@@ -1604,22 +1743,17 @@ async function syncStats() {
   if (error) throw error;
 
   if (remote) {
-    reps = Math.max(reps, remote.reps);
-    completed = Math.max(completed, remote.completed);
-    bestSec = Math.max(bestSec, remote.best_sec);
+    reps = remote.reps || 0;
+    completed = remote.completed || 0;
+    bestSec = remote.best_sec || 0;
+  } else {
+    reps = 0;
+    completed = 0;
+    bestSec = 0;
   }
 
   updateStatsDisplay();
-
-  await supabaseClient
-    .from('practice_stats')
-    .upsert({
-      user_id: supabaseUser.id,
-      reps: reps,
-      completed: completed,
-      best_sec: bestSec,
-      updated_at: new Date().toISOString()
-    });
+  updateUnlock();
 }
 
 async function syncHistory() {
@@ -1632,53 +1766,13 @@ async function syncHistory() {
 
   if (error) throw error;
 
-  const historyMap = new Map();
-  sessionHistory.forEach(h => {
-    historyMap.set(h.topic + '-' + h.elapsed, {
-      topic: h.topic,
-      elapsed: h.elapsed,
-      fillers: h.fillers,
-      createdAt: h.createdAt || Date.now()
-    });
-  });
+  sessionHistory = remote.map(r => ({
+    topic: r.topic,
+    elapsed: r.elapsed_seconds,
+    fillers: undefined,
+    createdAt: r.created_at ? new Date(r.created_at).getTime() : Date.now()
+  }));
 
-  remote.forEach(r => {
-    const key = r.topic + '-' + r.elapsed_seconds;
-    const time = r.created_at ? new Date(r.created_at).getTime() : Date.now();
-    if (!historyMap.has(key)) {
-      historyMap.set(key, {
-        topic: r.topic,
-        elapsed: r.elapsed_seconds,
-        fillers: undefined,
-        createdAt: time
-      });
-    }
-  });
-
-  const merged = Array.from(historyMap.values())
-    .sort((a,b) => b.createdAt - a.createdAt)
-    .slice(0, 10);
-
-  const remoteKeys = new Set(remote.map(r => r.topic + '-' + r.elapsed_seconds));
-  for (let local of sessionHistory) {
-    const key = local.topic + '-' + local.elapsed;
-    if (!remoteKeys.has(key)) {
-      try {
-        await supabaseClient
-          .from('session_history')
-          .insert({
-            user_id: supabaseUser.id,
-            topic: local.topic,
-            elapsed_seconds: local.elapsed,
-            created_at: local.createdAt ? new Date(local.createdAt).toISOString() : new Date().toISOString()
-          });
-      } catch (e) {
-        console.error('Error syncing history item to Supabase:', e);
-      }
-    }
-  }
-
-  sessionHistory = merged;
   renderHistory();
 }
 
