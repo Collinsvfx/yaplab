@@ -397,29 +397,29 @@
 
   /* Premium Desktop Typography Scaling (min-width: 768px) */
   @media (min-width: 768px) {
-    body { font-size: 18px; }
-    .wordmark { font-size: 44px !important; }
-    .topic-text { font-size: 40px !important; }
-    .timer-display { font-size: 120px !important; }
-    .stat-num { font-size: 44px !important; }
+    body { font-size: 20px; }
+    .wordmark { font-size: 52px !important; }
+    .topic-text { font-size: 48px !important; }
+    .timer-display { font-size: 144px !important; }
+    .stat-num { font-size: 52px !important; }
     
-    .learn-stat-num { font-size: 38px !important; }
-    .add-row > * { height: 48px !important; }
-    .add-input { font-size: 18px !important; }
-    .add-select { font-size: 17px !important; }
-    .add-row .btn-primary { font-size: 15px !important; }
+    .learn-stat-num { font-size: 44px !important; }
+    .add-row > * { height: 56px !important; }
+    .add-input { font-size: 20px !important; }
+    .add-select { font-size: 19px !important; }
+    .add-row .btn-primary { font-size: 18px !important; }
     
-    .learn-item-title { font-size: 20px !important; }
-    .script-section textarea { font-size: 17px !important; }
-    .section-label-input { font-size: 16px !important; }
-    .script-total-dur { font-size: 24px !important; }
+    .learn-item-title { font-size: 22px !important; }
+    .script-section textarea { font-size: 19px !important; }
+    .section-label-input { font-size: 18px !important; }
+    .script-total-dur { font-size: 28px !important; }
     
-    .section-title { font-size: 16px !important; }
-    .bookmark-item-text { font-size: 18px !important; }
-    .history-topic { font-size: 18px !important; }
-    .history-time { font-size: 18px !important; }
-    .feedback-title { font-size: 19px !important; }
-    .feedback-text { font-size: 17px !important; }
+    .section-title { font-size: 18px !important; }
+    .bookmark-item-text { font-size: 20px !important; }
+    .history-topic { font-size: 20px !important; }
+    .history-time { font-size: 20px !important; }
+    .feedback-title { font-size: 22px !important; }
+    .feedback-text { font-size: 19px !important; }
   }
 </style>
 </head>
@@ -693,6 +693,7 @@ const SUPABASE_ANON_KEY = "INJECT_SUPABASE_ANON_KEY";
 let supabaseClient = null;
 let supabaseUser = null;
 let activeAuthWallTab = 'signIn';
+let authWallHTML = '';
 
 // ── PRACTICE STATE ────────────────────────────────────────────────────────────
 let selectedDur=60,timerSec=60,timerMax=60,interval=null,isRunning=false;
@@ -1613,6 +1614,7 @@ async function authAction(action) {
       console.error(e);
     }
     supabaseUser = null;
+    document.getElementById('authWall').innerHTML = authWallHTML; // Restore login inputs to allow log in again
     document.getElementById('authWall').style.display = 'flex';
     document.querySelector('.main').style.display = 'none';
     document.getElementById('bottomNav').style.display = 'none';
@@ -1670,6 +1672,7 @@ async function authAction(action) {
 
 async function transitionToApp() {
   document.getElementById('authWall').style.display = 'none';
+  document.getElementById('authWall').innerHTML = ''; // Clear login inputs to block browser autofill
   document.querySelector('.main').style.display = 'flex';
   document.getElementById('bottomNav').style.display = 'flex';
   document.getElementById('settingsUserEmail').textContent = supabaseUser.email;
@@ -1678,8 +1681,6 @@ async function transitionToApp() {
   switchTab('learn');
 
   // Clear inputs
-  document.getElementById('authWallEmail').value = '';
-  document.getElementById('authWallPassword').value = '';
   document.getElementById('learnInput').value = '';
 
   // Clear any existing localStorage data (bypass local only completely)
@@ -1828,6 +1829,7 @@ async function syncHistory() {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
+  authWallHTML = document.getElementById('authWall').innerHTML;
   applyTheme();
   loadLearn();
   loadPracticeLocal();
