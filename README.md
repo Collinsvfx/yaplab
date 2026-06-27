@@ -21,4 +21,4 @@ YapLab is a single-file interactive web application designed to help you practic
 
 ## 🏃 Getting Started
 
-Simply open `YapLab_v5.html` in any modern web browser to start practicing!
+Simply open `index.html` in any modern web browser to start practicing!
