@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YapLab — Speech Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d0d; --surface: #161616; --surface2: #1e1e1e; --border: #2a2a2a;
+    --accent: #c8f135; --accent-dark: #8fb800; --accent-dim: rgba(200,241,53,0.12); --accent-dim2: rgba(200,241,53,0.06);
+    --text: #f0f0f0; --muted: #777; --danger: #ff5c5c; --warn: #ffb347;
+    --easy: #4ade80; --medium: #facc15; --hard: #f87171; --locked: #444;
+    --tab-active-text: #0d0d0d;
+  }
+  :root.light {
+    --bg: #f4f4f0; --surface: #ffffff; --surface2: #f0f0ec; --border: #e0e0d8;
+    --accent: #7ab800; --accent-dark: #5a8a00; --accent-dim: rgba(122,184,0,0.1); --accent-dim2: rgba(122,184,0,0.05);
+    --text: #111111; --muted: #888; --danger: #d93636; --warn: #d97706;
+    --easy: #16a34a; --medium: #b45309; --hard: #dc2626; --locked: #bbb;
+    --tab-active-text: #ffffff;
+  }
+  /* theme toggle */
+  .theme-toggle { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; color:var(--muted); display:flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; font-size:12px; font-weight:500; transition:all 0.15s; flex-shrink:0; }
+  .theme-toggle:hover { border-color:var(--accent); color:var(--text); }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:15px; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:32px 16px 64px; }
+  .header { width:100%; max-width:720px; display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:14px; }
+  .wordmark { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; letter-spacing:-0.5px; color:var(--text); }
+  .wordmark span { color:var(--accent); }
+  .tab-nav { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:4px; }
+  .tab-btn { font-family:'Inter',sans-serif; font-size:13px; font-weight:500; padding:6px 18px; border-radius:7px; border:none; cursor:pointer; color:var(--muted); background:transparent; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { background:var(--accent); color:var(--tab-active-text); font-weight:600; }
+  .main { width:100%; max-width:720px; display:flex; flex-direction:column; gap:20px; }
+  .tab-panel { display:none; flex-direction:column; gap:20px; }
+  .tab-panel.active { display:flex; }
+
+  /* Topic card */
+  .topic-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 28px 24px; position:relative; overflow:hidden; }
+  .topic-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--accent); opacity:0; transition:opacity 0.3s; }
+  .topic-card.active::before { opacity:1; }
+  .topic-label { font-size:11px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .topic-badge { background:var(--accent-dim); color:var(--accent); padding:2px 8px; border-radius:4px; font-size:10px; font-weight:500; letter-spacing:0.08em; }
+  .topic-text { font-family:'Syne',sans-serif; font-size:26px; font-weight:700; line-height:1.25; color:var(--text); min-height:64px; transition:opacity 0.2s; }
+  .topic-text.fading { opacity:0; }
+  .topic-meta { margin-top:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .topic-actions { margin-top:14px; display:flex; align-items:center; gap:10px; }
+  .meta-pill { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 12px; font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px; }
+  .meta-pill svg { opacity:0.6; }
+  .diff-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; }
+  .diff-badge.easy { background:rgba(74,222,128,0.12); color:var(--easy); border:1px solid rgba(74,222,128,0.25); }
+  .diff-badge.medium { background:rgba(250,204,21,0.12); color:var(--medium); border:1px solid rgba(250,204,21,0.25); }
+  .diff-badge.hard { background:rgba(248,113,113,0.12); color:var(--hard); border:1px solid rgba(248,113,113,0.25); }
+  .bookmark-btn { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:5px 12px; font-size:12px; font-family:'Inter',sans-serif; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.15s; }
+  .bookmark-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .bookmark-btn.saved { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+  /* Timer */
+  .timer-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .timer-display { font-family:'Syne',sans-serif; font-size:72px; font-weight:800; letter-spacing:-3px; line-height:1; color:var(--text); transition:color 0.3s; font-variant-numeric:tabular-nums; }
+  .timer-display.warn { color:var(--warn); }
+  .timer-display.danger { color:var(--danger); }
+  .timer-display.accent { color:var(--accent); }
+  .timer-bar-wrap { width:100%; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .timer-bar { height:100%; background:var(--accent); border-radius:2px; transition:width 1s linear, background 0.3s; width:100%; }
+  .timer-bar.warn { background:var(--warn); }
+  .timer-bar.danger { background:var(--danger); }
+  .duration-row { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .dur-btn { background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:6px 16px; font-family:'Inter',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.15s; }
+  .dur-btn:hover { border-color:var(--accent); color:var(--text); }
+  .dur-btn.selected { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+  .controls { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { font-family:'Inter',sans-serif; font-size:14px; font-weight:500; border-radius:10px; padding:10px 22px; cursor:pointer; border:1px solid transparent; transition:all 0.15s; display:flex; align-items:center; gap:7px; white-space:nowrap; }
+  .btn-primary { background:var(--accent); color:var(--tab-active-text); border-color:var(--accent); }
+  .btn-primary:hover { filter:brightness(1.1); }
+  .btn-secondary { background:transparent; color:var(--text); border-color:var(--border); }
+  .btn-secondary:hover { border-color:#555; background:var(--surface2); }
+  .btn-ghost { background:transparent; color:var(--muted); border-color:transparent; padding:10px 14px; }
+  .btn-ghost:hover { color:var(--text); }
+  .btn:disabled { opacity:0.35; cursor:not-allowed; filter:none; }
+
+  /* Diff filter */
+  .diff-filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .diff-filter-btn { background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:500; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:5px; }
+  .diff-filter-btn:hover { border-color:#555; color:var(--text); }
+  .diff-filter-btn.active-easy { background:rgba(74,222,128,0.12); border-color:var(--easy); color:var(--easy); }
+  .diff-filter-btn.active-medium { background:rgba(250,204,21,0.12); border-color:var(--medium); color:var(--medium); }
+  .diff-filter-btn.active-hard { background:rgba(248,113,113,0.12); border-color:var(--hard); color:var(--hard); }
+  .diff-filter-btn.active-all { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+  /* Cat row */
+  .cat-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .cat-btn { background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:500; cursor:pointer; transition:all 0.15s; }
+  .cat-btn:hover { border-color:#555; color:var(--text); }
+  .cat-btn.on { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+  /* Unlock */
+  .unlock-bar-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+  .unlock-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .unlock-label { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .unlock-label strong { color:var(--text); }
+  .unlock-track { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .unlock-fill { height:100%; border-radius:3px; transition:width 0.4s ease; }
+  .unlock-fill.hard { background:var(--hard); }
+
+  /* Filler */
+  .filler-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 24px; display:none; flex-direction:column; gap:14px; }
+  .filler-wrap.show { display:flex; }
+  .filler-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .filler-title { font-size:12px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .mic-indicator { width:8px; height:8px; border-radius:50%; background:var(--muted); transition:background 0.3s; }
+  .mic-indicator.active { background:var(--danger); animation:micpulse 1s ease-in-out infinite; }
+  @keyframes micpulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,92,92,0.3); } 50% { box-shadow:0 0 0 6px rgba(255,92,92,0); } }
+  .filler-grid { display:flex; gap:8px; flex-wrap:wrap; }
+  .filler-chip { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:13px; display:flex; align-items:center; gap:6px; }
+  .filler-chip .word { color:var(--muted); }
+  .filler-chip .count { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; color:var(--text); min-width:16px; text-align:right; }
+  .filler-chip.hit .word { color:var(--warn); }
+  .filler-chip.hit { border-color:rgba(255,179,71,0.3); }
+  .filler-total { font-size:12px; color:var(--muted); text-align:right; }
+  .filler-total strong { color:var(--text); }
+  .mic-error { font-size:12px; color:var(--warn); display:none; align-items:center; gap:5px; }
+  .mic-error.show { display:flex; }
+
+  /* Section title */
+  .section-title { font-size:11px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+  /* Bookmarks */
+  .bookmarks-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; }
+  .bookmark-list { display:flex; flex-direction:column; }
+  .bookmark-item { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); gap:10px; }
+  .bookmark-item:last-child { border-bottom:none; }
+  .bookmark-item-text { font-size:13px; color:var(--text); flex:1; }
+  .bookmark-item-meta { display:flex; align-items:center; gap:8px; }
+  .bookmark-load-btn { font-size:11px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:3px 8px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; white-space:nowrap; }
+  .bookmark-load-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .bookmark-del-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:2px; display:flex; align-items:center; transition:color 0.15s; }
+  .bookmark-del-btn:hover { color:var(--danger); }
+  .bookmark-empty { color:var(--muted); font-size:13px; text-align:center; padding:12px 0; }
+
+  /* History */
+  .history-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; }
+  .history-list { display:flex; flex-direction:column; }
+  .history-item { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); gap:12px; }
+  .history-item:last-child { border-bottom:none; }
+  .history-topic { font-size:14px; color:var(--text); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .history-right { display:flex; align-items:center; gap:8px; }
+  .history-time { font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--accent); white-space:nowrap; }
+  .history-filler { font-size:11px; color:var(--muted); white-space:nowrap; }
+  .history-empty { color:var(--muted); font-size:13px; text-align:center; padding:12px 0; }
+
+  /* Feedback */
+  .feedback-wrap { background:var(--accent-dim2); border:1px solid rgba(200,241,53,0.2); border-radius:12px; padding:16px 20px; display:none; flex-direction:column; gap:10px; }
+  .feedback-wrap.show { display:flex; }
+  .feedback-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--accent); }
+  .feedback-text { font-size:13px; color:var(--muted); line-height:1.6; }
+  .feedback-filler-note { font-size:12px; color:var(--muted); padding-top:8px; border-top:1px solid rgba(200,241,53,0.1); display:none; }
+  .feedback-filler-note.show { display:block; }
+
+  /* Stats */
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--text); line-height:1; margin-bottom:4px; }
+  .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .divider { border:none; border-top:1px solid var(--border); margin:4px 0; }
+  @keyframes pulse-ring { 0% { box-shadow:0 0 0 0 rgba(200,241,53,0.3); } 70% { box-shadow:0 0 0 10px rgba(200,241,53,0); } 100% { box-shadow:0 0 0 0 rgba(200,241,53,0); } }
+  .btn-primary.pulsing { animation:pulse-ring 1.5s ease-out infinite; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .fadeIn { animation:fadeIn 0.3s ease; }
+
+  /* ── LEARN TAB ── */
+  .learn-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .learn-stat { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 16px; text-align:center; }
+  .learn-stat-num { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; line-height:1; margin-bottom:3px; }
+  .learn-stat-num.c-unread { color:var(--muted); }
+  .learn-stat-num.c-read { color:var(--medium); }
+  .learn-stat-num.c-ready { color:var(--easy); }
+  .learn-stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .add-item-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; gap:14px; }
+  .add-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .add-input { flex:1; min-width:180px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; font-family:'Inter',sans-serif; font-size:14px; color:var(--text); outline:none; transition:border-color 0.15s; }
+  .add-input:focus { border-color:var(--accent); }
+  .add-input::placeholder { color:var(--muted); }
+  .add-select { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 12px; font-family:'Inter',sans-serif; font-size:13px; color:var(--text); outline:none; cursor:pointer; transition:border-color 0.15s; }
+  .add-select:focus { border-color:var(--accent); }
+  .add-select option { background:var(--surface2); }
+
+  .learn-list-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+  .learn-list-header { padding:18px 24px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .learn-filter-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .learn-filter-btn { background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:4px 12px; font-size:11px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; }
+  .learn-filter-btn:hover { border-color:#555; color:var(--text); }
+  .learn-filter-btn.active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+  .learn-list { display:flex; flex-direction:column; }
+  .learn-item { padding:16px 24px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:10px; }
+  .learn-item:last-child { border-bottom:none; }
+  .learn-item-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .learn-item-title { font-size:14px; font-weight:500; color:var(--text); flex:1; line-height:1.4; }
+  .learn-item-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+
+  .status-btn { font-family:'Inter',sans-serif; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; border:1px solid; cursor:pointer; transition:all 0.15s; white-space:nowrap; letter-spacing:0.04em; }
+  .status-btn.unread { background:rgba(119,119,119,0.1); color:var(--muted); border-color:#333; }
+  .status-btn.read { background:rgba(250,204,21,0.1); color:var(--medium); border-color:rgba(250,204,21,0.3); }
+  .status-btn.ready { background:rgba(74,222,128,0.1); color:var(--easy); border-color:rgba(74,222,128,0.3); }
+
+  .learn-item-del { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:3px; display:flex; align-items:center; transition:color 0.15s; }
+  .learn-item-del:hover { color:var(--danger); }
+  .learn-item-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .learn-cat-pill { font-size:10px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:2px 7px; }
+  .notes-toggle { font-size:11px; color:var(--muted); background:none; border:none; cursor:pointer; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:4px; padding:0; transition:color 0.15s; }
+  .notes-toggle:hover { color:var(--accent); }
+  .notes-area { display:none; flex-direction:column; gap:12px; }
+  .notes-area.open { display:flex; }
+  .notes-hint { font-size:11px; color:var(--muted); }
+  .learn-empty { padding:40px 24px; text-align:center; color:var(--muted); font-size:13px; line-height:1.7; }
+  .learn-empty strong { color:var(--text); display:block; margin-bottom:4px; font-size:14px; }
+
+  /* ── SCRIPT BUILDER ── */
+  .script-toolbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .script-toolbar-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-right:4px; }
+  .template-btn { background:var(--surface2); border:1px solid var(--border); color:var(--muted); border-radius:7px; padding:5px 12px; font-size:11px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; white-space:nowrap; }
+  .template-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .add-section-btn { background:var(--accent-dim); border:1px solid rgba(200,241,53,0.3); color:var(--accent); border-radius:7px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; display:flex; align-items:center; gap:4px; }
+  .add-section-btn:hover { background:rgba(200,241,53,0.2); }
+
+  .script-sections { display:flex; flex-direction:column; gap:10px; }
+  .script-section { background:var(--surface2); border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:border-color 0.15s, opacity 0.15s, transform 0.15s; cursor:default; }
+  .script-section:focus-within { border-color:rgba(200,241,53,0.35); }
+  .script-section.dragging { opacity:0.4; }
+  .script-section.drag-over { border-color:var(--accent); transform:scale(1.01); }
+  .drag-handle { display:flex; align-items:center; padding:0 4px 0 2px; color:var(--muted); cursor:grab; flex-shrink:0; touch-action:none; }
+  .drag-handle:active { cursor:grabbing; }
+  .drag-handle svg { pointer-events:none; }
+  .script-section-head { display:flex; align-items:center; gap:8px; padding:8px 12px; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02); }
+  .section-num { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; color:var(--muted); background:var(--border); border-radius:4px; padding:1px 6px; flex-shrink:0; }
+  .section-label-input { flex:1; background:transparent; border:none; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--text); outline:none; letter-spacing:0.04em; text-transform:uppercase; }
+  .section-label-input::placeholder { color:var(--muted); text-transform:none; letter-spacing:0; font-weight:400; }
+  .section-stats { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .section-wc { font-size:10px; color:var(--muted); white-space:nowrap; }
+  .section-dur { font-size:10px; color:var(--accent); font-weight:600; white-space:nowrap; font-family:'Syne',sans-serif; }
+  .section-del-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:2px; display:flex; align-items:center; transition:color 0.15s; flex-shrink:0; }
+  .section-del-btn:hover { color:var(--danger); }
+  .script-section textarea { width:100%; background:transparent; border:none; padding:10px 14px; font-family:'Inter',sans-serif; font-size:13px; color:var(--text); resize:vertical; min-height:80px; outline:none; line-height:1.6; }
+  .script-section textarea::placeholder { color:var(--muted); }
+
+  .script-total-bar { background:var(--accent-dim2); border:1px solid rgba(200,241,53,0.15); border-radius:8px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .script-total-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; }
+  .script-total-nums { display:flex; align-items:center; gap:14px; }
+  .script-total-wc { font-size:12px; color:var(--muted); }
+  .script-total-dur { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; color:var(--accent); }
+  .script-empty-hint { font-size:12px; color:var(--muted); text-align:center; padding:12px 0; font-style:italic; }
+
+  /* title editing */
+  .learn-item-title-wrap { flex:1; display:flex; align-items:center; gap:6px; min-width:0; }
+  .learn-item-title { font-size:14px; font-weight:500; color:var(--text); flex:1; line-height:1.4; word-break:break-word; }
+  .title-edit-input { flex:1; background:var(--surface2); border:1px solid var(--accent); border-radius:6px; padding:4px 8px; font-family:'Inter',sans-serif; font-size:14px; font-weight:500; color:var(--text); outline:none; min-width:0; }
+  .title-edit-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; padding:2px 4px; display:flex; align-items:center; flex-shrink:0; transition:color 0.15s; }
+  .title-edit-btn:hover { color:var(--accent); }
+
+  @media (max-width:480px) {
+    .timer-display { font-size:52px; }
+    .topic-text { font-size:20px; }
+    .stats-row { grid-template-columns:1fr 1fr; }
+    .header { flex-wrap:wrap; gap:12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">Yap<span>Lab</span></div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+      <svg id="themeIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span id="themeLabel">Light</span>
+    </button>
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tabPracticeBtn" onclick="switchTab('practice')">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Practice
+      </button>
+      <button class="tab-btn" id="tabLearnBtn" onclick="switchTab('learn')">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Learn
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- PRACTICE TAB -->
+  <div class="tab-panel active" id="panelPractice">
+    <div class="topic-card" id="topicCard">
+      <div class="topic-label">
+        <span>Your topic</span>
+        <span class="topic-badge" id="catBadge">random</span>
+      </div>
+      <div class="topic-text" id="topicText">Hit "New topic" to get started</div>
+      <div class="topic-meta">
+        <div class="meta-pill" id="diffPill">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>—
+        </div>
+        <span class="diff-badge" id="difficultyBadge" style="display:none"></span>
+        <div class="meta-pill" id="tipPill" style="display:none">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.4 4.7-3.5 5.9V17a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-2.1C6.4 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/></svg>
+          <span id="tipText"></span>
+        </div>
+      </div>
+      <div class="topic-actions">
+        <button class="bookmark-btn" id="bookmarkBtn" onclick="toggleBookmark()" style="display:none">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span id="bookmarkLabel">Save topic</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Difficulty</div>
+      <div class="diff-filter-row">
+        <button class="diff-filter-btn active-all" data-diff="all" onclick="setDiffFilter('all',this)">All</button>
+        <button class="diff-filter-btn" data-diff="easy" onclick="setDiffFilter('easy',this)">🟢 Easy</button>
+        <button class="diff-filter-btn" data-diff="medium" onclick="setDiffFilter('medium',this)">🟡 Medium</button>
+        <button class="diff-filter-btn" data-diff="hard" onclick="setDiffFilter('hard',this)" id="hardFilterBtn">🔴 Hard <span id="hardLockLabel" style="font-size:10px;margin-left:2px;">— unlock at 10 reps</span></button>
+      </div>
+    </div>
+
+    <div class="unlock-bar-wrap" id="unlockBar">
+      <div style="font-size:12px;color:var(--muted);font-weight:500;">🔒 Hard topics unlock at <strong style="color:var(--text)">10 completed reps</strong></div>
+      <div class="unlock-row">
+        <span class="unlock-label">Progress</span>
+        <div class="unlock-track"><div class="unlock-fill hard" id="unlockFill" style="width:0%"></div></div>
+        <span class="unlock-label"><strong id="unlockCount">0</strong>/10</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Topic categories</div>
+      <div class="cat-row" id="catRow"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="timer-wrap">
+      <div class="timer-display" id="timerDisplay">1:00</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+      <div>
+        <div class="section-title" style="text-align:center;margin-bottom:8px">Duration</div>
+        <div class="duration-row" id="durRow">
+          <button class="dur-btn" data-sec="30">30s</button>
+          <button class="dur-btn selected" data-sec="60">1 min</button>
+          <button class="dur-btn" data-sec="120">2 min</button>
+          <button class="dur-btn" data-sec="180">3 min</button>
+          <button class="dur-btn" data-sec="300">5 min</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="newTopic()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
+          New topic
+        </button>
+        <button class="btn btn-primary" id="startBtn" onclick="startStop()">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          Start
+        </button>
+        <button class="btn btn-ghost" id="resetBtn" onclick="resetTimer()" disabled>Reset</button>
+      </div>
+    </div>
+
+    <div class="filler-wrap" id="fillerWrap">
+      <div class="filler-header">
+        <div class="filler-title"><div class="mic-indicator" id="micIndicator"></div>Filler word tracker</div>
+        <div class="mic-error" id="micError">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Mic access denied
+        </div>
+      </div>
+      <div class="filler-grid" id="fillerGrid"></div>
+      <div class="filler-total" id="fillerTotal"></div>
+    </div>
+
+    <div class="feedback-wrap" id="feedbackWrap">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div class="feedback-text" id="feedbackText"></div>
+      <div class="feedback-filler-note" id="feedbackFillerNote"></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="statReps">0</div><div class="stat-label">Reps today</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBest">—</div><div class="stat-label">Longest</div></div>
+      <div class="stat-card"><div class="stat-num" id="statStreak">0</div><div class="stat-label">Completed</div></div>
+    </div>
+
+    <div class="bookmarks-wrap" id="bookmarksWrap">
+      <div class="section-title">Saved topics</div>
+      <div class="bookmark-list" id="bookmarkList"><div class="bookmark-empty">No saved topics yet.</div></div>
+    </div>
+
+    <div class="history-wrap">
+      <div class="section-title">Session log</div>
+      <div class="history-list" id="historyList"><div class="history-empty">No sessions yet. Start your first rep.</div></div>
+    </div>
+  </div>
+
+  <!-- LEARN TAB -->
+  <div class="tab-panel" id="panelLearn">
+    <div class="learn-stats">
+      <div class="learn-stat"><div class="learn-stat-num c-unread" id="lsUnread">0</div><div class="learn-stat-label">To Read</div></div>
+      <div class="learn-stat"><div class="learn-stat-num c-read" id="lsRead">0</div><div class="learn-stat-label">Read</div></div>
+      <div class="learn-stat"><div class="learn-stat-num c-ready" id="lsReady">0</div><div class="learn-stat-label">Ready to Speak</div></div>
+    </div>
+
+    <div class="add-item-card">
+      <div class="section-title" style="margin-bottom:0">Add topic to learn</div>
+      <div class="add-row">
+        <input class="add-input" id="learnInput" type="text" placeholder="e.g. Why UI is important, what it means…" />
+        <select class="add-select" id="learnCatSelect">
+          <option value="design">Design</option>
+          <option value="opinions">Opinions</option>
+          <option value="persuasion">Persuasion</option>
+          <option value="storytelling">Storytelling</option>
+          <option value="impromptu">Impromptu</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="addLearnItem()" style="padding:9px 18px;font-size:13px;">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add
+        </button>
+      </div>
+    </div>
+
+    <div class="learn-list-wrap">
+      <div class="learn-list-header">
+        <div class="section-title" style="margin-bottom:0">Your reading list</div>
+        <div class="learn-filter-row">
+          <button class="learn-filter-btn active" data-filter="all" onclick="setLearnFilter('all',this)">All</button>
+          <button class="learn-filter-btn" data-filter="unread" onclick="setLearnFilter('unread',this)">To Read</button>
+          <button class="learn-filter-btn" data-filter="read" onclick="setLearnFilter('read',this)">Read</button>
+          <button class="learn-filter-btn" data-filter="ready" onclick="setLearnFilter('ready',this)">Ready</button>
+        </div>
+      </div>
+      <div class="learn-list" id="learnList">
+        <div class="learn-empty"><strong>Nothing here yet</strong>Add a topic above to start your reading list.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── TOPICS DATA ───────────────────────────────────────────────────────────────
+const TOPICS = {
+  "opinions":{ label:"Opinions", topics:[
+    {t:"Social media does more harm than good",d:"easy"},{t:"Everyone should learn to cook",d:"easy"},{t:"Remote work is the future of every industry",d:"easy"},{t:"Hustle culture is toxic",d:"easy"},{t:"Everyone needs a mentor",d:"easy"},{t:"Failure is overrated as a teacher",d:"medium"},{t:"Talent is mostly just practice in disguise",d:"easy"},{t:"Most meetings should be emails",d:"easy"},{t:"Networking is just being genuinely helpful",d:"easy"},{t:"Perfectionism is fear wearing a productive mask",d:"medium"},{t:"Optimism without a plan is just wishful thinking",d:"medium"},{t:"Schools teach compliance more than thinking",d:"medium"},{t:"Passion is a terrible reason to start a business",d:"medium"},{t:"The best leaders make themselves unnecessary",d:"medium"},{t:"Authenticity online is a performance",d:"hard"},{t:"Comfort is the enemy of growth — argue both sides",d:"hard"},{t:"Is originality dead in the age of AI?",d:"hard"},{t:"The attention economy is more dangerous than social media",d:"hard"},{t:"Why most productivity advice fails the people who need it most",d:"hard"},{t:"The myth of the self-made person",d:"hard"},{t:"Why being average is underrated",d:"medium"},{t:"Discipline is more important than motivation",d:"easy"},{t:"We mistake busyness for productivity",d:"easy"},{t:"Vulnerability is a strategy, not just a feeling",d:"medium"},{t:"Speed is more valuable than perfection in the early stage",d:"easy"},{t:"Why copying is the best way to learn",d:"easy"},{t:"Status is more motivating than money for most people",d:"hard"},{t:"The difference between confidence and arrogance",d:"medium"}
+  ]},
+  "design":{ label:"Design", topics:[
+    {t:"What makes a great user onboarding experience",d:"easy"},{t:"The difference between UI and UX in plain terms",d:"easy"},{t:"Why simplicity is the hardest thing to design",d:"easy"},{t:"How to give useful design feedback",d:"easy"},{t:"What design systems are and why teams need them",d:"medium"},{t:"The most common mistake junior designers make",d:"easy"},{t:"How to design for users who don't read",d:"medium"},{t:"Why accessibility makes products better for everyone",d:"easy"},{t:"The role of motion in modern UI design",d:"medium"},{t:"What no-code tools mean for the future of design",d:"medium"},{t:"How colour psychology affects conversion rates",d:"medium"},{t:"Why most app redesigns fail their users",d:"hard"},{t:"The problem with designing for the average user",d:"hard"},{t:"How to present a design concept to a skeptical client",d:"medium"},{t:"Why dark mode is more than just aesthetics",d:"easy"},{t:"The difference between a good designer and a great one",d:"easy"},{t:"How AI tools are changing the designer's workflow",d:"medium"},{t:"When should designers push back on a client brief?",d:"hard"},{t:"Why typography is the most underrated design skill",d:"medium"},{t:"How to conduct a useful usability test with five people",d:"medium"},{t:"What makes a landing page actually convert?",d:"easy"},{t:"Design for trust: what signals make users feel safe?",d:"hard"},{t:"Why empty states are the most neglected part of any product",d:"medium"},{t:"The ethics of dark patterns in UX",d:"hard"},{t:"What separates a portfolio that gets hired from one that doesn't",d:"easy"},{t:"How to transition from graphic design to UX",d:"easy"},{t:"Why the best UI feels invisible",d:"medium"},{t:"The role of a design critique in a healthy team",d:"medium"},{t:"How to charge more as a freelance designer",d:"hard"},{t:"What it means to design for emotion, not just function",d:"hard"}
+  ]},
+  "storytelling":{ label:"Storytelling", topics:[
+    {t:"Tell me about a time you overcame a real fear",d:"easy"},{t:"The moment you knew you were on the right path",d:"easy"},{t:"A decision that changed everything for you",d:"easy"},{t:"The biggest lesson from your worst project",d:"easy"},{t:"Describe your proudest moment without bragging",d:"medium"},{t:"A person who changed how you see the world",d:"easy"},{t:"The day something didn't go as planned — and what happened next",d:"medium"},{t:"What you wish someone had told you five years ago",d:"easy"},{t:"How you got into the work you do now",d:"easy"},{t:"The most interesting problem you've ever solved",d:"medium"},{t:"A moment you felt like giving up — and what kept you going",d:"medium"},{t:"Tell the story of a project you are most proud of",d:"easy"},{t:"A time you had to have a difficult conversation",d:"medium"},{t:"How a failure led to your biggest insight",d:"medium"},{t:"A moment that made you laugh at yourself",d:"easy"},{t:"The first time you realised you were good at something",d:"easy"},{t:"Tell a story in exactly three sentences",d:"hard"},{t:"Describe a turning point without using the word 'but'",d:"hard"},{t:"A risk you took that paid off unexpectedly",d:"easy"},{t:"The hardest feedback you ever received and what you did with it",d:"medium"},{t:"Tell a story that illustrates who you are as a professional",d:"hard"},{t:"The time you had to start over",d:"medium"},{t:"A moment you surprised yourself",d:"easy"}
+  ]},
+  "impromptu":{ label:"Impromptu", topics:[
+    {t:"If you could automate one part of your life, what would it be?",d:"easy"},{t:"What's a skill that took you longest to learn?",d:"easy"},{t:"Describe your city to someone who's never been there",d:"easy"},{t:"If you had to teach something tomorrow, what would it be?",d:"easy"},{t:"What would you do with an unexpected free week?",d:"easy"},{t:"Explain what you do to a 10-year-old",d:"easy"},{t:"What's something most people get wrong about your field?",d:"medium"},{t:"What does success actually look like to you?",d:"medium"},{t:"If money wasn't the goal, what would you build?",d:"medium"},{t:"What's one thing you changed your mind about recently?",d:"medium"},{t:"What object in your home best represents your personality?",d:"easy"},{t:"Describe your perfect productive day in detail",d:"easy"},{t:"What's something you believe that most people in your industry don't?",d:"hard"},{t:"What question do you hate being asked and why?",d:"medium"},{t:"What's the best piece of advice you've ignored?",d:"medium"},{t:"What are you better at than you give yourself credit for?",d:"easy"},{t:"What problem in your industry makes you frustrated every time?",d:"medium"},{t:"What habit has had the biggest impact on your life?",d:"easy"},{t:"What would your 15-year-old self think of your life right now?",d:"medium"},{t:"What belief do you hold that you can't fully defend?",d:"hard"},{t:"What's something you've stopped doing that improved your life?",d:"easy"},{t:"If you wrote a book tomorrow, what would it be about?",d:"medium"}
+  ]},
+  "persuasion":{ label:"Persuasion", topics:[
+    {t:"Convince me to start learning UI/UX design today",d:"easy"},{t:"Why building in public is worth the vulnerability",d:"medium"},{t:"Make the case for taking a gap year",d:"easy"},{t:"Argue that constraints make you more creative",d:"medium"},{t:"Why everyone should try teaching what they know",d:"easy"},{t:"Convince me that slow growth is better than hype",d:"medium"},{t:"The case for niching down hard as a freelancer",d:"medium"},{t:"Make the case for a product you use every day",d:"easy"},{t:"Convince a skeptic that design is a business skill, not decoration",d:"hard"},{t:"Argue that AI will create more creative jobs than it destroys",d:"hard"},{t:"Make the case for charging premium prices as a freelancer",d:"hard"},{t:"Convince me that content creation is a legitimate business strategy",d:"medium"},{t:"Argue that learning to code makes you a better designer",d:"medium"},{t:"Convince an executive to invest in UX research before building",d:"hard"},{t:"Argue that social proof is more powerful than advertising",d:"medium"},{t:"Make the case for working fewer hours to produce better work",d:"medium"},{t:"Convince me that a portfolio matters more than a degree",d:"easy"},{t:"Convince a non-designer to care about typography",d:"easy"},{t:"Make the case that feedback culture saves companies money",d:"medium"},{t:"Argue that the best marketing is just being remarkably useful",d:"medium"},{t:"Convince me that a personal brand is not optional for creatives",d:"easy"},{t:"Make the case for shipping imperfect work over waiting for perfect",d:"easy"},{t:"Convince a founder to hire a UX designer before a developer",d:"hard"},{t:"Argue that simplicity in products is a competitive advantage",d:"medium"},{t:"Convince me that reading is the highest-leverage use of time",d:"medium"},{t:"Make the case for saying no more often as a freelancer",d:"medium"},{t:"Argue that the best portfolio piece is a product that actually ships",d:"medium"}
+  ]}
+};
+
+const TIPS = ["Start with a bold claim, not a definition.","Speak to one person, not a crowd.","Use a pause instead of 'um'.","End with a clear statement, not a fade-out.","Tell a micro-story in the first 10 seconds.","Use contrast — 'most people think X, but actually...'","Name something specific. Numbers and names build trust.","Slow down at key points for emphasis.","Ask yourself: what's the one thing I want them to remember?","Open with a question, not an answer.","Vary your sentence length. Short sentences hit hard.","Don't summarize — build toward a conclusion."];
+const FEEDBACK = {
+  complete:[{t:"Full rep done 💪",b:"You stayed the whole time. That's the habit. Do it again without stopping to think."},{t:"Rep complete.",b:"The discomfort you felt? That's the work. Next rep, try starting with a story instead of a point."},{t:"Solid.",b:"Now rate yourself honestly — structure, pacing, confidence. Pick one to improve next round."}],
+  early:[{t:"You stopped early.",b:"That's fine — it happens. Next time, commit to keeping talking even if you repeat yourself. Fluency > perfection."},{t:"Cut short.",b:"When you go blank, try bridging: 'what that means is...' or 'the reason I say this is...' — buys you 5 seconds to find your thread."}]
+};
+const FILLER_WORDS = ["um","uh","like","you know","basically","literally","right","so","actually","kind of","sort of"];
+
+// ── PRACTICE STATE ────────────────────────────────────────────────────────────
+let selectedDur=60,timerSec=60,timerMax=60,interval=null,isRunning=false;
+let currentTopic=null,currentCat=null,currentDiff=null;
+let activeCats=Object.keys(TOPICS),diffFilter="all",hardUnlocked=false;
+let sessionHistory=[],bookmarks=[],reps=0,completed=0,bestSec=0;
+let recognition=null,micAllowed=false,fillerCounts={},lastFillerCounts={};
+
+// ── LEARN STATE ───────────────────────────────────────────────────────────────
+let learnItems=[];
+let learnFilter='all';
+let learnIdCounter=0;
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────────────────────
+const LS_KEY = 'yaplab_learn_v3';
+
+function saveLearn() {
+  try {
+    const payload = JSON.stringify({ items: learnItems, counter: learnIdCounter, savedAt: Date.now() });
+    localStorage.setItem(LS_KEY, payload);
+  } catch(e) {
+    // storage full — try clearing old keys first
+    try { localStorage.removeItem('yaplab_learn_v1'); localStorage.setItem(LS_KEY, JSON.stringify({ items: learnItems, counter: learnIdCounter })); } catch(e2) {}
+  }
+}
+
+function loadLearn() {
+  try {
+    // try current version first, fall back to v1
+    const raw = localStorage.getItem(LS_KEY) || localStorage.getItem('yaplab_learn_v1');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    learnItems = (data.items || []).map(item=>({
+      ...item,
+      sections: item.sections
+        ? item.sections
+        : (item.notes ? [{id:Date.now()+Math.random(),label:'Notes',placeholder:'',text:item.notes}] : [])
+    }));
+    learnIdCounter = data.counter || learnItems.length;
+    // immediately re-save under current key to lock it in
+    saveLearn();
+  } catch(e) { learnItems = []; }
+}
+
+// save before the tab closes
+window.addEventListener('beforeunload', saveLearn);
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const name = tab.charAt(0).toUpperCase()+tab.slice(1);
+  document.getElementById('panel'+name).classList.add('active');
+  document.getElementById('tab'+name+'Btn').classList.add('active');
+}
+
+// ── DIFFICULTY FILTER ─────────────────────────────────────────────────────────
+function setDiffFilter(diff,btn) {
+  if(diff==='hard'&&!hardUnlocked)return;
+  diffFilter=diff;
+  document.querySelectorAll('.diff-filter-btn').forEach(b=>b.className='diff-filter-btn');
+  btn.classList.add('active-'+diff);
+}
+
+// ── UNLOCK ────────────────────────────────────────────────────────────────────
+function updateUnlock() {
+  const pct=Math.min(100,(completed/10)*100);
+  document.getElementById('unlockFill').style.width=pct+'%';
+  document.getElementById('unlockCount').textContent=completed;
+  if(completed>=10&&!hardUnlocked){
+    hardUnlocked=true;
+    document.getElementById('hardLockLabel').textContent='— unlocked!';
+    document.getElementById('hardFilterBtn').style.opacity='1';
+    document.getElementById('unlockBar').innerHTML=`<div style="font-size:12px;color:var(--hard);font-weight:500;">🔓 Hard topics unlocked! <span style="color:var(--muted)">— ${completed} completed reps</span></div>`;
+  }
+}
+
+// ── CATEGORIES ────────────────────────────────────────────────────────────────
+const catRow=document.getElementById('catRow');
+Object.entries(TOPICS).forEach(([key,val])=>{
+  const b=document.createElement('button');
+  b.className='cat-btn on'; b.textContent=val.label; b.dataset.cat=key;
+  b.onclick=()=>toggleCat(key,b);
+  catRow.appendChild(b);
+});
+function toggleCat(key,btn){
+  const idx=activeCats.indexOf(key);
+  if(idx>-1){if(activeCats.length===1)return;activeCats.splice(idx,1);btn.classList.remove('on');}
+  else{activeCats.push(key);btn.classList.add('on');}
+}
+
+// ── DURATION BUTTONS ──────────────────────────────────────────────────────────
+document.querySelectorAll('.dur-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(isRunning)return;
+    document.querySelectorAll('.dur-btn').forEach(x=>x.classList.remove('selected'));
+    b.classList.add('selected');
+    selectedDur=parseInt(b.dataset.sec); timerSec=selectedDur; timerMax=selectedDur;
+    updateDisplay(); updateBar(1);
+    document.getElementById('feedbackWrap').classList.remove('show');
+  });
+});
+
+// ── TOPIC LOGIC ───────────────────────────────────────────────────────────────
+function newTopic(){
+  if(isRunning)resetTimer();
+  let pool=activeCats.flatMap(c=>TOPICS[c].topics.map(item=>({...item,c})));
+  if(diffFilter!=='all') pool=pool.filter(i=>i.d===diffFilter);
+  else if(!hardUnlocked) pool=pool.filter(i=>i.d!=='hard');
+  if(pool.length===0) pool=activeCats.flatMap(c=>TOPICS[c].topics.filter(i=>i.d==='easy').map(i=>({...i,c})));
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  currentTopic=pick.t; currentCat=pick.c; currentDiff=pick.d;
+  const el=document.getElementById('topicText');
+  el.classList.add('fading');
+  setTimeout(()=>{el.textContent=pick.t;el.classList.remove('fading');el.classList.add('fadeIn');setTimeout(()=>el.classList.remove('fadeIn'),400);},200);
+  document.getElementById('catBadge').textContent=TOPICS[pick.c].label;
+  const badge=document.getElementById('difficultyBadge');
+  badge.style.display='inline-flex'; badge.className='diff-badge '+pick.d;
+  badge.textContent={easy:'🟢 Easy',medium:'🟡 Medium',hard:'🔴 Hard'}[pick.d]||pick.d;
+  const tl=timerSec<=30?"Quick fire":timerSec<=60?"Short form":timerSec<=180?"Standard":"Long form";
+  document.getElementById('diffPill').innerHTML=`<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> ${tl}`;
+  document.getElementById('tipText').textContent=TIPS[Math.floor(Math.random()*TIPS.length)];
+  document.getElementById('tipPill').style.display='flex';
+  document.getElementById('topicCard').classList.add('active');
+  document.getElementById('feedbackWrap').classList.remove('show');
+  document.getElementById('bookmarkBtn').style.display='flex';
+  updateBookmarkBtn();
+}
+
+// ── BOOKMARKS ─────────────────────────────────────────────────────────────────
+function toggleBookmark(){
+  if(!currentTopic)return;
+  const idx=bookmarks.findIndex(b=>b.t===currentTopic);
+  if(idx>-1)bookmarks.splice(idx,1); else bookmarks.push({t:currentTopic,c:currentCat,d:currentDiff});
+  updateBookmarkBtn(); renderBookmarks();
+}
+function updateBookmarkBtn(){
+  const isSaved=bookmarks.some(b=>b.t===currentTopic);
+  document.getElementById('bookmarkBtn').classList.toggle('saved',isSaved);
+  document.getElementById('bookmarkLabel').textContent=isSaved?'Saved':'Save topic';
+  document.getElementById('bookmarkBtn').querySelector('svg').setAttribute('fill',isSaved?'currentColor':'none');
+}
+function renderBookmarks(){
+  const list=document.getElementById('bookmarkList'); list.innerHTML='';
+  if(!bookmarks.length){list.innerHTML='<div class="bookmark-empty">No saved topics yet.</div>';return;}
+  bookmarks.forEach((b,i)=>{
+    const dot={easy:'🟢',medium:'🟡',hard:'🔴'}[b.d]||'';
+    const item=document.createElement('div'); item.className='bookmark-item fadeIn';
+    item.innerHTML=`<span class="bookmark-item-text">${b.t}</span><div class="bookmark-item-meta"><span style="font-size:11px;color:var(--muted)">${dot} ${TOPICS[b.c]?.label||b.c}</span><button class="bookmark-load-btn" onclick="loadBookmark(${i})">Use</button><button class="bookmark-del-btn" onclick="removeBookmark(${i})"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>`;
+    list.appendChild(item);
+  });
+}
+function loadBookmark(i){
+  const b=bookmarks[i]; if(!b)return;
+  if(isRunning)resetTimer();
+  currentTopic=b.t; currentCat=b.c; currentDiff=b.d;
+  const el=document.getElementById('topicText');
+  el.classList.add('fading');
+  setTimeout(()=>{el.textContent=b.t;el.classList.remove('fading');el.classList.add('fadeIn');setTimeout(()=>el.classList.remove('fadeIn'),400);},200);
+  document.getElementById('catBadge').textContent=TOPICS[b.c]?.label||b.c;
+  const badge=document.getElementById('difficultyBadge');
+  badge.style.display='inline-flex'; badge.className='diff-badge '+b.d;
+  badge.textContent={easy:'🟢 Easy',medium:'🟡 Medium',hard:'🔴 Hard'}[b.d]||b.d;
+  document.getElementById('tipText').textContent=TIPS[Math.floor(Math.random()*TIPS.length)];
+  document.getElementById('tipPill').style.display='flex';
+  document.getElementById('topicCard').classList.add('active');
+  document.getElementById('feedbackWrap').classList.remove('show');
+  document.getElementById('bookmarkBtn').style.display='flex';
+  updateBookmarkBtn();
+}
+function removeBookmark(i){ bookmarks.splice(i,1); if(currentTopic)updateBookmarkBtn(); renderBookmarks(); }
+
+// ── FILLER ────────────────────────────────────────────────────────────────────
+function initFiller(){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    document.getElementById('micError').classList.add('show'); return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR(); recognition.continuous=true; recognition.interimResults=true; recognition.lang='en-US';
+  recognition.onresult=(e)=>{
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript.toLowerCase();
+      if(e.results[i].isFinal){FILLER_WORDS.forEach(w=>{const m=t.match(new RegExp('\\b'+w.replace(/ /g,'\\s+')+'\\b','gi'));if(m)fillerCounts[w]=(fillerCounts[w]||0)+m.length;});}
+    }
+    renderFillerGrid();
+  };
+  recognition.onerror=(e)=>{if(e.error==='not-allowed')document.getElementById('micError').classList.add('show');};
+  recognition.onend=()=>{if(isRunning){try{recognition.start();}catch(e){}}};
+}
+function renderFillerGrid(){
+  const grid=document.getElementById('fillerGrid'); grid.innerHTML=''; let total=0;
+  FILLER_WORDS.forEach(w=>{
+    const count=fillerCounts[w]||0; total+=count;
+    const chip=document.createElement('div'); chip.className='filler-chip'+(count>0?' hit':'');
+    chip.innerHTML=`<span class="word">${w}</span><span class="count">${count}</span>`;
+    grid.appendChild(chip);
+  });
+  document.getElementById('fillerTotal').innerHTML=`Total fillers: <strong>${total}</strong>`;
+}
+function startMic(){
+  if(!recognition)initFiller();
+  fillerCounts={}; renderFillerGrid();
+  document.getElementById('fillerWrap').classList.add('show');
+  document.getElementById('micIndicator').classList.add('active');
+  try{recognition.start();micAllowed=true;document.getElementById('micError').classList.remove('show');}catch(e){}
+}
+function stopMic(){
+  document.getElementById('micIndicator').classList.remove('active');
+  try{recognition.stop();}catch(e){}
+  lastFillerCounts={...fillerCounts};
+}
+
+// ── TIMER ─────────────────────────────────────────────────────────────────────
+function startStop(){
+  if(!currentTopic){newTopic();return;}
+  if(isRunning){
+    clearInterval(interval);isRunning=false;
+    stopMic();showFeedback(false,timerSec);
+    logSession(currentTopic,timerMax-timerSec);
+    updateStartBtn(); document.getElementById('resetBtn').disabled=false;
+  } else {
+    if(timerSec<=0)resetTimer();
+    isRunning=true; updateStartBtn(); document.getElementById('resetBtn').disabled=true;
+    startMic(); interval=setInterval(tick,1000);
+  }
+}
+function tick(){
+  timerSec--;updateDisplay();updateBar(timerSec/timerMax);
+  if(timerSec<=0){
+    clearInterval(interval);isRunning=false;
+    stopMic();showFeedback(true,timerMax);logSession(currentTopic,timerMax);
+    updateStartBtn(); document.getElementById('resetBtn').disabled=false;
+    document.getElementById('timerDisplay').classList.add('accent');
+    setTimeout(()=>document.getElementById('timerDisplay').classList.remove('accent'),2000);
+  }
+}
+function resetTimer(){
+  clearInterval(interval);if(isRunning)stopMic();
+  isRunning=false;timerSec=selectedDur;timerMax=selectedDur;
+  updateDisplay();updateBar(1);updateStartBtn();
+  document.getElementById('resetBtn').disabled=true;
+  document.getElementById('feedbackWrap').classList.remove('show');
+  const d=document.getElementById('timerDisplay');d.classList.remove('warn','danger','accent');
+  document.getElementById('timerBar').classList.remove('warn','danger');
+}
+function updateDisplay(){
+  const m=Math.floor(timerSec/60),s=timerSec%60;
+  document.getElementById('timerDisplay').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  const d=document.getElementById('timerDisplay');d.classList.remove('warn','danger','accent');
+  const pct=timerSec/timerMax;
+  if(pct<=0.15)d.classList.add('danger'); else if(pct<=0.33)d.classList.add('warn');
+}
+function updateBar(ratio){
+  const bar=document.getElementById('timerBar');
+  bar.style.width=Math.max(0,ratio*100)+'%';
+  bar.classList.remove('warn','danger');
+  if(ratio<=0.15)bar.classList.add('danger'); else if(ratio<=0.33)bar.classList.add('warn');
+}
+function updateStartBtn(){
+  const btn=document.getElementById('startBtn');
+  if(isRunning){btn.innerHTML=`<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause`;btn.classList.remove('pulsing');}
+  else{btn.innerHTML=`<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Start`;if(currentTopic)btn.classList.add('pulsing');}
+}
+function showFeedback(isComplete,sec){
+  const pool=isComplete?FEEDBACK.complete:FEEDBACK.early;
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('feedbackTitle').textContent=pick.t;
+  document.getElementById('feedbackText').textContent=pick.b;
+  const total=Object.values(lastFillerCounts).reduce((a,b)=>a+b,0);
+  const note=document.getElementById('feedbackFillerNote');
+  if(total>0){
+    const top=Object.entries(lastFillerCounts).sort((a,b)=>b[1]-a[1])[0];
+    note.textContent=`Filler words this rep: ${total} total. Most used: "${top[0]}" (${top[1]}×). Try replacing it with a pause.`;
+    note.classList.add('show');
+  } else if(micAllowed){note.textContent='Zero filler words detected. Clean delivery.';note.classList.add('show');}
+  else note.classList.remove('show');
+  document.getElementById('feedbackWrap').classList.add('show');
+}
+function logSession(topic,elapsed){
+  if(elapsed<3)return;
+  reps++;const done=elapsed>=timerMax;if(done)completed++;if(elapsed>bestSec)bestSec=elapsed;
+  document.getElementById('statReps').textContent=reps;
+  document.getElementById('statStreak').textContent=completed;
+  const bm=Math.floor(bestSec/60),bs=bestSec%60;
+  document.getElementById('statBest').textContent=bestSec>=60?`${bm}m${String(bs).padStart(2,'0')}s`:`${bestSec}s`;
+  updateUnlock();
+  const list=document.getElementById('historyList');
+  const empty=list.querySelector('.history-empty');if(empty)empty.remove();
+  const em=Math.floor(elapsed/60),es=elapsed%60;
+  const timeStr=elapsed>=60?`${em}:${String(es).padStart(2,'0')}`:`0:${String(elapsed).padStart(2,'0')}`;
+  const tf=Object.values(lastFillerCounts).reduce((a,b)=>a+b,0);
+  const fs=micAllowed?` · ${tf} fillers`:'';
+  const item=document.createElement('div');item.className='history-item fadeIn';
+  item.innerHTML=`<span class="history-topic">${topic}</span><div class="history-right"><span class="history-filler">${fs}</span><span class="history-time">${timeStr}</span></div>`;
+  list.insertBefore(item,list.firstChild);
+  sessionHistory.unshift({topic,elapsed});
+  if(sessionHistory.length>10){list.removeChild(list.lastChild);sessionHistory.pop();}
+}
+
+// ── LEARN TAB ─────────────────────────────────────────────────────────────────
+const CAT_LABELS={design:'Design',opinions:'Opinions',persuasion:'Persuasion',storytelling:'Storytelling',impromptu:'Impromptu',other:'Other'};
+const STATUS_LABELS={unread:'· Unread',read:'✓ Read',ready:'✦ Ready to speak'};
+const WPM = 130; // words per minute speaking pace
+
+const TEMPLATES = {
+  viral: {
+    label: 'Viral (Experience/Experiment)',
+    sections: [
+      { label: 'Hook', placeholder: `Open with the problem or the challenge — make the viewer feel the stakes immediately.\n\nExamples:\n• "My app has been getting signups — but users open it once and never come back. I think I finally know why."\n• "I tried to add one feature to my product. It broke everything. Here's what actually happened."` },
+      { label: 'Stakes', placeholder: `Why does this matter to you — and why should it matter to the viewer?\n\nExamples:\n• "Every user who churns in week one is money I'll never make. And I was losing almost all of them."\n• "I had three paying customers watching me. I couldn't ship something broken."` },
+      { label: 'The Plan', placeholder: `What are you about to do, and how are you approaching it?\n\nExamples:\n• "So here's what I decided to build — a two-phase onboarding. Get them to upload. Then show them where everything lives."\n• "I gave myself one afternoon. No extensions, no excuses. Here's the exact plan I followed."` },
+      { label: 'The Build', placeholder: `Show the actual work. Walk through the decisions you're making as you go.\n\nExamples:\n• "I started with the welcome screen. One screen, not four. People skip long intros — I've seen it in every app I've tested."\n• "The first thing I did was map the flow on paper before touching any tool. That saved me two hours of back-and-forth."` },
+      { label: 'The Struggle', placeholder: `Show a moment where something went wrong or didn't work as expected. This is what makes it real.\n\nExamples:\n• "The progress screen looked fine on desktop. On a smaller window, it completely broke. I almost missed it."\n• "I built the whole thing in one direction — then realized I'd solved the wrong problem entirely."` },
+      { label: 'The Result', placeholder: `Show the before and after. Make it visual and concrete.\n\nExamples:\n• "This is what a new user sees now — clear direction from the first second. Sign up, upload, get your clips, done."\n• "Here's the old version. Here's the new one. The difference took less than three hours to build."` },
+      { label: 'Reflection & Outro', placeholder: `What did you learn? What's next? End with something that sticks.\n\nExamples:\n• "Is it perfect? No. But it's a thousand times better than leaving users to figure it out alone. The next thing I'm adding is a quote card generator — that's a different video."\n• "The lesson: solve the first 60 seconds of your user's experience before you build anything else. I'll see you in the next one."` }
+    ]
+  },
+  story: {
+    label: 'Story Arc',
+    sections: [
+      { label: 'Opening Image', placeholder: `Drop the viewer into a specific moment — a scene, not a summary.\n\nExamples:\n• "It's 11pm. I'm staring at a screen that says 'zero signups.' I've been building for six months."\n• "The client's on the call. I'm sharing my screen. And the prototype is broken."` },
+      { label: 'Setup', placeholder: `Give context — who you are, what the world looked like before things changed.\n\nExamples:\n• "At the time, I was three months into freelancing. Two clients, steady income, thought I had it figured out."\n• "I'd been teaching design for a year. I knew the theory. I just hadn't shipped anything real yet."` },
+      { label: 'Problem', placeholder: `What disrupted the normal? What forced a change?\n\nExamples:\n• "Then I lost both clients in the same week. No warning, no reason — just gone."\n• "The feedback from my first real user was brutal. They didn't understand a single screen I'd designed."` },
+      { label: 'Rising Action', placeholder: `What did you try? What happened as you worked through it?\n\nExamples:\n• "I spent two weeks reaching out to 40 potential clients. Heard back from three. Booked one."\n• "I redesigned the whole flow — twice. Each version taught me something the last one didn't."` },
+      { label: 'Climax / Turn', placeholder: `The pivotal moment. The thing that changed everything.\n\nExamples:\n• "Then one conversation shifted how I saw the whole problem. A mentor asked me one question I couldn't answer."\n• "I almost gave up. And then — at 2am — it clicked. I had been solving the wrong thing the entire time."` },
+      { label: 'Resolution', placeholder: `What happened after? What does the world look like now?\n\nExamples:\n• "Three months later, I had more clients than I could take. Not because I got better at pitching — because I stopped pitching."\n• "The product shipped. It wasn't perfect. But users got it. And that was everything."` },
+      { label: 'Takeaway', placeholder: `What's the one thing you want them to walk away with?\n\nExamples:\n• "The lesson I keep coming back to: the people who figure it out aren't the ones who never struggle — they're the ones who don't stop when they do."\n• "If you're in the hard part right now, you're not behind. You're exactly where the learning happens."` }
+    ]
+  },
+  persuasion: {
+    label: 'Persuasion',
+    sections: [
+      { label: 'Bold Claim', placeholder: `Start with a statement that challenges what most people assume.\n\nExamples:\n• "Most designers are solving the wrong problem — and they don't even know it."\n• "Your onboarding is costing you more revenue than your pricing ever will."` },
+      { label: 'Why It Matters', placeholder: `Explain the stakes. Why should they care right now?\n\nExamples:\n• "Every user who doesn't understand your product in the first 60 seconds is gone — probably forever."\n• "Design isn't decoration. It's the difference between a product people trust and one they abandon."` },
+      { label: 'Common Objection', placeholder: `Steelman the opposing view before you dismantle it.\n\nExamples:\n• "I know what you're thinking — 'I don't have time for UX research, I just need to ship.'"\n• "Most people say: 'Users will figure it out.' And maybe they will. But will they stick around long enough?"` },
+      { label: 'Evidence / Example', placeholder: `Use a specific story, number, or example — not a vague claim.\n\nExamples:\n• "I ran a test. Two versions of the same screen. The one with a single clear CTA converted 40% better."\n• "Slack's onboarding doesn't teach you every feature. It gets you to send one message. That's it. And it works."` },
+      { label: 'Reframe', placeholder: `Shift how they see the issue entirely.\n\nExamples:\n• "This isn't about making things pretty. It's about making sure people don't leave confused."\n• "Onboarding isn't a feature. It's the first impression your product makes — and you only get one."` },
+      { label: 'Call to Action', placeholder: `End with something specific they can do right now.\n\nExamples:\n• "Open your app as if you're a brand new user. Time how long it takes to understand what to do. That number will tell you everything."\n• "Before you build the next feature, sit with one real user for 20 minutes. Watch where they get stuck. That's your roadmap."` }
+    ]
+  },
+  tutorial: {
+    label: 'Tutorial / How-To',
+    sections: [
+      { label: 'Hook — The Result', placeholder: `Show or describe what they'll be able to do by the end. Lead with the outcome.\n\nExamples:\n• "By the end of this, you'll have a fully working onboarding flow — built in under two hours."\n• "I'm going to show you exactly how I structure my design tokens so I never have to guess which colour to use."` },
+      { label: 'What You Need', placeholder: `Set them up for success — tools, context, prerequisites.\n\nExamples:\n• "You'll need Figma, a basic component library, and about 45 minutes. That's it."\n• "This works whether you're using Antigravity, Cursor, or building vanilla. The logic is the same."` },
+      { label: 'Step 1', placeholder: `First action — be specific. Tell them exactly what to do and why.\n\nExamples:\n• "Start with your welcome screen. One screen, one message, one button. Resist the urge to explain everything here."\n• "Before you open any tool, write the user's goal in one sentence. That sentence becomes your north star for every decision."` },
+      { label: 'Step 2', placeholder: `Next step — continue the sequence.\n\nExamples:\n• "Now set up your progress state. While the app is processing, don't show a blank screen — show momentum."\n• "Map your token names to their purpose, not their value. 'color-text-primary' is useful. 'gray-900' is not."` },
+      { label: 'Step 3', placeholder: `Third step — keep moving forward.\n\nExamples:\n• "Finally, build the feature tour. Three steps maximum — clips, preview, export. Dismiss on any click outside."\n• "Now wire up the alias layer. Every component references an alias token, never a base token directly."` },
+      { label: 'Common Mistakes', placeholder: `Warn them about the things that trip most people up.\n\nExamples:\n• "The mistake I see most often: building a 6-step onboarding when users just want to do the thing."\n• "Don't name tokens after their visual appearance. If the colour changes, your name becomes a lie."` },
+      { label: 'Wrap Up', placeholder: `Summarise what they built and point to what's next.\n\nExamples:\n• "That's your full onboarding — welcome screen, progress state, feature tour. Now go test it on someone who's never seen your product."\n• "You now have a token system that scales. The next layer is theming — swapping the whole brand with one variable."` }
+    ]
+  }
+};
+
+function addLearnItem(){
+  const input=document.getElementById('learnInput');
+  const title=input.value.trim(); if(!title){input.focus();return;}
+  const cat=document.getElementById('learnCatSelect').value;
+  learnItems.unshift({id:++learnIdCounter,title,category:cat,status:'unread',sections:[]});
+  input.value='';
+  saveLearn(); renderLearnList(); updateLearnStats();
+}
+document.getElementById('learnInput').addEventListener('keydown',e=>{if(e.key==='Enter')addLearnItem();});
+
+function setLearnFilter(filter,btn){
+  learnFilter=filter;
+  document.querySelectorAll('.learn-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLearnList();
+}
+
+function cycleStatus(id){
+  const item=learnItems.find(i=>i.id===id); if(!item)return;
+  item.status={unread:'read',read:'ready',ready:'unread'}[item.status];
+  saveLearn(); renderLearnList(); updateLearnStats();
+}
+
+function deleteLearnItem(id){
+  learnItems=learnItems.filter(i=>i.id!==id);
+  saveLearn(); renderLearnList(); updateLearnStats();
+}
+
+function toggleScript(id){
+  const area=document.getElementById('script-area-'+id); if(!area)return;
+  area.classList.toggle('open');
+  const tog=document.getElementById('script-toggle-'+id);
+  if(tog)tog.textContent=area.classList.contains('open')?'▲ Hide script':'▼ Write script';
+}
+
+function esc(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function wordCount(text){ return text.trim()===''?0:text.trim().split(/\s+/).length; }
+
+function formatDur(words){
+  const secs=Math.round((words/WPM)*60);
+  if(secs<60) return secs+'s';
+  const m=Math.floor(secs/60),s=secs%60;
+  return s>0?`${m}m ${s}s`:`${m}m`;
+}
+
+function addSection(itemId, labelOverride, placeholderOverride){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  if(!item.sections) item.sections=[];
+  const idx=item.sections.length+1;
+  item.sections.push({id:Date.now()+Math.random(),label:labelOverride||'Section '+idx,placeholder:placeholderOverride||'',text:''});
+  saveLearn();
+  renderScriptSections(itemId);
+}
+
+function deleteSection(itemId, secId){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  item.sections=item.sections.filter(s=>s.id!==secId);
+  saveLearn();
+  renderScriptSections(itemId);
+}
+
+function updateSectionLabel(itemId, secId, value){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  const sec=item.sections.find(s=>s.id===secId); if(!sec)return;
+  sec.label=value;
+  saveLearn();
+}
+
+function updateSectionText(itemId, secId, value){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  const sec=item.sections.find(s=>s.id===secId); if(!sec)return;
+  sec.text=value;
+  saveLearn();
+  updateSectionStats(itemId, secId, value);
+  updateTotalBar(itemId);
+}
+
+function updateSectionStats(itemId, secId, text){
+  const wc=wordCount(text);
+  const wcEl=document.getElementById(`sec-wc-${itemId}-${secId}`);
+  const durEl=document.getElementById(`sec-dur-${itemId}-${secId}`);
+  if(wcEl) wcEl.textContent=wc+' words';
+  if(durEl) durEl.textContent=wc>0?'~'+formatDur(wc):'—';
+}
+
+function updateTotalBar(itemId){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  const totalWc=(item.sections||[]).reduce((a,s)=>a+wordCount(s.text),0);
+  const twcEl=document.getElementById(`total-wc-${itemId}`);
+  const tdurEl=document.getElementById(`total-dur-${itemId}`);
+  if(twcEl) twcEl.textContent=totalWc+' words';
+  if(tdurEl) tdurEl.textContent=totalWc>0?'~'+formatDur(totalWc):'—';
+}
+
+function loadTemplate(itemId, tplKey){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  const tpl=TEMPLATES[tplKey]; if(!tpl)return;
+  if(item.sections&&item.sections.length>0){
+    if(!confirm('This will replace your current sections. Continue?'))return;
+  }
+  item.sections=tpl.sections.map((s,idx)=>({id:Date.now()+idx,label:s.label,placeholder:s.placeholder,text:''}));
+  saveLearn();
+  renderScriptSections(itemId);
+}
+
+// ── DRAG TO REORDER ───────────────────────────────────────────────────────────
+let dragSrcItemId=null, dragSrcSecId=null, dragEl=null;
+
+function onDragStart(e, itemId, secId){
+  dragSrcItemId=itemId; dragSrcSecId=secId;
+  dragEl=e.currentTarget.closest('.script-section');
+  dragEl.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain','');
+}
+function onDragOver(e, itemId, secId){
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  if(secId===dragSrcSecId) return;
+  document.querySelectorAll('.script-section').forEach(el=>el.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e, itemId, secId){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(secId===dragSrcSecId||itemId!==dragSrcItemId) return;
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  const fromIdx=item.sections.findIndex(s=>s.id===dragSrcSecId);
+  const toIdx=item.sections.findIndex(s=>s.id===secId);
+  if(fromIdx<0||toIdx<0) return;
+  const [moved]=item.sections.splice(fromIdx,1);
+  item.sections.splice(toIdx,0,moved);
+  saveLearn();
+  renderScriptSections(itemId);
+}
+function onDragEnd(e){
+  document.querySelectorAll('.script-section').forEach(el=>el.classList.remove('dragging','drag-over'));
+  dragSrcItemId=null; dragSrcSecId=null; dragEl=null;
+}
+
+function renderScriptSections(itemId){
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  const container=document.getElementById(`sections-${itemId}`); if(!container)return;
+  container.innerHTML='';
+
+  const sections=item.sections||[];
+  if(sections.length===0){
+    container.innerHTML='<div class="script-empty-hint">No sections yet — load a template or add a section manually.</div>';
+  } else {
+    sections.forEach((sec,idx)=>{
+      const wc=wordCount(sec.text);
+      const ph=sec.placeholder||'Write this section…';
+      const secIdSafe=String(sec.id).replace('.','_');
+      const div=document.createElement('div');
+      div.className='script-section fadeIn';
+      div.draggable=true;
+      div.dataset.secId=sec.id;
+      div.addEventListener('dragstart', e=>onDragStart(e,itemId,sec.id));
+      div.addEventListener('dragover',  e=>onDragOver(e,itemId,sec.id));
+      div.addEventListener('dragleave', e=>onDragLeave(e));
+      div.addEventListener('drop',      e=>onDrop(e,itemId,sec.id));
+      div.addEventListener('dragend',   e=>onDragEnd(e));
+      div.innerHTML=`
+        <div class="script-section-head">
+          <div class="drag-handle" title="Drag to reorder">
+            <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="4" cy="3" r="1.5"/><circle cx="8" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="4" cy="13" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+          </div>
+          <span class="section-num">${idx+1}</span>
+          <input class="section-label-input" value="${esc(sec.label)}" placeholder="Section name…"
+            onchange="updateSectionLabel(${itemId},${sec.id},this.value)"
+            oninput="updateSectionLabel(${itemId},${sec.id},this.value)">
+          <div class="section-stats">
+            <span class="section-wc" id="sec-wc-${itemId}-${secIdSafe}">${wc} words</span>
+            <span class="section-dur" id="sec-dur-${itemId}-${secIdSafe}">${wc>0?'~'+formatDur(wc):'—'}</span>
+          </div>
+          <button class="section-del-btn" onclick="deleteSection(${itemId},${sec.id})" title="Remove section">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <textarea placeholder="${esc(ph)}"
+          oninput="updateSectionText(${itemId},${sec.id},this.value)">${esc(sec.text)}</textarea>`;
+      container.appendChild(div);
+    });
+  }
+
+  // total bar
+  const totalWc=sections.reduce((a,s)=>a+wordCount(s.text),0);
+  const twcEl=document.getElementById(`total-wc-${itemId}`);
+  const tdurEl=document.getElementById(`total-dur-${itemId}`);
+  if(twcEl) twcEl.textContent=totalWc+' words';
+  if(tdurEl) tdurEl.textContent=totalWc>0?'~'+formatDur(totalWc):'—';
+}
+
+function renderLearnList(){
+  const list=document.getElementById('learnList');
+  const filtered=learnFilter==='all'?learnItems:learnItems.filter(i=>i.status===learnFilter);
+  if(!filtered.length){
+    list.innerHTML=learnItems.length===0
+      ?'<div class="learn-empty"><strong>Nothing here yet</strong>Add a topic above to start writing your first script.</div>'
+      :'<div class="learn-empty"><strong>No items with this status</strong>Try a different filter.</div>';
+    return;
+  }
+  list.innerHTML='';
+  filtered.forEach(item=>{
+    if(!item.sections) item.sections=[];
+    const hasScript=item.sections.length>0;
+    const totalWc=item.sections.reduce((a,s)=>a+wordCount(s.text),0);
+    const div=document.createElement('div'); div.className='learn-item fadeIn';
+    div.innerHTML=`
+      <div class="learn-item-top">
+        <div class="learn-item-title-wrap" id="title-wrap-${item.id}">
+          <div class="learn-item-title" id="title-display-${item.id}">${esc(item.title)}</div>
+          <button class="title-edit-btn" onclick="startEditTitle(${item.id})" title="Edit title">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+        </div>
+        <div class="learn-item-actions">
+          <button class="status-btn ${item.status}" onclick="cycleStatus(${item.id})">${STATUS_LABELS[item.status]}</button>
+          <button class="learn-item-del" onclick="deleteLearnItem(${item.id})" title="Remove"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        </div>
+      </div>
+      <div class="learn-item-meta">
+        <span class="learn-cat-pill">${CAT_LABELS[item.category]||item.category}</span>
+        ${hasScript?`<span style="font-size:10px;color:var(--accent);font-weight:600;">${item.sections.length} sections · ${totalWc>0?'~'+formatDur(totalWc):'0 words'}</span>`:''}
+        <button class="notes-toggle" id="script-toggle-${item.id}" onclick="toggleScript(${item.id})">${hasScript?'▼ View script':'▼ Write script'}</button>
+      </div>
+      <div class="notes-area" id="script-area-${item.id}">
+        <div class="script-toolbar">
+          <span class="script-toolbar-label">Template:</span>
+          ${Object.entries(TEMPLATES).map(([k,t])=>`<button class="template-btn" onclick="loadTemplate(${item.id},'${k}')">${t.label}</button>`).join('')}
+          <button class="add-section-btn" onclick="addSection(${item.id})">
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add section
+          </button>
+        </div>
+        <div class="script-sections" id="sections-${item.id}"></div>
+        <div class="script-total-bar" id="total-bar-${item.id}">
+          <span class="script-total-label">Total script</span>
+          <div class="script-total-nums">
+            <span class="script-total-wc" id="total-wc-${item.id}">${totalWc} words</span>
+            <span class="script-total-dur" id="total-dur-${item.id}">${totalWc>0?'~'+formatDur(totalWc):'—'}</span>
+          </div>
+        </div>
+        <div class="notes-hint">Speaking pace: ~130 words/min · Drag <svg style="display:inline;vertical-align:middle" width="10" height="13" viewBox="0 0 12 16" fill="currentColor"><circle cx="4" cy="3" r="1.5"/><circle cx="8" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="4" cy="13" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg> to reorder · Auto-saves · Mark <strong>Ready to speak</strong> when done</div>
+      </div>`;
+    list.appendChild(div);
+    renderScriptSections(item.id);
+  });
+}
+
+
+function updateLearnStats(){
+  document.getElementById('lsUnread').textContent=learnItems.filter(i=>i.status==='unread').length;
+  document.getElementById('lsRead').textContent=learnItems.filter(i=>i.status==='read').length;
+  document.getElementById('lsReady').textContent=learnItems.filter(i=>i.status==='ready').length;
+}
+
+// ── TITLE EDITING ─────────────────────────────────────────────────────────────
+function startEditTitle(id){
+  const item=learnItems.find(i=>i.id===id); if(!item)return;
+  const wrap=document.getElementById('title-wrap-'+id); if(!wrap)return;
+  wrap.innerHTML=`
+    <input class="title-edit-input" id="title-input-${id}" value="${esc(item.title)}" maxlength="120" />
+    <button class="title-edit-btn" onclick="saveEditTitle(${id})" title="Save">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    </button>
+    <button class="title-edit-btn" onclick="cancelEditTitle(${id})" title="Cancel">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>`;
+  const inp=document.getElementById('title-input-'+id);
+  inp.focus(); inp.select();
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter') saveEditTitle(id);
+    if(e.key==='Escape') cancelEditTitle(id);
+  });
+}
+
+function saveEditTitle(id){
+  const item=learnItems.find(i=>i.id===id); if(!item)return;
+  const inp=document.getElementById('title-input-'+id); if(!inp)return;
+  const val=inp.value.trim();
+  if(val) item.title=val;
+  saveLearn();
+  renderLearnList(); updateLearnStats();
+}
+
+function cancelEditTitle(id){
+  const wrap=document.getElementById('title-wrap-'+id); if(!wrap)return;
+  const item=learnItems.find(i=>i.id===id); if(!item)return;
+  wrap.innerHTML=`
+    <div class="learn-item-title" id="title-display-${id}">${esc(item.title)}</div>
+    <button class="title-edit-btn" onclick="startEditTitle(${id})" title="Edit title">
+      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>`;
+}
+
+// ── THEME TOGGLE ──────────────────────────────────────────────────────────────
+const THEME_KEY='yaplab_theme';
+let isLight = localStorage.getItem(THEME_KEY)==='light';
+
+function applyTheme(){
+  const icon = document.getElementById('themeIcon');
+  const label = document.getElementById('themeLabel');
+  if(!icon||!label) return;
+  if(isLight){
+    document.documentElement.classList.add('light');
+    label.textContent='Dark';
+    while(icon.firstChild) icon.removeChild(icon.firstChild);
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx','12');c.setAttribute('cy','12');c.setAttribute('r','5');
+    c.setAttribute('fill','none');c.setAttribute('stroke','currentColor');c.setAttribute('stroke-width','2');
+    icon.appendChild(c);
+    [[12,1,12,3],[12,21,12,23],[4.22,4.22,5.64,5.64],[18.36,18.36,19.78,19.78],
+     [1,12,3,12],[21,12,23,12],[4.22,19.78,5.64,18.36],[18.36,5.64,19.78,4.22]].forEach(function(p){
+      const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+      l.setAttribute('x1',p[0]);l.setAttribute('y1',p[1]);l.setAttribute('x2',p[2]);l.setAttribute('y2',p[3]);
+      l.setAttribute('stroke','currentColor');l.setAttribute('stroke-width','2');
+      icon.appendChild(l);
+    });
+  } else {
+    document.documentElement.classList.remove('light');
+    label.textContent='Light';
+    while(icon.firstChild) icon.removeChild(icon.firstChild);
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
+    p.setAttribute('fill','none');p.setAttribute('stroke','currentColor');p.setAttribute('stroke-width','2');
+    icon.appendChild(p);
+  }
+}
+
+function toggleTheme(){
+  isLight=!isLight;
+  localStorage.setItem(THEME_KEY, isLight?'light':'dark');
+  applyTheme();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  applyTheme();
+  loadLearn();
+  updateDisplay();
+  initFiller();
+  renderBookmarks();
+  renderLearnList();
+  updateLearnStats();
+});
+</script>
+</body>
+</html>
