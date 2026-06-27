@@ -397,27 +397,29 @@
 
   /* Premium Desktop Typography Scaling (min-width: 768px) */
   @media (min-width: 768px) {
-    body { font-size: 16px; }
-    .wordmark { font-size: 32px !important; }
-    .topic-text { font-size: 32px !important; }
-    .timer-display { font-size: 84px !important; }
-    .stat-num { font-size: 32px !important; }
+    body { font-size: 18px; }
+    .wordmark { font-size: 44px !important; }
+    .topic-text { font-size: 40px !important; }
+    .timer-display { font-size: 120px !important; }
+    .stat-num { font-size: 44px !important; }
     
-    .learn-stat-num { font-size: 26px !important; }
-    .add-input { font-size: 15px !important; }
-    .add-select { font-size: 14px !important; }
+    .learn-stat-num { font-size: 38px !important; }
+    .add-row > * { height: 48px !important; }
+    .add-input { font-size: 18px !important; }
+    .add-select { font-size: 17px !important; }
+    .add-row .btn-primary { font-size: 15px !important; }
     
-    .learn-item-title { font-size: 16px !important; }
-    .script-section textarea { font-size: 14px !important; }
-    .section-label-input { font-size: 13px !important; }
-    .script-total-dur { font-size: 18px !important; }
+    .learn-item-title { font-size: 20px !important; }
+    .script-section textarea { font-size: 17px !important; }
+    .section-label-input { font-size: 16px !important; }
+    .script-total-dur { font-size: 24px !important; }
     
-    .section-title { font-size: 12px !important; }
-    .bookmark-item-text { font-size: 14px !important; }
-    .history-topic { font-size: 15px !important; }
-    .history-time { font-size: 14px !important; }
-    .feedback-title { font-size: 15px !important; }
-    .feedback-text { font-size: 14px !important; }
+    .section-title { font-size: 16px !important; }
+    .bookmark-item-text { font-size: 18px !important; }
+    .history-topic { font-size: 18px !important; }
+    .history-time { font-size: 18px !important; }
+    .feedback-title { font-size: 19px !important; }
+    .feedback-text { font-size: 17px !important; }
   }
 </style>
 </head>
@@ -553,7 +555,7 @@
     <div class="add-item-card">
       <div class="section-title" style="margin-bottom:0">Add topic to learn</div>
       <div class="add-row">
-        <input class="add-input" id="learnInput" type="text" placeholder="e.g. Why UI is important, what it means…" />
+        <input class="add-input" id="learnInput" type="text" placeholder="e.g. Why UI is important, what it means…" autocomplete="off" />
         <select class="add-select" id="learnCatSelect">
           <option value="design">Design</option>
           <option value="opinions">Opinions</option>
@@ -1678,6 +1680,7 @@ async function transitionToApp() {
   // Clear inputs
   document.getElementById('authWallEmail').value = '';
   document.getElementById('authWallPassword').value = '';
+  document.getElementById('learnInput').value = '';
 
   // Clear any existing localStorage data (bypass local only completely)
   localStorage.removeItem(LS_KEY);
