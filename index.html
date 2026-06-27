@@ -11,6 +11,7 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
+    color-scheme: dark;
     --bg: #0d0d0d; --surface: #161616; --surface2: #1e1e1e; --border: #2a2a2a;
     --accent: #c8f135; --accent-dark: #8fb800; --accent-dim: rgba(200,241,53,0.12); --accent-dim2: rgba(200,241,53,0.06);
     --text: #f0f0f0; --muted: #777; --danger: #ff5c5c; --warn: #ffb347;
@@ -18,11 +19,32 @@
     --tab-active-text: #0d0d0d;
   }
   :root.light {
+    color-scheme: light;
     --bg: #f4f4f0; --surface: #ffffff; --surface2: #f0f0ec; --border: #e0e0d8;
     --accent: #7ab800; --accent-dark: #5a8a00; --accent-dim: rgba(122,184,0,0.1); --accent-dim2: rgba(122,184,0,0.05);
     --text: #111111; --muted: #888; --danger: #d93636; --warn: #d97706;
     --easy: #16a34a; --medium: #b45309; --hard: #dc2626; --locked: #bbb;
     --tab-active-text: #ffffff;
+  }
+
+  /* Sleek custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
   }
   /* theme toggle */
   .theme-toggle { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; color:var(--muted); display:flex; align-items:center; gap:6px; font-family:'Plus Jakarta Sans',sans-serif; font-size:12px; font-weight:500; transition:all 0.15s; flex-shrink:0; }
