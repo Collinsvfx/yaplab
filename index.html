@@ -730,6 +730,197 @@
       padding: 10px 16px !important;
     }
   }
+
+  /* ── PREFLIGHT CARD STYLES ── */
+  .preflight-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s ease;
+  }
+  .preflight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .preflight-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .preflight-complete-checkmark {
+    color: #10b981;
+    font-weight: bold;
+    font-size: 14px;
+    margin-left: 6px;
+    animation: scale-up 0.2s ease-out;
+  }
+  @keyframes scale-up {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .preflight-badge {
+    background: var(--border);
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .preflight-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .preflight-field-row {
+    display: flex;
+    gap: 12px;
+  }
+  @media (max-width: 767px) {
+    .preflight-field-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  .preflight-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .preflight-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .preflight-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .preflight-input:focus {
+    border-color: rgba(200, 241, 53, 0.4);
+    box-shadow: 0 0 6px rgba(200, 241, 53, 0.08);
+  }
+  textarea.preflight-input {
+    resize: vertical;
+  }
+
+  /* Preflight AI Feedback Section */
+  .preflight-ai-section {
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+  .preflight-ai-btn {
+    font-size: 11px !important;
+    padding: 6px 12px !important;
+    border-color: rgba(200, 241, 53, 0.3) !important;
+    background: transparent !important;
+    color: var(--accent) !important;
+    font-weight: 600;
+  }
+  .preflight-ai-btn:hover {
+    background: rgba(200, 241, 53, 0.08) !important;
+    border-color: var(--accent) !important;
+  }
+  .preflight-ai-result {
+    margin-top: 10px;
+    font-family: 'Inter', sans-serif;
+  }
+  .preflight-ai-loading {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .preflight-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: preflight-spin 0.8s linear infinite;
+  }
+  @keyframes preflight-spin {
+    to { transform: rotate(360deg); }
+  }
+  .preflight-result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .preflight-status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .preflight-status-badge.strong {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+  }
+  .preflight-status-badge.partial {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+  }
+  .preflight-status-badge.mismatch {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+  }
+  .preflight-result-critique {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+    margin: 8px 0;
+  }
+  .preflight-result-suggestions {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0;
+    padding-left: 16px;
+    line-height: 1.5;
+  }
+  .preflight-result-suggestions li {
+    margin-top: 4px;
+  }
+  .preflight-ai-error {
+    font-size: 11px;
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    padding: 8px;
+    border-radius: 6px;
+  }
+  @media (min-width: 768px) {
+    .preflight-title { font-size: 15px !important; }
+    .preflight-badge { font-size: 12px !important; }
+    .preflight-label { font-size: 13px !important; }
+    .preflight-input { font-size: 15px !important; padding: 10px 14px !important; }
+    .preflight-ai-btn { font-size: 14px !important; padding: 8px 16px !important; }
+    .preflight-result-critique { font-size: 15px !important; }
+    .preflight-result-suggestions { font-size: 13px !important; }
+    .preflight-status-badge { font-size: 12px !important; }
+  }
 </style>
 </head>
 <body>
@@ -1748,7 +1939,7 @@ function updateSectionStats(itemId, secId, text){
 
 function updateTotalBar(itemId){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
-  const totalWc=(item.sections||[]).reduce((a,s)=>a+wordCount(s.text),0);
+  const totalWc=(item.sections||[]).filter(s => s.type !== 'preflight').reduce((a,s)=>a+wordCount(s.text),0);
   const twcEl=document.getElementById(`total-wc-${itemId}`);
   const tdurEl=document.getElementById(`total-dur-${itemId}`);
   if(twcEl) twcEl.textContent=totalWc+' words';
@@ -1758,16 +1949,30 @@ function updateTotalBar(itemId){
 async function loadTemplate(itemId, tplKey){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   const tpl=TEMPLATES[tplKey]; if(!tpl)return;
-  if(item.sections&&item.sections.length>0){
+  
+  const dialogueSections = (item.sections || []).filter(s => s.type !== 'preflight');
+  if(dialogueSections.length>0){
     if(!confirm('This will replace your current sections. Continue?'))return;
   }
-  item.sections=tpl.sections.map((s,idx)=>({
+  
+  const preflight = (item.sections || []).find(s => s.type === 'preflight');
+  const newSections = tpl.sections.map((s,idx)=>({
     id:Date.now()+idx,
     label:s.label || (s.role === 'J' ? 'Junior' : s.role === 'S' ? 'Senior' : ''),
     role: s.role || null,
     placeholder:s.placeholder || '',
     text:''
   }));
+  
+  if (preflight) {
+    item.sections = [preflight, ...newSections];
+  } else {
+    item.sections = [
+      { type: 'preflight', emotionalEntry: '', whoFeels: '', hookTest: '' },
+      ...newSections
+    ];
+  }
+  
   item.updatedAt=Date.now();
   renderScriptSections(itemId);
   await saveSectionsToSupabase(itemId);
@@ -1777,7 +1982,7 @@ function copyScriptToClipboard(itemId, btn) {
   const item = learnItems.find(i => i.id === itemId);
   if (!item) return;
   
-  const sections = item.sections || [];
+  const sections = (item.sections || []).filter(s => s.type !== 'preflight');
   let content = '';
   sections.forEach((sec, idx) => {
     const label = sec.label || (sec.role === 'J' ? 'Junior' : sec.role === 'S' ? 'Senior' : `Section ${idx + 1}`);
@@ -1798,7 +2003,7 @@ function exportToWord(itemId) {
   const item = learnItems.find(i => i.id === itemId);
   if (!item) return;
   
-  const sections = item.sections || [];
+  const sections = (item.sections || []).filter(s => s.type !== 'preflight');
   let html = `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
     <head>
@@ -1840,7 +2045,7 @@ function exportToText(itemId) {
   const item = learnItems.find(i => i.id === itemId);
   if (!item) return;
   
-  const sections = item.sections || [];
+  const sections = (item.sections || []).filter(s => s.type !== 'preflight');
   let content = `${item.title.toUpperCase()}\n`;
   content += `Category: ${CAT_LABELS[item.category] || item.category}\n`;
   content += `====================================================\n\n`;
@@ -1861,6 +2066,193 @@ function exportToText(itemId) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+function renderPreflightHtml(item) {
+  let preflight = (item.sections || []).find(s => s.type === 'preflight');
+  if (!preflight) {
+    preflight = { type: 'preflight', emotionalEntry: '', whoFeels: '', hookTest: '' };
+    if (!item.sections) item.sections = [];
+    item.sections.unshift(preflight);
+  }
+  
+  const emotionalEntry = preflight.emotionalEntry || '';
+  const whoFeels = preflight.whoFeels || '';
+  const hookTest = preflight.hookTest || '';
+  
+  const isComplete = emotionalEntry.trim() !== '' && whoFeels.trim() !== '' && hookTest.trim() !== '';
+  const checkmark = isComplete ? `<span class="preflight-complete-checkmark" title="Pre-script complete">✓</span>` : '';
+  
+  return `
+    <div class="preflight-card" id="preflight-${item.id}">
+      <div class="preflight-header">
+        <div style="display:flex; align-items:center;">
+          <span class="preflight-title">Pre-Script: Find Your Hook</span>
+          ${checkmark}
+        </div>
+        <span class="preflight-badge">Not included in duration</span>
+      </div>
+      
+      <div class="preflight-body">
+        <div class="preflight-field">
+          <label class="preflight-label">What's the feeling behind this topic?</label>
+          <textarea class="preflight-input" rows="2" placeholder="e.g. I kept getting rejected from jobs and didn't know why — that frustration is why I made this video."
+            oninput="updatePreflightField(${item.id}, 'emotionalEntry', this.value)">${esc(emotionalEntry)}</textarea>
+        </div>
+        
+        <div class="preflight-field-row">
+          <div class="preflight-field" style="flex:1;">
+            <label class="preflight-label">Who specifically feels this?</label>
+            <input class="preflight-input" type="text" placeholder="e.g. Junior designers who've sent 20+ applications" value="${esc(whoFeels)}"
+              oninput="updatePreflightField(${item.id}, 'whoFeels', this.value)">
+          </div>
+          <div class="preflight-field" style="flex:1;">
+            <label class="preflight-label">Rewrite your title as a hook sentence</label>
+            <input class="preflight-input" type="text" placeholder="e.g. I audited 10 job descriptions and found I was missing 70% of the skills — so I fixed it." value="${esc(hookTest)}"
+              oninput="updatePreflightField(${item.id}, 'hookTest', this.value)">
+          </div>
+        </div>
+        
+        <div class="preflight-ai-section">
+          <button class="btn btn-secondary preflight-ai-btn" onclick="checkScriptAlignment(${item.id}, this)">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;display:inline-block;vertical-align:middle"><path d="M9.813 15.904L9 21L7.188 15.904L2 15L7.188 14.096L9 9L9.813 14.096L15 15L9.813 15.904Z"/><path d="M19.071 4.929a10 10 0 00-14.142 0M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Analyze Script Alignment
+          </button>
+          <div class="preflight-ai-result" id="preflight-ai-result-${item.id}" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function updatePreflightField(itemId, field, value) {
+  const item = learnItems.find(i => i.id === itemId);
+  if (!item) return;
+  
+  let preflight = (item.sections || []).find(s => s.type === 'preflight');
+  if (!preflight) {
+    preflight = { type: 'preflight', emotionalEntry: '', whoFeels: '', hookTest: '' };
+    if (!item.sections) item.sections = [];
+    item.sections.unshift(preflight);
+  }
+  
+  preflight[field] = value;
+  item.updatedAt = Date.now();
+  
+  const isComplete = (preflight.emotionalEntry || '').trim() !== '' && 
+                     (preflight.whoFeels || '').trim() !== '' && 
+                     (preflight.hookTest || '').trim() !== '';
+  
+  const card = document.getElementById(`preflight-${itemId}`);
+  if (card) {
+    const headerContainer = card.querySelector('.preflight-header div');
+    let checkmark = headerContainer.querySelector('.preflight-complete-checkmark');
+    if (isComplete) {
+      if (!checkmark) {
+        headerContainer.insertAdjacentHTML('beforeend', '<span class="preflight-complete-checkmark" title="Pre-script complete">✓</span>');
+      }
+    } else {
+      if (checkmark) checkmark.remove();
+    }
+  }
+  
+  triggerScriptSave(itemId);
+}
+
+async function checkScriptAlignment(itemId, btn) {
+  const item = learnItems.find(i => i.id === itemId);
+  if (!item) return;
+  
+  let preflight = (item.sections || []).find(s => s.type === 'preflight');
+  if (!preflight) return;
+  
+  const resultEl = document.getElementById(`preflight-ai-result-${itemId}`);
+  if (!resultEl) return;
+  
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div class="preflight-ai-loading"><span class="preflight-spinner"></span> Analyzing your script alignment...</div>`;
+  btn.disabled = true;
+  
+  const dialogueSections = (item.sections || []).filter(s => s.type !== 'preflight');
+  const fullScriptText = dialogueSections.map((s, idx) => {
+    const label = s.label || (s.role === 'J' ? 'Junior' : s.role === 'S' ? 'Senior' : `Section ${idx + 1}`);
+    return `[${label}]: ${s.text}`;
+  }).join('\n\n');
+  
+  try {
+    if (!supabaseClient) {
+      // Mock result for offline local storage testing
+      setTimeout(() => {
+        const mockResult = {
+          status: 'partial_match',
+          critique: '[Local Offline Mock] Your script matches your target audience well, but your hook could highlight the core tension more clearly.',
+          suggestions: [
+            'Try opening with a stronger hook line matching your planning.',
+            'Deploy to Vercel with GEMINI_API_KEY configured to get live AI reviews!'
+          ]
+        };
+        renderAlignmentResult(itemId, mockResult);
+        btn.disabled = false;
+      }, 1200);
+      return;
+    }
+    
+    const res = await fetch('/api/check-alignment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emotionalEntry: preflight.emotionalEntry,
+        whoFeels: preflight.whoFeels,
+        hookTest: preflight.hookTest,
+        fullScriptText: fullScriptText
+      })
+    });
+    
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Server error');
+    }
+    
+    const alignmentResult = await res.json();
+    renderAlignmentResult(itemId, alignmentResult);
+  } catch (err) {
+    resultEl.innerHTML = `<div class="preflight-ai-error">Failed to check alignment: ${esc(err.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderAlignmentResult(itemId, result) {
+  const resultEl = document.getElementById(`preflight-ai-result-${itemId}`);
+  if (!resultEl) return;
+  
+  const statusLabels = {
+    strong_match: '✓ Strong Match',
+    partial_match: '⚠ Partial Match',
+    mismatch: '✗ Mismatch'
+  };
+  
+  const statusClasses = {
+    strong_match: 'strong',
+    partial_match: 'partial',
+    mismatch: 'mismatch'
+  };
+  
+  const statusLabel = statusLabels[result.status] || 'Unknown';
+  const statusClass = statusClasses[result.status] || '';
+  
+  const suggestionsHtml = (result.suggestions || []).map(s => `<li>${esc(s)}</li>`).join('');
+  
+  resultEl.innerHTML = `
+    <div class="preflight-result-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-weight:600;font-size:12px;color:var(--text);">AI Assessment</span>
+        <span class="preflight-status-badge ${statusClass}">${esc(statusLabel)}</span>
+      </div>
+      <p class="preflight-result-critique">${esc(result.critique)}</p>
+      ${suggestionsHtml ? `<ul class="preflight-result-suggestions">${suggestionsHtml}</ul>` : ''}
+    </div>
+  `;
 }
 
 // ── DRAG TO REORDER ───────────────────────────────────────────────────────────
@@ -1903,8 +2295,10 @@ function renderRoleplayScriptSections(itemId, container, sections) {
   const inPractice = practiceModes[itemId] || false;
   const activeRole = practiceActiveRoles[itemId] || 'J';
 
-  const juniorSections = sections.filter(s => s.role === 'J');
-  const seniorSections = sections.filter(s => s.role === 'S');
+  const dialogueSections = sections.filter(s => s.type !== 'preflight');
+
+  const juniorSections = dialogueSections.filter(s => s.role === 'J');
+  const seniorSections = dialogueSections.filter(s => s.role === 'S');
   const wcJunior = juniorSections.reduce((sum, s) => sum + wordCount(s.text), 0);
   const wcSenior = seniorSections.reduce((sum, s) => sum + wordCount(s.text), 0);
   const totalWc = wcJunior + wcSenior;
@@ -1925,20 +2319,20 @@ function renderRoleplayScriptSections(itemId, container, sections) {
     colsContainer.className = 'roleplay-cols-container fadeIn';
 
     const juniorCol = document.createElement('div');
-    juniorCol.className = `roleplay-col roleplay-col-junior ${activeRole === 'J' ? 'highlighted' : 'dimmed'}`;
+    juniorCol.className = `roleplay-col roleplay-col-junior ${activeRole !== 'J' ? 'dimmed' : 'highlighted'}`;
     juniorCol.innerHTML = `<div class="roleplay-col-header">Junior</div>`;
     
     const juniorBlocksDiv = document.createElement('div');
     juniorBlocksDiv.className = 'roleplay-blocks';
 
     const seniorCol = document.createElement('div');
-    seniorCol.className = `roleplay-col roleplay-col-senior ${activeRole === 'S' ? 'highlighted' : 'dimmed'}`;
+    seniorCol.className = `roleplay-col roleplay-col-senior ${activeRole !== 'S' ? 'dimmed' : 'highlighted'}`;
     seniorCol.innerHTML = `<div class="roleplay-col-header">Senior</div>`;
     
     const seniorBlocksDiv = document.createElement('div');
     seniorBlocksDiv.className = 'roleplay-blocks';
 
-    sections.forEach((sec, idx) => {
+    dialogueSections.forEach((sec, idx) => {
       const lineNum = idx + 1;
       const block = document.createElement('div');
       block.className = 'roleplay-practice-block';
@@ -1947,7 +2341,7 @@ function renderRoleplayScriptSections(itemId, container, sections) {
           <span class="roleplay-badge ${sec.role.toLowerCase()}">${sec.role}</span>
           <span class="roleplay-line-num">Line ${lineNum}</span>
         </div>
-        <div class="roleplay-practice-text">${esc(sec.text) || '<em style="color:var(--muted)">[Silent]</em>'}</div>
+        <div class="roleplay-practice-text">${esc(sec.text || '[Silence]')}</div>
       `;
 
       if (sec.role === 'J') {
@@ -2058,7 +2452,8 @@ function renderScriptSections(itemId){
   const container=document.getElementById(`sections-${itemId}`); if(!container)return;
   container.innerHTML='';
 
-  const sections=item.sections||[];
+  const allSections=item.sections||[];
+  const sections=allSections.filter(s => s.type !== 'preflight');
   const isRoleplay = sections.some(s => s.role !== undefined && s.role !== null);
   if (isRoleplay) {
     renderRoleplayScriptSections(itemId, container, sections);
@@ -2170,10 +2565,11 @@ function renderLearnList(){
       </div>
       <div class="learn-item-meta">
         <span class="learn-cat-pill">${CAT_LABELS[item.category]||item.category}</span>
-        ${hasScript?`<span style="font-size:10px;color:var(--accent);font-weight:600;">${item.sections.length} ${isRoleplay ? 'lines' : 'sections'} · ${totalWc>0?'~'+formatDur(totalWc):'0 words'}</span>`:''}
+        ${hasScript?`<span style="font-size:10px;color:var(--accent);font-weight:600;">${item.sections.filter(s => s.type !== 'preflight').length} ${isRoleplay ? 'lines' : 'sections'} · ${totalWc>0?'~'+formatDur(totalWc):'0 words'}</span>`:''}
         <button class="notes-toggle" id="script-toggle-${item.id}" onclick="toggleScript(${item.id})">${isOpen ? '▲ Hide script' : (hasScript ? '▼ View script' : '▼ Write script')}</button>
       </div>
       <div class="notes-area ${isOpen ? 'open' : ''}" id="script-area-${item.id}">
+        ${renderPreflightHtml(item)}
         ${toolbarHtml}
         <div class="script-sections" id="sections-${item.id}"></div>
         <div class="script-total-bar" id="total-bar-${item.id}">
