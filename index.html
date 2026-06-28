@@ -2251,6 +2251,7 @@ function renderAlignmentResult(itemId, result) {
       </div>
       <p class="preflight-result-critique">${esc(result.critique)}</p>
       ${suggestionsHtml ? `<ul class="preflight-result-suggestions">${suggestionsHtml}</ul>` : ''}
+      ${result.modelUsed ? `<div style="font-size:9px;color:var(--muted);margin-top:10px;text-align:right;">Model: ${esc(result.modelUsed)}</div>` : ''}
     </div>
   `;
 }

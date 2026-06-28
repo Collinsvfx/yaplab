@@ -24,52 +24,79 @@ Dialogue Script Content:
 Analyze if the script dialogue stays true to the target audience, emotional motivation, and the hook. Suggest how to better align the text. Output your assessment in JSON structure.
 `;
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            responseSchema: {
-              type: 'OBJECT',
-              properties: {
-                status: {
-                  type: 'STRING',
-                  enum: ['strong_match', 'partial_match', 'mismatch']
+  // We define the fallback stack of Gemini models using only Flash & Flash-Lite models
+  const modelStack = [
+    'gemini-3.5-flash',
+    'gemini-3.1-flash',
+    'gemini-3-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite'
+  ];
+
+  let lastError = null;
+
+  for (const model of modelStack) {
+    try {
+      console.log(`Attempting alignment check with model: ${model}`);
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: 'application/json',
+              responseSchema: {
+                type: 'OBJECT',
+                properties: {
+                  status: {
+                    type: 'STRING',
+                    enum: ['strong_match', 'partial_match', 'mismatch']
+                  },
+                  critique: { type: 'STRING' },
+                  suggestions: {
+                    type: 'ARRAY',
+                    items: { type: 'STRING' }
+                  }
                 },
-                critique: { type: 'STRING' },
-                suggestions: {
-                  type: 'ARRAY',
-                  items: { type: 'STRING' }
-                }
-              },
-              required: ['status', 'critique', 'suggestions']
+                required: ['status', 'critique', 'suggestions']
+              }
             }
-          }
-        })
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`Model ${model} failed with status ${response.status}: ${errText}`);
+        lastError = new Error(`Model ${model} error (HTTP ${response.status}): ${errText}`);
+        continue; // Try the next model in the stack
       }
-    );
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: `Gemini API Error: ${errText}` });
+      const data = await response.json();
+      const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!responseText) {
+        console.warn(`Model ${model} returned empty content.`);
+        lastError = new Error(`Model ${model} returned empty content.`);
+        continue;
+      }
+
+      const alignmentResult = JSON.parse(responseText.trim());
+      // Append which model was successfully used
+      alignmentResult.modelUsed = model;
+      
+      return res.status(200).json(alignmentResult);
+    } catch (err) {
+      console.error(`Error during request to ${model}:`, err.message);
+      lastError = err;
     }
-
-    const data = await response.json();
-    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!responseText) {
-      return res.status(500).json({ error: 'No response from Gemini model.' });
-    }
-
-    const alignmentResult = JSON.parse(responseText.trim());
-    return res.status(200).json(alignmentResult);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
   }
+
+  // If we reach here, all models in the stack failed
+  return res.status(502).json({
+    error: `All fallback models failed. Last error: ${lastError ? lastError.message : 'Unknown error'}`
+  });
 }
