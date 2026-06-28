@@ -421,6 +421,274 @@
     .feedback-title { font-size: 22px !important; }
     .feedback-text { font-size: 19px !important; }
   }
+
+  /* ── ROLEPLAY BUILDER & PRACTICE MODE STYLES ── */
+  .roleplay-cols-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    margin-top: 12px;
+  }
+  @media (max-width: 767px) {
+    .roleplay-cols-container {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+  .roleplay-col {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    gap: 12px;
+    transition: all 0.3s ease;
+  }
+  .roleplay-col-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .roleplay-col-junior .roleplay-col-header {
+    color: var(--accent);
+  }
+  .roleplay-col-senior .roleplay-col-header {
+    color: #a855f7;
+  }
+  .roleplay-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+    min-height: 80px;
+  }
+  .roleplay-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: border-color 0.15s;
+  }
+  .roleplay-block:focus-within {
+    border-color: rgba(200, 241, 53, 0.3);
+  }
+  .roleplay-block-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .roleplay-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--bg);
+    letter-spacing: 0.05em;
+  }
+  .roleplay-badge.j {
+    background: var(--accent);
+  }
+  .roleplay-badge.s {
+    background: #a855f7;
+    color: #fff;
+  }
+  .roleplay-line-num {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .roleplay-del-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+  }
+  .roleplay-del-btn:hover {
+    color: var(--danger);
+  }
+  .roleplay-block textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+    line-height: 1.5;
+  }
+  .roleplay-block textarea::placeholder {
+    color: var(--muted);
+  }
+  .add-roleplay-btn {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .add-roleplay-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--accent-dim2);
+  }
+  .roleplay-col-stats {
+    font-size: 10px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    text-align: right;
+  }
+  .roleplay-col-stats strong {
+    color: var(--text);
+  }
+  
+  /* Practice Mode specific */
+  .practice-toggle-btn {
+    background: var(--accent-dim);
+    border: 1px solid rgba(200, 241, 53, 0.3);
+    color: var(--accent);
+    border-radius: 7px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .practice-toggle-btn:hover {
+    background: rgba(200, 241, 53, 0.2);
+  }
+  .practice-toggle-btn.practicing {
+    background: var(--easy);
+    border-color: var(--easy);
+    color: var(--tab-active-text);
+  }
+  .practice-toggle-btn.practicing:hover {
+    filter: brightness(1.1);
+  }
+  
+  .roleplay-practice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+  }
+  .roleplay-practice-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .roleplay-role-selector {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px;
+  }
+  .roleplay-selector-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .roleplay-selector-btn.active.j {
+    background: var(--accent);
+    color: var(--tab-active-text);
+  }
+  .roleplay-selector-btn.active.s {
+    background: #a855f7;
+    color: #fff;
+  }
+  
+  .roleplay-practice-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .roleplay-practice-block-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .roleplay-practice-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+  
+  .roleplay-col.dimmed {
+    opacity: 0.25;
+    filter: grayscale(60%);
+  }
+  .roleplay-col.highlighted {
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(200, 241, 53, 0.06);
+  }
+  .roleplay-col-senior.highlighted {
+    border-color: #a855f7;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.06);
+  }
+
+  /* Desktop Scaling for Roleplay components */
+  @media (min-width: 768px) {
+    .roleplay-col-header { font-size: 18px !important; }
+    .roleplay-line-num { font-size: 14px !important; }
+    .roleplay-badge { font-size: 13px !important; padding: 2px 8px !important; }
+    .roleplay-block textarea { font-size: 18px !important; }
+    .roleplay-practice-text { font-size: 18px !important; }
+    .add-roleplay-btn { font-size: 15px !important; padding: 12px !important; }
+    .roleplay-col-stats { font-size: 14px !important; }
+    .roleplay-selector-btn { font-size: 14px !important; padding: 6px 14px !important; }
+    .roleplay-practice-title { font-size: 15px !important; }
+  }
 </style>
 </head>
 <body>
@@ -707,6 +975,8 @@ let learnItems=[];
 let learnFilter='all';
 let learnIdCounter=0;
 let openScriptIds = new Set();
+let practiceModes = {}; // itemId -> boolean
+let practiceActiveRoles = {}; // itemId -> 'J' or 'S'
 
 // ── LOCALSTORAGE ──────────────────────────────────────────────────────────────
 const LS_KEY = 'yaplab_learn_v3';
@@ -714,10 +984,43 @@ const LS_BOOKMARKS = 'yaplab_bookmarks_v1';
 const LS_STATS = 'yaplab_stats_v1';
 const LS_HISTORY = 'yaplab_history_v1';
 
-function saveLearn() {}
-function loadLearn() {}
-function savePracticeLocal() {}
-function loadPracticeLocal() {}
+function saveLearn() {
+  localStorage.setItem(LS_KEY, JSON.stringify(learnItems));
+}
+function loadLearn() {
+  const raw = localStorage.getItem(LS_KEY);
+  if (raw) {
+    try {
+      learnItems = JSON.parse(raw);
+    } catch(e) {
+      console.error(e);
+    }
+  }
+}
+function savePracticeLocal() {
+  localStorage.setItem(LS_BOOKMARKS, JSON.stringify(bookmarks));
+  localStorage.setItem(LS_STATS, JSON.stringify({ reps, completed, bestSec }));
+  localStorage.setItem(LS_HISTORY, JSON.stringify(sessionHistory));
+}
+function loadPracticeLocal() {
+  try {
+    const bm = localStorage.getItem(LS_BOOKMARKS);
+    if (bm) bookmarks = JSON.parse(bm);
+    
+    const st = localStorage.getItem(LS_STATS);
+    if (st) {
+      const o = JSON.parse(st);
+      reps = o.reps || 0;
+      completed = o.completed || 0;
+      bestSec = o.bestSec || 0;
+    }
+    
+    const hi = localStorage.getItem(LS_HISTORY);
+    if (hi) sessionHistory = JSON.parse(hi);
+  } catch(e) {
+    console.error(e);
+  }
+}
 
 function updateStatsDisplay() {
   document.getElementById('statReps').textContent = reps;
@@ -1131,6 +1434,13 @@ const TEMPLATES = {
       { label: 'Common Mistakes', placeholder: `Warn them about the things that trip most people up.\n\nExamples:\n• "The mistake I see most often: building a 6-step onboarding when users just want to do the thing."\n• "Don't name tokens after their visual appearance. If the colour changes, your name becomes a lie."` },
       { label: 'Wrap Up', placeholder: `Summarise what they built and point to what's next.\n\nExamples:\n• "That's your full onboarding — welcome screen, progress state, feature tour. Now go test it on someone who's never seen your product."\n• "You now have a token system that scales. The next layer is theming — swapping the whole brand with one variable."` }
     ]
+  },
+  roleplay: {
+    label: 'Roleplay',
+    sections: [
+      { role: 'J', label: 'Junior', placeholder: 'Junior: Ask a question or start the conversation...' },
+      { role: 'S', label: 'Senior', placeholder: 'Senior: Answer, guide, or challenge...' }
+    ]
   }
 };
 
@@ -1157,6 +1467,8 @@ async function saveSectionsToSupabase(itemId) {
     } catch(e) {
       console.error('Failed to save script:', e);
     }
+  } else {
+    saveLearn();
   }
 }
 
@@ -1198,6 +1510,21 @@ async function addLearnItem(){
       input.disabled = false;
       input.value = '';
     }
+  } else {
+    const localId = Date.now();
+    learnItems.unshift({
+      id: localId,
+      title,
+      category: cat,
+      status: 'unread',
+      sections: [],
+      updatedAt: Date.now()
+    });
+    saveLearn();
+    renderLearnList();
+    updateLearnStats();
+    input.disabled = false;
+    input.value = '';
   }
 }
 document.getElementById('learnInput').addEventListener('keydown',e=>{if(e.key==='Enter')addLearnItem();});
@@ -1230,6 +1557,12 @@ async function cycleStatus(id){
     } catch (e) {
       console.error(e);
     }
+  } else {
+    item.status = nextStatus;
+    item.updatedAt = Date.now();
+    saveLearn();
+    renderLearnList();
+    updateLearnStats();
   }
 }
 
@@ -1247,6 +1580,11 @@ async function deleteLearnItem(id){
     } catch(e) {
       console.error(e);
     }
+  } else {
+    learnItems=learnItems.filter(i=>i.id!==id);
+    saveLearn();
+    renderLearnList();
+    updateLearnStats();
   }
 }
 
@@ -1274,6 +1612,34 @@ function formatDur(words){
   if(secs<60) return secs+'s';
   const m=Math.floor(secs/60),s=secs%60;
   return s>0?`${m}m ${s}s`:`${m}m`;
+}
+
+async function addRoleplaySection(itemId, role) {
+  const item=learnItems.find(i=>i.id===itemId); if(!item)return;
+  if(!item.sections) item.sections=[];
+  item.sections.push({
+    id: Date.now() + Math.random(),
+    role: role,
+    label: role === 'J' ? 'Junior' : 'Senior',
+    placeholder: role === 'J' ? 'Junior: Type dialogue here...' : 'Senior: Type dialogue here...',
+    text: ''
+  });
+  item.updatedAt=Date.now();
+  renderScriptSections(itemId);
+  await saveSectionsToSupabase(itemId);
+}
+
+function toggleRoleplayPractice(itemId) {
+  practiceModes[itemId] = !practiceModes[itemId];
+  if (practiceModes[itemId] && !practiceActiveRoles[itemId]) {
+    practiceActiveRoles[itemId] = 'J';
+  }
+  renderLearnList();
+}
+
+function setPracticeActiveRole(itemId, role) {
+  practiceActiveRoles[itemId] = role;
+  renderScriptSections(itemId);
 }
 
 async function addSection(itemId, labelOverride, placeholderOverride){
@@ -1308,6 +1674,25 @@ function updateSectionText(itemId, secId, value){
   sec.text=value;
   item.updatedAt=Date.now();
   updateSectionStats(itemId, secId, value);
+  
+  // Dynamically update Roleplay per-role stats
+  const isRoleplay = item.sections.some(s => s.role !== undefined && s.role !== null);
+  if (isRoleplay) {
+    const juniorSections = item.sections.filter(s => s.role === 'J');
+    const seniorSections = item.sections.filter(s => s.role === 'S');
+    const wcJunior = juniorSections.reduce((sum, s) => sum + wordCount(s.text), 0);
+    const wcSenior = seniorSections.reduce((sum, s) => sum + wordCount(s.text), 0);
+    
+    const jStatsEl = document.getElementById(`roleplay-stats-j-${itemId}`);
+    if (jStatsEl) {
+      jStatsEl.innerHTML = `Junior: <strong>${wcJunior} words</strong> · <strong>~${wcJunior > 0 ? formatDur(wcJunior) : '—'}</strong>`;
+    }
+    const sStatsEl = document.getElementById(`roleplay-stats-s-${itemId}`);
+    if (sStatsEl) {
+      sStatsEl.innerHTML = `Senior: <strong>${wcSenior} words</strong> · <strong>~${wcSenior > 0 ? formatDur(wcSenior) : '—'}</strong>`;
+    }
+  }
+
   updateTotalBar(itemId);
   triggerScriptSave(itemId);
 }
@@ -1335,7 +1720,13 @@ async function loadTemplate(itemId, tplKey){
   if(item.sections&&item.sections.length>0){
     if(!confirm('This will replace your current sections. Continue?'))return;
   }
-  item.sections=tpl.sections.map((s,idx)=>({id:Date.now()+idx,label:s.label,placeholder:s.placeholder,text:''}));
+  item.sections=tpl.sections.map((s,idx)=>({
+    id:Date.now()+idx,
+    label:s.label || (s.role === 'J' ? 'Junior' : s.role === 'S' ? 'Senior' : ''),
+    role: s.role || null,
+    placeholder:s.placeholder || '',
+    text:''
+  }));
   item.updatedAt=Date.now();
   renderScriptSections(itemId);
   await saveSectionsToSupabase(itemId);
@@ -1377,12 +1768,172 @@ function onDragEnd(e){
   dragSrcItemId=null; dragSrcSecId=null; dragEl=null;
 }
 
+function renderRoleplayScriptSections(itemId, container, sections) {
+  const inPractice = practiceModes[itemId] || false;
+  const activeRole = practiceActiveRoles[itemId] || 'J';
+
+  const juniorSections = sections.filter(s => s.role === 'J');
+  const seniorSections = sections.filter(s => s.role === 'S');
+  const wcJunior = juniorSections.reduce((sum, s) => sum + wordCount(s.text), 0);
+  const wcSenior = seniorSections.reduce((sum, s) => sum + wordCount(s.text), 0);
+  const totalWc = wcJunior + wcSenior;
+
+  if (inPractice) {
+    const practiceHeader = document.createElement('div');
+    practiceHeader.className = 'roleplay-practice-header fadeIn';
+    practiceHeader.innerHTML = `
+      <span class="roleplay-practice-title">Practice Active Roleplay</span>
+      <div class="roleplay-role-selector">
+        <button class="roleplay-selector-btn j ${activeRole === 'J' ? 'active' : ''}" onclick="setPracticeActiveRole(${itemId}, 'J')">Junior</button>
+        <button class="roleplay-selector-btn s ${activeRole === 'S' ? 'active' : ''}" onclick="setPracticeActiveRole(${itemId}, 'S')">Senior</button>
+      </div>
+    `;
+    container.appendChild(practiceHeader);
+
+    const colsContainer = document.createElement('div');
+    colsContainer.className = 'roleplay-cols-container fadeIn';
+
+    const juniorCol = document.createElement('div');
+    juniorCol.className = `roleplay-col roleplay-col-junior ${activeRole === 'J' ? 'highlighted' : 'dimmed'}`;
+    juniorCol.innerHTML = `<div class="roleplay-col-header">Junior</div>`;
+    
+    const juniorBlocksDiv = document.createElement('div');
+    juniorBlocksDiv.className = 'roleplay-blocks';
+
+    const seniorCol = document.createElement('div');
+    seniorCol.className = `roleplay-col roleplay-col-senior ${activeRole === 'S' ? 'highlighted' : 'dimmed'}`;
+    seniorCol.innerHTML = `<div class="roleplay-col-header">Senior</div>`;
+    
+    const seniorBlocksDiv = document.createElement('div');
+    seniorBlocksDiv.className = 'roleplay-blocks';
+
+    sections.forEach((sec, idx) => {
+      const lineNum = idx + 1;
+      const block = document.createElement('div');
+      block.className = 'roleplay-practice-block';
+      block.innerHTML = `
+        <div class="roleplay-practice-block-head">
+          <span class="roleplay-badge ${sec.role.toLowerCase()}">${sec.role}</span>
+          <span class="roleplay-line-num">Line ${lineNum}</span>
+        </div>
+        <div class="roleplay-practice-text">${esc(sec.text) || '<em style="color:var(--muted)">[Silent]</em>'}</div>
+      `;
+
+      if (sec.role === 'J') {
+        juniorBlocksDiv.appendChild(block);
+      } else {
+        seniorBlocksDiv.appendChild(block);
+      }
+    });
+
+    juniorCol.appendChild(juniorBlocksDiv);
+    seniorCol.appendChild(seniorBlocksDiv);
+
+    const juniorStats = document.createElement('div');
+    juniorStats.className = 'roleplay-col-stats';
+    juniorStats.innerHTML = `Junior: <strong>${wcJunior} words</strong> · <strong>~${wcJunior > 0 ? formatDur(wcJunior) : '—'}</strong>`;
+    juniorCol.appendChild(juniorStats);
+
+    const seniorStats = document.createElement('div');
+    seniorStats.className = 'roleplay-col-stats';
+    seniorStats.innerHTML = `Senior: <strong>${wcSenior} words</strong> · <strong>~${wcSenior > 0 ? formatDur(wcSenior) : '—'}</strong>`;
+    seniorCol.appendChild(seniorStats);
+
+    colsContainer.appendChild(juniorCol);
+    colsContainer.appendChild(seniorCol);
+    container.appendChild(colsContainer);
+
+  } else {
+    const colsContainer = document.createElement('div');
+    colsContainer.className = 'roleplay-cols-container fadeIn';
+
+    const juniorCol = document.createElement('div');
+    juniorCol.className = 'roleplay-col roleplay-col-junior';
+    juniorCol.innerHTML = `<div class="roleplay-col-header">Junior</div>`;
+    
+    const juniorBlocksDiv = document.createElement('div');
+    juniorBlocksDiv.className = 'roleplay-blocks';
+
+    const seniorCol = document.createElement('div');
+    seniorCol.className = 'roleplay-col roleplay-col-senior';
+    seniorCol.innerHTML = `<div class="roleplay-col-header">Senior</div>`;
+    
+    const seniorBlocksDiv = document.createElement('div');
+    seniorBlocksDiv.className = 'roleplay-blocks';
+
+    sections.forEach((sec, idx) => {
+      const lineNum = idx + 1;
+      const block = document.createElement('div');
+      block.className = 'roleplay-block';
+      block.innerHTML = `
+        <div class="roleplay-block-head">
+          <span class="roleplay-badge ${sec.role.toLowerCase()}">${sec.role}</span>
+          <span class="roleplay-line-num">Line ${lineNum}</span>
+          <button class="roleplay-del-btn" onclick="deleteSection(${itemId}, ${sec.id})" title="Delete line">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <textarea placeholder="${esc(sec.placeholder || 'Type line dialogue...')}"
+          oninput="updateSectionText(${itemId}, ${sec.id}, this.value)">${esc(sec.text)}</textarea>
+      `;
+
+      if (sec.role === 'J') {
+        juniorBlocksDiv.appendChild(block);
+      } else {
+        seniorBlocksDiv.appendChild(block);
+      }
+    });
+
+    juniorCol.appendChild(juniorBlocksDiv);
+    seniorCol.appendChild(seniorBlocksDiv);
+
+    const addJuniorBtn = document.createElement('button');
+    addJuniorBtn.className = 'add-roleplay-btn';
+    addJuniorBtn.innerHTML = `<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>+ Junior line`;
+    addJuniorBtn.onclick = () => addRoleplaySection(itemId, 'J');
+    juniorCol.appendChild(addJuniorBtn);
+
+    const addSeniorBtn = document.createElement('button');
+    addSeniorBtn.className = 'add-roleplay-btn';
+    addSeniorBtn.innerHTML = `<svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>+ Senior line`;
+    addSeniorBtn.onclick = () => addRoleplaySection(itemId, 'S');
+    seniorCol.appendChild(addSeniorBtn);
+
+    const juniorStats = document.createElement('div');
+    juniorStats.className = 'roleplay-col-stats';
+    juniorStats.id = `roleplay-stats-j-${itemId}`;
+    juniorStats.innerHTML = `Junior: <strong>${wcJunior} words</strong> · <strong>~${wcJunior > 0 ? formatDur(wcJunior) : '—'}</strong>`;
+    juniorCol.appendChild(juniorStats);
+
+    const seniorStats = document.createElement('div');
+    seniorStats.className = 'roleplay-col-stats';
+    seniorStats.id = `roleplay-stats-s-${itemId}`;
+    seniorStats.innerHTML = `Senior: <strong>${wcSenior} words</strong> · <strong>~${wcSenior > 0 ? formatDur(wcSenior) : '—'}</strong>`;
+    seniorCol.appendChild(seniorStats);
+
+    colsContainer.appendChild(juniorCol);
+    colsContainer.appendChild(seniorCol);
+    container.appendChild(colsContainer);
+  }
+
+  const twcEl = document.getElementById(`total-wc-${itemId}`);
+  const tdurEl = document.getElementById(`total-dur-${itemId}`);
+  if (twcEl) twcEl.textContent = totalWc + ' words';
+  if (tdurEl) tdurEl.textContent = totalWc > 0 ? '~' + formatDur(totalWc) : '—';
+}
+
 function renderScriptSections(itemId){
   const item=learnItems.find(i=>i.id===itemId); if(!item)return;
   const container=document.getElementById(`sections-${itemId}`); if(!container)return;
   container.innerHTML='';
 
   const sections=item.sections||[];
+  const isRoleplay = sections.some(s => s.role !== undefined && s.role !== null);
+  if (isRoleplay) {
+    renderRoleplayScriptSections(itemId, container, sections);
+    return;
+  }
+
   if(sections.length===0){
     container.innerHTML='<div class="script-empty-hint">No sections yet — load a template or add a section manually.</div>';
   } else {
@@ -1446,6 +1997,32 @@ function renderLearnList(){
     const hasScript=item.sections.length>0;
     const isOpen=openScriptIds.has(item.id);
     const totalWc=item.sections.reduce((a,s)=>a+wordCount(s.text),0);
+    const isRoleplay = item.sections.some(s => s.role !== undefined && s.role !== null);
+    const inPractice = practiceModes[item.id] || false;
+
+    let toolbarHtml = `<div class="script-toolbar">
+      <span class="script-toolbar-label">Template:</span>
+      ${Object.entries(TEMPLATES).map(([k,t])=>`<button class="template-btn" onclick="loadTemplate(${item.id},'${k}')">${t.label}</button>`).join('')}`;
+
+    if (isRoleplay) {
+      toolbarHtml += `
+        <button class="practice-toggle-btn ${inPractice ? 'practicing' : ''}" onclick="toggleRoleplayPractice(${item.id})">
+          ${inPractice ? `
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;display:inline-block;vertical-align:middle"><path d="M11 5H6a2 2 0 0 0-2 2v11M14 9l3-3-3-3M17 6H9"/></svg>Edit script
+          ` : `
+            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;display:inline-block;vertical-align:middle"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Practice this roleplay
+          `}
+        </button>
+      `;
+    } else {
+      toolbarHtml += `
+        <button class="add-section-btn" onclick="addSection(${item.id})">
+          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add section
+        </button>
+      `;
+    }
+    toolbarHtml += `</div>`;
+
     const div=document.createElement('div'); div.className='learn-item fadeIn';
     div.innerHTML=`
       <div class="learn-item-top">
@@ -1462,26 +2039,20 @@ function renderLearnList(){
       </div>
       <div class="learn-item-meta">
         <span class="learn-cat-pill">${CAT_LABELS[item.category]||item.category}</span>
-        ${hasScript?`<span style="font-size:10px;color:var(--accent);font-weight:600;">${item.sections.length} sections · ${totalWc>0?'~'+formatDur(totalWc):'0 words'}</span>`:''}
+        ${hasScript?`<span style="font-size:10px;color:var(--accent);font-weight:600;">${item.sections.length} ${isRoleplay ? 'lines' : 'sections'} · ${totalWc>0?'~'+formatDur(totalWc):'0 words'}</span>`:''}
         <button class="notes-toggle" id="script-toggle-${item.id}" onclick="toggleScript(${item.id})">${isOpen ? '▲ Hide script' : (hasScript ? '▼ View script' : '▼ Write script')}</button>
       </div>
       <div class="notes-area ${isOpen ? 'open' : ''}" id="script-area-${item.id}">
-        <div class="script-toolbar">
-          <span class="script-toolbar-label">Template:</span>
-          ${Object.entries(TEMPLATES).map(([k,t])=>`<button class="template-btn" onclick="loadTemplate(${item.id},'${k}')">${t.label}</button>`).join('')}
-          <button class="add-section-btn" onclick="addSection(${item.id})">
-            <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add section
-          </button>
-        </div>
+        ${toolbarHtml}
         <div class="script-sections" id="sections-${item.id}"></div>
         <div class="script-total-bar" id="total-bar-${item.id}">
-          <span class="script-total-label">Total script</span>
+          <span class="script-total-label">${isRoleplay ? 'Combined Total' : 'Total script'}</span>
           <div class="script-total-nums">
             <span class="script-total-wc" id="total-wc-${item.id}">${totalWc} words</span>
             <span class="script-total-dur" id="total-dur-${item.id}">${totalWc>0?'~'+formatDur(totalWc):'—'}</span>
           </div>
         </div>
-        <div class="notes-hint">Speaking pace: ~130 words/min · Drag <svg style="display:inline;vertical-align:middle" width="10" height="13" viewBox="0 0 12 16" fill="currentColor"><circle cx="4" cy="3" r="1.5"/><circle cx="8" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="4" cy="13" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg> to reorder · Auto-saves · Mark <strong>Ready to speak</strong> when done</div>
+        <div class="notes-hint">Speaking pace: ~130 words/min · ${isRoleplay ? 'Columns sit side-by-side · Switch active role mid-session' : 'Drag <svg style="display:inline;vertical-align:middle" width="10" height="13" viewBox="0 0 12 16" fill="currentColor"><circle cx="4" cy="3" r="1.5"/><circle cx="8" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="4" cy="13" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg> to reorder'} · Auto-saves · Mark <strong>Ready to speak</strong> when done</div>
       </div>`;
     list.appendChild(div);
     renderScriptSections(item.id);
@@ -1537,6 +2108,11 @@ async function saveEditTitle(id){
     } catch (e) {
       console.error(e);
     }
+  } else {
+    item.title = val;
+    item.updatedAt = Date.now();
+    saveLearn();
+    renderLearnList(); updateLearnStats();
   }
 }
 
@@ -1681,6 +2257,12 @@ async function authAction(action) {
   }
 }
 
+function runOffline() {
+  supabaseClient = null;
+  supabaseUser = { id: 'offline-user', email: 'offline-mode@yaplab.local' };
+  transitionToApp();
+}
+
 async function transitionToApp() {
   document.getElementById('authWall').style.display = 'none';
   document.getElementById('authWall').innerHTML = ''; // Clear login inputs to block browser autofill
@@ -1694,14 +2276,27 @@ async function transitionToApp() {
   // Clear inputs
   document.getElementById('learnInput').value = '';
 
-  // Clear any existing localStorage data (bypass local only completely)
-  localStorage.removeItem(LS_KEY);
-  localStorage.removeItem(LS_BOOKMARKS);
-  localStorage.removeItem(LS_STATS);
-  localStorage.removeItem(LS_HISTORY);
+  if (supabaseClient && supabaseUser) {
+    // Clear any existing localStorage data (bypass local only completely)
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_BOOKMARKS);
+    localStorage.removeItem(LS_STATS);
+    localStorage.removeItem(LS_HISTORY);
 
-  // Sync data directly
-  await syncAllData();
+    // Sync data directly
+    await syncAllData();
+  } else {
+    // Local storage fallback mode
+    loadLearn();
+    loadPracticeLocal();
+    
+    // Render local data
+    renderLearnList();
+    updateLearnStats();
+    renderBookmarks();
+    renderHistory();
+    updateStatsDisplay();
+  }
 }
 
 async function initSupabaseAtStartup() {
@@ -1709,7 +2304,16 @@ async function initSupabaseAtStartup() {
     document.getElementById('authWall').style.display = 'flex';
     document.querySelector('.main').style.display = 'none';
     document.getElementById('bottomNav').style.display = 'none';
-    showAuthWallStatus('error', 'Please configure your SUPABASE_URL and SUPABASE_ANON_KEY environment variables on Vercel to deploy.');
+    
+    const statusEl = document.getElementById('authWallStatus');
+    statusEl.className = 'modal-status error';
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = `
+      Please configure your SUPABASE_URL and SUPABASE_ANON_KEY environment variables on Vercel to deploy.
+      <button class="btn btn-secondary" onclick="runOffline()" style="justify-content:center; margin-top:12px; width:100%; border-color:var(--border);">
+        Run Offline (Local Storage Mode)
+      </button>
+    `;
     return;
   }
 
@@ -1726,7 +2330,16 @@ async function initSupabaseAtStartup() {
     }
   } catch(e) {
     console.error('Failed to initialize Supabase client:', e);
-    showAuthWallStatus('error', 'Failed to connect: ' + e.message);
+    
+    const statusEl = document.getElementById('authWallStatus');
+    statusEl.className = 'modal-status error';
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = `
+      Failed to connect to Supabase: ${e.message}
+      <button class="btn btn-secondary" onclick="runOffline()" style="justify-content:center; margin-top:12px; width:100%; border-color:var(--border);">
+        Run Offline (Local Storage Mode)
+      </button>
+    `;
   }
 }
 
