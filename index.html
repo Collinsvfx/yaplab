@@ -2521,9 +2521,9 @@ function renderLearnList(){
   list.innerHTML='';
   filtered.forEach(item=>{
     if(!item.sections) item.sections=[];
-    const hasScript=item.sections.length>0;
+    const hasScript=item.sections.filter(s => s.type !== 'preflight').length>0;
     const isOpen=openScriptIds.has(item.id);
-    const totalWc=item.sections.reduce((a,s)=>a+wordCount(s.text),0);
+    const totalWc=item.sections.filter(s => s.type !== 'preflight').reduce((a,s)=>a+wordCount(s.text),0);
     const isRoleplay = item.sections.some(s => s.role !== undefined && s.role !== null);
     const inPractice = practiceModes[item.id] || false;
 
