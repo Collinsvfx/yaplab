@@ -921,6 +921,325 @@
     .preflight-result-suggestions { font-size: 13px !important; }
     .preflight-status-badge { font-size: 12px !important; }
   }
+
+  /* ── STORY FINDER TAB STYLES ── */
+  .sf-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .sf-type-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text);
+    font-family: inherit;
+  }
+  .sf-type-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--accent-dim2);
+  }
+  .sf-type-icon {
+    font-size: 28px;
+  }
+  .sf-type-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .sf-type-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  
+  .sf-workspace-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    align-items: start;
+    margin-top: 12px;
+  }
+  @media (max-width: 900px) {
+    .sf-workspace-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .sf-chat-column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    overflow: hidden;
+  }
+  .sf-chat-window {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .sf-msg {
+    max-width: 80%;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: fadeIn 0.25s ease-out;
+  }
+  .sf-msg.coach {
+    background: var(--surface2);
+    color: var(--text);
+    align-self: flex-start;
+    border-top-left-radius: 2px;
+  }
+  .sf-msg.user {
+    background: var(--accent);
+    color: var(--tab-active-text);
+    align-self: flex-end;
+    border-top-right-radius: 2px;
+    font-weight: 500;
+  }
+  .sf-msg.loading {
+    background: var(--surface2);
+    color: var(--muted);
+    align-self: flex-start;
+    border-top-left-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sf-chat-input-container {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.01);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .sf-analysis-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .sf-analysis-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .sf-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .sf-anatomy-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sf-anatomy-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .sf-anatomy-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    margin-top: 6px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  .sf-anatomy-item.filled .sf-anatomy-indicator {
+    background: var(--easy);
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+  }
+  .sf-anatomy-content {
+    flex: 1;
+  }
+  .sf-anatomy-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .sf-anatomy-value {
+    font-size: 13px;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .sf-anatomy-item.filled .sf-anatomy-label {
+    color: var(--easy);
+  }
+  
+  .sf-xray-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .xr-highlight {
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: help;
+    position: relative;
+    display: inline;
+  }
+  .xr-conflict {
+    background: rgba(250, 204, 21, 0.15);
+    border-bottom: 2px solid var(--medium);
+    color: var(--medium);
+  }
+  .xr-visual {
+    background: rgba(74, 222, 128, 0.15);
+    border-bottom: 2px solid var(--easy);
+    color: var(--easy);
+  }
+  .xr-turning_point {
+    background: rgba(168, 85, 247, 0.15);
+    border-bottom: 2px solid #a855f7;
+    color: #b76efc;
+  }
+  .xr-explanation {
+    background: rgba(248, 113, 113, 0.15);
+    border-bottom: 2px solid var(--hard);
+    color: var(--hard);
+  }
+  .xr-redundant {
+    background: rgba(119, 119, 119, 0.15);
+    border-bottom: 2px solid var(--muted);
+    color: var(--muted);
+  }
+  
+  .sf-xray-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 10px;
+  }
+  .sf-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  
+  .sf-movie-comp {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sf-movie-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .sf-movie-box .lbl {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .sf-movie-box.before {
+    border-left: 3px solid var(--danger);
+  }
+  .sf-movie-box.after {
+    border-left: 3px solid var(--easy);
+  }
+
+  .sf-score-overall-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .sf-score-overall {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .sf-score-overall-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+  
+  .sf-score-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sf-score-bar-item {}
+  .sf-score-bar-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .sf-score-bar-label span {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .sf-score-bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .sf-score-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.5s ease-in-out;
+  }
+  
+  /* Desktop overrides for premium styling */
+  @media (min-width: 768px) {
+    .sf-type-title { font-size: 20px !important; }
+    .sf-type-desc { font-size: 14px !important; }
+    .sf-msg { font-size: 18px !important; }
+    .sf-anatomy-label { font-size: 13px !important; }
+    .sf-anatomy-value { font-size: 16px !important; }
+    .sf-score-overall { font-size: 72px !important; }
+    .sf-score-bar-label { font-size: 14px !important; }
+  }
 </style>
 </head>
 <body>
@@ -930,6 +1249,201 @@
 </div>
 
 <div class="main">
+
+  <!-- STORY FINDER TAB -->
+  <div class="tab-panel" id="panelStoryFinder">
+    <!-- Story Finder Header -->
+    <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+      <h2 style="font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:var(--text); margin-bottom: 4px;">Story Finder 🔍</h2>
+      <p style="font-size:14px; color:var(--muted);">Let's discover today's story together. Spot conflict, build visual scenes, and find the lesson hiding in your day.</p>
+    </div>
+
+    <!-- 1. Landing Screen (Story Type Selector) -->
+    <div id="sfLandingState" class="fadeIn">
+      <div class="section-title">Select today's story type to begin</div>
+      <div class="sf-types-grid">
+        <button class="sf-type-card" onclick="startStorySession('built')">
+          <div class="sf-type-icon">🧱</div>
+          <div class="sf-type-title">I Built Something</div>
+          <div class="sf-type-desc">Documenting a feature, prototype, or new design milestone.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('failed')">
+          <div class="sf-type-icon">❌</div>
+          <div class="sf-type-title">I Failed At Something</div>
+          <div class="sf-type-desc">A mistake made, client pushback, or a broken design prototype.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('learned')">
+          <div class="sf-type-icon">💡</div>
+          <div class="sf-type-title">I Learned Something</div>
+          <div class="sf-type-desc">A new UX pattern, a code discovery, or design feedback.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('surprised')">
+          <div class="sf-type-icon">😲</div>
+          <div class="sf-type-title">Something Surprised Me</div>
+          <div class="sf-type-desc">An unexpected user test result, or sudden feedback.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('changedMind')">
+          <div class="sf-type-icon">🤔</div>
+          <div class="sf-type-title">I Changed My Mind</div>
+          <div class="sf-type-desc">Why you swapped a design system element, color, or strategy.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('opinion')">
+          <div class="sf-type-icon">🔥</div>
+          <div class="sf-type-title">I Have An Opinion</div>
+          <div class="sf-type-desc">Hot takes on UI patterns, design trends, or work culture.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('disagree')">
+          <div class="sf-type-icon">⚔️</div>
+          <div class="sf-type-title">I Disagree With Something</div>
+          <div class="sf-type-desc">Pushing back on a standard rule, a client brief, or a trend.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('beforeAfter')">
+          <div class="sf-type-icon">📈</div>
+          <div class="sf-type-title">Before vs After</div>
+          <div class="sf-type-desc">Showing the transformation of a screen or interface layout.</div>
+        </button>
+        <button class="sf-type-card" onclick="startStorySession('decision')">
+          <div class="sf-type-icon">🎯</div>
+          <div class="sf-type-title">One Decision Changed Everything</div>
+          <div class="sf-type-desc">The critical design choice that saved the user experience.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Active Session Workspace (Split Screen) -->
+    <div id="sfActiveSessionState" style="display:none;" class="fadeIn">
+      <!-- Session Bar / Story Type indicator and Exit -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="sfActiveIcon" style="font-size:20px;">🧱</span>
+          <strong id="sfActiveLabel" style="font-family:'Syne',sans-serif; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text);">I Built Something</strong>
+        </div>
+        <button class="btn btn-ghost" onclick="exitStorySession()" style="font-size:12px; padding:6px 12px; color:var(--danger);">✕ Exit Session</button>
+      </div>
+
+      <div class="sf-workspace-grid">
+        <!-- Chat Area (Left Column) -->
+        <div class="sf-chat-column">
+          <div class="sf-chat-window" id="sfChatWindow">
+            <!-- Messages go here -->
+          </div>
+          <!-- Chat Input -->
+          <div class="sf-chat-input-container">
+            <input type="text" id="sfChatInput" class="add-input" placeholder="Type your answer to the coach..." autocomplete="off" style="flex:1;" />
+            <button class="btn btn-primary" id="sfSendBtn" onclick="sendStoryMessage()" style="height:100%; border-radius:8px; font-weight:600; padding:0 20px;">
+              Send
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar / Analysis Area (Right Column) -->
+        <div class="sf-analysis-column">
+          <!-- Story Anatomy -->
+          <div class="sf-analysis-card">
+            <h3 class="sf-card-title">Story Anatomy</h3>
+            <div class="sf-anatomy-list">
+              <div class="sf-anatomy-item" id="anat-goal">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">GOAL</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+              <div class="sf-anatomy-item" id="anat-obstacle">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">OBSTACLE</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+              <div class="sf-anatomy-item" id="anat-attempts">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">ATTEMPTS</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+              <div class="sf-anatomy-item" id="anat-breakthrough">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">BREAKTHROUGH</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+              <div class="sf-anatomy-item" id="anat-lesson">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">LESSON</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Story X-Ray -->
+          <div class="sf-analysis-card" id="sfXrayCard">
+            <h3 class="sf-card-title">Story X-Ray</h3>
+            <div class="sf-xray-content" id="sfXrayContent">
+              <div style="font-size:12px; color:var(--muted); font-style:italic;">Your latest response will be analyzed for visual specificity, conflict, and turning points.</div>
+            </div>
+          </div>
+
+          <!-- Movie Test -->
+          <div class="sf-analysis-card" id="sfMovieCard">
+            <h3 class="sf-card-title">Movie Test</h3>
+            <div class="sf-movie-content" id="sfMovieContent">
+              <div style="font-size:12px; color:var(--muted); font-style:italic;">Visual suggestions (Show vs Tell) will appear here as you tell your story.</div>
+            </div>
+          </div>
+
+          <!-- Story Score (Fills on Complete or updates live) -->
+          <div class="sf-analysis-card" id="sfScoreCard" style="display:none;">
+            <h3 class="sf-card-title">Story Score</h3>
+            <div class="sf-score-overall-wrap">
+              <div class="sf-score-overall" id="sfOverallScore">0</div>
+              <div class="sf-score-overall-label">OVERALL</div>
+            </div>
+            <div class="sf-score-bars">
+              <div class="sf-score-bar-item">
+                <div class="sf-score-bar-label">Curiosity <span id="val-curiosity">0</span>%</div>
+                <div class="sf-score-bar-track"><div class="sf-score-bar-fill" id="fill-curiosity" style="width:0%"></div></div>
+              </div>
+              <div class="sf-score-bar-item">
+                <div class="sf-score-bar-label">Conflict <span id="val-conflict">0</span>%</div>
+                <div class="sf-score-bar-track"><div class="sf-score-bar-fill" id="fill-conflict" style="width:0%"></div></div>
+              </div>
+              <div class="sf-score-bar-item">
+                <div class="sf-score-bar-label">Visual Scenes <span id="val-visualScenes">0</span>%</div>
+                <div class="sf-score-bar-track"><div class="sf-score-bar-fill" id="fill-visualScenes" style="width:0%"></div></div>
+              </div>
+              <div class="sf-score-bar-item">
+                <div class="sf-score-bar-label">Emotional Journey <span id="val-emotionalJourney">0</span>%</div>
+                <div class="sf-score-bar-track"><div class="sf-score-bar-fill" id="fill-emotionalJourney" style="width:0%"></div></div>
+              </div>
+              <div class="sf-score-bar-item">
+                <div class="sf-score-bar-label">Lesson <span id="val-lesson">0</span>%</div>
+                <div class="sf-score-bar-track"><div class="sf-score-bar-fill" id="fill-lesson" style="width:0%"></div></div>
+              </div>
+              <div class="sf-score-bar-item">
+                <div class="sf-score-bar-label">Specificity <span id="val-specificity">0</span>%</div>
+                <div class="sf-score-bar-track"><div class="sf-score-bar-fill" id="fill-specificity" style="width:0%"></div></div>
+              </div>
+            </div>
+            <div id="sfScoreCritique" style="font-size:12px; color:var(--text); line-height:1.5; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);"></div>
+          </div>
+
+          <!-- Replay & Export Card -->
+          <div class="sf-analysis-card" id="sfReplayCard" style="display:none;">
+            <h3 class="sf-card-title">Daily Story Replay</h3>
+            <div id="sfReplayText" style="font-size:13px; color:var(--text); line-height:1.6; white-space:pre-wrap; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:14px;"></div>
+            <button class="btn btn-primary" onclick="exportStoryToScriptBuilder()" style="width:100%; justify-content:center; font-weight:700;">
+              ⚡ Send to Script Builder
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- PRACTICE TAB -->
   <div class="tab-panel" id="panelPractice">
@@ -1114,6 +1628,18 @@
 
 </div>
 
+<!-- Custom Exit Confirmation Modal -->
+<div id="sfConfirmModal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.65); display:none; align-items:center; justify-content:center; z-index:9999; padding:20px; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);">
+  <div class="modal-card" style="max-width:380px; width:100%; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.6); background:var(--surface); border-radius:16px; padding:24px; display:flex; flex-direction:column; gap:16px;">
+    <div style="font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--text); text-align:center;">Exit Story Session?</div>
+    <div style="font-size:13px; color:var(--muted); line-height:1.6; text-align:center;">Are you sure you want to exit this session? Your current progress will be lost.</div>
+    <div style="display:flex; justify-content:center; gap:12px; margin-top:8px;">
+      <button class="btn btn-secondary" onclick="closeSfConfirmModal()" style="font-size:12px; padding:8px 16px; font-weight:600;">Cancel</button>
+      <button class="btn" onclick="confirmExitStorySession()" style="background:var(--danger); color:#fff; font-size:12px; padding:8px 16px; border:none; font-weight:600; border-radius:8px; cursor:pointer;">Exit</button>
+    </div>
+  </div>
+</div>
+
 <!-- Fullscreen Auth Wall -->
 <div id="authWall" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:2000; padding:20px;">
   <div class="modal-card" style="max-width:380px; width:100%; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.6);">
@@ -1146,7 +1672,13 @@
 
 <!-- Bottom Navigation Bar -->
 <div class="bottom-nav" id="bottomNav" style="display: none;">
-  <button class="bottom-nav-item active" id="btnNavLearn" onclick="switchTab('learn')">
+  <button class="bottom-nav-item" id="btnNavStoryFinder" onclick="switchTab('storyFinder')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+    </svg>
+    <span>Story Finder</span>
+  </button>
+  <button class="bottom-nav-item" id="btnNavLearn" onclick="switchTab('learn')">
     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
     <span>Learn</span>
   </button>
@@ -1298,6 +1830,7 @@ function switchTab(tab) {
 
   // Update bottom nav active classes
   document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+  if (tab === 'storyFinder') document.getElementById('btnNavStoryFinder').classList.add('active');
   if (tab === 'practice') document.getElementById('btnNavPractice').classList.add('active');
   if (tab === 'learn') document.getElementById('btnNavLearn').classList.add('active');
   if (tab === 'settings') document.getElementById('btnNavSettings').classList.add('active');
@@ -2809,8 +3342,8 @@ async function transitionToApp() {
   document.getElementById('bottomNav').style.display = 'flex';
   document.getElementById('settingsUserEmail').textContent = supabaseUser.email;
 
-  // Set default tab to learn
-  switchTab('learn');
+  // Set default tab to storyFinder
+  switchTab('storyFinder');
 
   // Clear inputs
   document.getElementById('learnInput').value = '';
@@ -2990,6 +3523,518 @@ async function syncHistory() {
   renderHistory();
 }
 
+// ── STORY FINDER STATE ────────────────────────────────────────────────────────
+let sfActiveStoryType = null;
+let sfHistory = [];
+let sfAnatomyState = { goal: null, obstacle: null, attempts: null, breakthrough: null, lesson: null };
+let sfIsLoading = false;
+let sfOfflineStep = 0;
+
+// ── STORY FINDER ACTIONS ──────────────────────────────────────────────────────
+function startStorySession(type) {
+  sfActiveStoryType = type;
+  sfHistory = [];
+  sfAnatomyState = { goal: null, obstacle: null, attempts: null, breakthrough: null, lesson: null };
+  sfIsLoading = false;
+
+  const STORY_TYPES = {
+    built: { label: 'I Built Something', icon: '🧱' },
+    failed: { label: 'I Failed At Something', icon: '❌' },
+    learned: { label: 'I Learned Something', icon: '💡' },
+    surprised: { label: 'Something Surprised Me', icon: '😲' },
+    changedMind: { label: 'I Changed My Mind', icon: '🤔' },
+    opinion: { label: 'I Have An Opinion', icon: '🔥' },
+    disagree: { label: 'I Disagree With Something', icon: '⚔️' },
+    beforeAfter: { label: 'Before vs After', icon: '📈' },
+    decision: { label: 'One Decision Changed Everything', icon: '🎯' }
+  };
+  
+  const info = STORY_TYPES[type] || { label: 'General Storytelling', icon: '📖' };
+  document.getElementById('sfActiveIcon').textContent = info.icon;
+  document.getElementById('sfActiveLabel').textContent = info.label;
+
+  // Clear UI elements
+  document.getElementById('sfChatWindow').innerHTML = '';
+  updateAnatomyUI();
+  document.getElementById('sfXrayContent').innerHTML = '<div style="font-size:12px; color:var(--muted); font-style:italic;">Your latest response will be analyzed for visual specificity, conflict, and turning points.</div>';
+  document.getElementById('sfMovieContent').innerHTML = '<div style="font-size:12px; color:var(--muted); font-style:italic;">Visual suggestions (Show vs Tell) will appear here as you tell your story.</div>';
+  document.getElementById('sfScoreCard').style.display = 'none';
+  document.getElementById('sfReplayCard').style.display = 'none';
+  
+  // Reset input state
+  const chatInput = document.getElementById('sfChatInput');
+  chatInput.value = '';
+  chatInput.disabled = false;
+  chatInput.placeholder = 'Type your answer to the coach...';
+  document.getElementById('sfSendBtn').disabled = false;
+
+  // Transition UI
+  document.getElementById('sfLandingState').style.display = 'none';
+  document.getElementById('sfActiveSessionState').style.display = 'block';
+
+  // Seed with coach's first greeting / question
+  sendStoryMessage(true);
+}
+
+function exitStorySession() {
+  document.getElementById('sfConfirmModal').style.display = 'flex';
+}
+
+function closeSfConfirmModal() {
+  document.getElementById('sfConfirmModal').style.display = 'none';
+}
+
+function confirmExitStorySession() {
+  document.getElementById('sfConfirmModal').style.display = 'none';
+  document.getElementById('sfActiveSessionState').style.display = 'none';
+  document.getElementById('sfLandingState').style.display = 'block';
+  sfActiveStoryType = null;
+  sfHistory = [];
+}
+
+async function sendStoryMessage(isInit = false) {
+  console.log('[StoryFinder] sendStoryMessage called, isInit:', isInit, 'loading:', sfIsLoading);
+  if (sfIsLoading) return;
+  
+  const inputEl = document.getElementById('sfChatInput');
+  const userText = isInit ? '' : inputEl.value.trim();
+  console.log('[StoryFinder] userText:', userText);
+  
+  if (!isInit && !userText) {
+    inputEl.focus();
+    return;
+  }
+
+  const chatWindow = document.getElementById('sfChatWindow');
+  if (!isInit) {
+    console.log('[StoryFinder] Adding user bubble for text:', userText);
+    const userBubble = document.createElement('div');
+    userBubble.className = 'sf-msg user';
+    userBubble.textContent = userText;
+    chatWindow.appendChild(userBubble);
+    sfHistory.push({ role: 'user', text: userText });
+    
+    // Clear and lock inputs
+    inputEl.value = '';
+    inputEl.disabled = true;
+    document.getElementById('sfSendBtn').disabled = true;
+    console.log('[StoryFinder] Cleared input box value:', inputEl.value);
+  }
+
+  if (!supabaseClient) {
+    simulateOfflineStorySession(isInit, userText);
+    return;
+  }
+
+  // Create loading bubble
+  const loadingBubble = document.createElement('div');
+  loadingBubble.className = 'sf-msg loading';
+  loadingBubble.id = 'sfCoachLoadingBubble';
+  loadingBubble.innerHTML = '<span class="preflight-spinner"></span> Coach is thinking...';
+  chatWindow.appendChild(loadingBubble);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  sfIsLoading = true;
+
+  try {
+    const res = await fetch('/api/story-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        storyType: sfActiveStoryType,
+        history: sfHistory,
+        userMessage: isInit ? null : userText,
+        anatomyState: sfAnatomyState
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error('Coach failed to respond. Check server logs or retry.');
+    }
+
+    const result = await res.json();
+
+    // Remove loading indicator
+    const lb = document.getElementById('sfCoachLoadingBubble');
+    if (lb) lb.remove();
+
+    // Render coach bubble
+    const coachBubble = document.createElement('div');
+    coachBubble.className = 'sf-msg coach';
+    coachBubble.textContent = result.coachMessage;
+    chatWindow.appendChild(coachBubble);
+    sfHistory.push({ role: 'model', text: result.coachMessage });
+
+    // Update Story Anatomy
+    if (result.extractedAnatomy) {
+      sfAnatomyState = result.extractedAnatomy;
+      updateAnatomyUI();
+    }
+
+    // Update Highlights (Story X-Ray)
+    updateXrayUI(result.xRayHighlights);
+
+    // Update Movie Test
+    updateMovieTestUI(result.movieTest);
+
+    // Handle session end
+    if (result.isComplete) {
+      inputEl.placeholder = 'Session complete!';
+      inputEl.disabled = true;
+      document.getElementById('sfSendBtn').disabled = true;
+
+      if (result.score) {
+        renderStoryScore(result.score);
+      }
+
+      if (result.dailyReplay) {
+        document.getElementById('sfReplayText').textContent = result.dailyReplay;
+        document.getElementById('sfReplayCard').style.display = 'block';
+      }
+
+      window.sfLastScriptOutline = result.scriptOutline || [];
+    } else {
+      inputEl.disabled = false;
+      document.getElementById('sfSendBtn').disabled = false;
+      inputEl.placeholder = 'Type your answer to the coach...';
+      inputEl.focus();
+    }
+
+  } catch (err) {
+    const lb = document.getElementById('sfCoachLoadingBubble');
+    if (lb) lb.remove();
+
+    const errBubble = document.createElement('div');
+    errBubble.className = 'sf-msg coach';
+    errBubble.style.color = 'var(--danger)';
+    errBubble.textContent = 'Error: ' + err.message;
+    chatWindow.appendChild(errBubble);
+
+    if (!isInit) {
+      inputEl.disabled = false;
+      document.getElementById('sfSendBtn').disabled = false;
+    }
+  } finally {
+    sfIsLoading = false;
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+}
+
+function simulateOfflineStorySession(isInit = false, userText = '') {
+  console.log('[StoryFinder] simulateOfflineStorySession called, isInit:', isInit, 'userText:', userText, 'offlineStep:', sfOfflineStep);
+  const chatWindow = document.getElementById('sfChatWindow');
+  const inputEl = document.getElementById('sfChatInput');
+
+  if (isInit) {
+    sfOfflineStep = 0;
+    sfIsLoading = true;
+    inputEl.disabled = true;
+    document.getElementById('sfSendBtn').disabled = true;
+    
+    // Simulate loading delay for offline natural feel
+    setTimeout(() => {
+      const greetQuestions = {
+        built: "Goal: Let's discover today's story. What were you trying to build or accomplish today?",
+        failed: "Goal: Let's discover today's story. What exactly did you fail at or struggle with today?",
+        learned: "Goal: Let's discover today's story. What was the key lesson or breakthrough you learned today?",
+        surprised: "Goal: Let's discover today's story. What unexpected thing happened or surprised you today?",
+        changedMind: "Goal: Let's discover today's story. What did you decide to change your mind about today?",
+        opinion: "Goal: Let's discover today's story. What hot take or strong design opinion is on your mind today?",
+        disagree: "Goal: Let's discover today's story. What design rule or trend do you disagree with today?",
+        beforeAfter: "Goal: Let's discover today's story. What UI screen did you transform or improve today?",
+        decision: "Goal: Let's discover today's story. What was the single critical decision you made today?"
+      };
+      
+      const welcome = greetQuestions[sfActiveStoryType] || "Goal: Let's discover today's story. What were you trying to accomplish today?";
+      
+      const bubble = document.createElement('div');
+      bubble.className = 'sf-msg coach';
+      bubble.textContent = `[Offline Mode] ${welcome}`;
+      chatWindow.appendChild(bubble);
+      sfHistory.push({ role: 'model', text: welcome });
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      sfIsLoading = false;
+      inputEl.disabled = false;
+      document.getElementById('sfSendBtn').disabled = false;
+      inputEl.focus();
+    }, 800);
+    return;
+  }
+
+  sfIsLoading = true;
+  const loadingBubble = document.createElement('div');
+  loadingBubble.className = 'sf-msg loading';
+  loadingBubble.id = 'sfCoachLoadingBubble';
+  loadingBubble.innerHTML = '<span class="preflight-spinner"></span> Coach is thinking...';
+  chatWindow.appendChild(loadingBubble);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  setTimeout(() => {
+    const lb = document.getElementById('sfCoachLoadingBubble');
+    if (lb) lb.remove();
+
+    let coachReply = '';
+    sfOfflineStep++;
+
+    if (sfOfflineStep === 1) {
+      sfAnatomyState.goal = userText;
+      coachReply = "Obstacle: Got it. What stopped you? E.g., what roadblock or design constraint stood in your way?";
+    } else if (sfOfflineStep === 2) {
+      sfAnatomyState.obstacle = userText;
+      coachReply = "Attempts: That sounds like a challenge. What did you try to fix it, and what failed?";
+    } else if (sfOfflineStep === 3) {
+      sfAnatomyState.attempts = userText;
+      coachReply = "Breakthrough: Interesting. How did you eventually solve it or make a breakthrough?";
+    } else if (sfOfflineStep === 4) {
+      sfAnatomyState.breakthrough = userText;
+      coachReply = "Lesson: Excellent. What was the key lesson or takeaway from this experience?";
+    } else if (sfOfflineStep === 5) {
+      sfAnatomyState.lesson = userText;
+      coachReply = "Movie Test: Let's make it visual. If this were a scene in a movie, what would the camera see? What did your screen show?";
+    } else {
+      coachReply = "Amazing job! We have a complete story structure now. Look at your Story Score and Replay below!";
+      
+      // Calculate story score
+      const mockScore = {
+        overall: 84,
+        curiosity: 88,
+        conflict: 90,
+        visualScenes: 72,
+        emotionalJourney: 85,
+        lesson: 92,
+        specificity: 78,
+        critique: "[Offline Mode Review] Your story has strong conflict and a very clear structural pivot. To improve visual scenes, focus more on sensory details (like red error dialogs or loading spinner freezes) instead of abstract summaries."
+      };
+      renderStoryScore(mockScore);
+
+      // Generate replay
+      const mockReplay = `🎬 MOVIE REPLAY: My ${sfActiveStoryType.toUpperCase()} Day\n\n` +
+        `🏁 GOAL: ${sfAnatomyState.goal}\n` +
+        `❌ OBSTACLE: ${sfAnatomyState.obstacle}\n` +
+        `🛠️ ATTEMPTS: ${sfAnatomyState.attempts}\n` +
+        `💡 BREAKTHROUGH: ${sfAnatomyState.breakthrough}\n` +
+        `🎓 LESSON: ${sfAnatomyState.lesson}\n` +
+        `👁️ VISUALS: ${userText}`;
+      
+      document.getElementById('sfReplayText').textContent = mockReplay;
+      document.getElementById('sfReplayCard').style.display = 'block';
+
+      // Seed Script Outline
+      window.sfLastScriptOutline = [
+        { label: 'Hook', text: `Open with the core challenge: "I wanted to ${sfAnatomyState.goal.toLowerCase()} today. But it failed."` },
+        { label: 'Conflict', text: `Describe the roadblock: ${sfAnatomyState.obstacle}. It looked like: ${userText}.` },
+        { label: 'Struggle', text: `Detail your failed attempts: ${sfAnatomyState.attempts}.` },
+        { label: 'Pivot', text: `Reveal the turning point: ${sfAnatomyState.breakthrough}.` },
+        { label: 'Value Drop', text: `Conclude with the lesson: ${sfAnatomyState.lesson}.` }
+      ];
+
+      inputEl.placeholder = 'Session complete!';
+      inputEl.disabled = true;
+      document.getElementById('sfSendBtn').disabled = true;
+    }
+
+    // Update highlights and movie test with mock reviews
+    const mockHighlights = [
+      { text: userText.slice(0, Math.min(25, userText.length)), type: 'conflict', critique: 'Defines the tension and obstacle clearly.' },
+      { text: userText.slice(Math.min(25, userText.length), Math.min(60, userText.length)), type: 'visual', critique: 'Includes visual cues representing active design.' }
+    ].filter(h => h.text.length > 0);
+    
+    updateXrayUI(mockHighlights);
+    updateAnatomyUI();
+
+    const mockMovieTest = {
+      before: "I spent hours trying to debug the error.",
+      after: "I stared at a console of 12 recurring red error codes for three hours.",
+      explanation: "Shows specific, visual evidence of debug stress instead of abstract time summary."
+    };
+    updateMovieTestUI(mockMovieTest);
+
+    // Show coach bubble
+    const bubble = document.createElement('div');
+    bubble.className = 'sf-msg coach';
+    bubble.textContent = `[Offline Mode] ${coachReply}`;
+    chatWindow.appendChild(bubble);
+    sfHistory.push({ role: 'model', text: coachReply });
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    sfIsLoading = false;
+    if (sfOfflineStep <= 5) {
+      inputEl.disabled = false;
+      document.getElementById('sfSendBtn').disabled = false;
+      inputEl.placeholder = 'Type your answer to the coach...';
+      inputEl.focus();
+    }
+  }, 1000);
+}
+
+function updateAnatomyUI() {
+  const steps = ['goal', 'obstacle', 'attempts', 'breakthrough', 'lesson'];
+  steps.forEach(step => {
+    const val = sfAnatomyState[step];
+    const el = document.getElementById('anat-' + step);
+    if (el) {
+      if (val && val.trim() !== '' && val !== 'Not yet identified') {
+        el.classList.add('filled');
+        el.querySelector('.sf-anatomy-value').textContent = val;
+      } else {
+        el.classList.remove('filled');
+        el.querySelector('.sf-anatomy-value').textContent = '—';
+      }
+    }
+  });
+}
+
+function updateXrayUI(highlights) {
+  const xrayDiv = document.getElementById('sfXrayContent');
+  if (!highlights || highlights.length === 0) {
+    xrayDiv.innerHTML = '<div style="font-size:12px; color:var(--muted); font-style:italic;">Your latest response will be analyzed for visual specificity, conflict, and turning points.</div>';
+    return;
+  }
+
+  let html = '<div class="sf-xray-text">';
+  highlights.forEach(h => {
+    const xrClass = 'xr-highlight xr-' + h.type;
+    html += `<span class="${xrClass}" title="${esc(h.critique)}">${esc(h.text)}</span> `;
+  });
+  html += '</div>';
+
+  html += `
+    <div class="sf-xray-legend">
+      <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:var(--easy); display:inline-block; vertical-align:middle; margin-right:3px;"></span>Visual</span>
+      <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:var(--medium); display:inline-block; vertical-align:middle; margin-right:3px;"></span>Conflict</span>
+      <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:#a855f7; display:inline-block; vertical-align:middle; margin-right:3px;"></span>Turn</span>
+      <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:var(--hard); display:inline-block; vertical-align:middle; margin-right:3px;"></span>Explanation</span>
+    </div>
+  `;
+
+  xrayDiv.innerHTML = html;
+}
+
+function updateMovieTestUI(movieTest) {
+  const movieDiv = document.getElementById('sfMovieContent');
+  if (!movieTest || !movieTest.before) {
+    movieDiv.innerHTML = '<div style="font-size:12px; color:var(--muted); font-style:italic;">Visual suggestions (Show vs Tell) will appear here as you tell your story.</div>';
+    return;
+  }
+
+  movieDiv.innerHTML = `
+    <div class="sf-movie-comp fadeIn">
+      <div class="sf-movie-box before" style="margin-bottom:6px;">
+        <div class="lbl">Before (Telling)</div>
+        <div style="font-style:italic; color:var(--muted);">"${esc(movieTest.before)}"</div>
+      </div>
+      <div class="sf-movie-box after" style="margin-bottom:6px;">
+        <div class="lbl">After (Showing Movie)</div>
+        <strong>"${esc(movieTest.after)}"</strong>
+      </div>
+      <div style="font-size:11px; color:var(--muted); line-height:1.4;">${esc(movieTest.explanation)}</div>
+    </div>
+  `;
+}
+
+function renderStoryScore(score) {
+  document.getElementById('sfScoreCard').style.display = 'block';
+  document.getElementById('sfOverallScore').textContent = score.overall;
+  
+  const metrics = ['curiosity', 'conflict', 'visualScenes', 'emotionalJourney', 'lesson', 'specificity'];
+  metrics.forEach(m => {
+    const val = score[m] || 0;
+    const valEl = document.getElementById('val-' + m);
+    const fillEl = document.getElementById('fill-' + m);
+    if (valEl) valEl.textContent = val;
+    if (fillEl) fillEl.style.width = val + '%';
+  });
+
+  document.getElementById('sfScoreCritique').textContent = score.critique;
+}
+
+async function exportStoryToScriptBuilder() {
+  if (!window.sfLastScriptOutline || window.sfLastScriptOutline.length === 0) {
+    alert('No script outline found to export.');
+    return;
+  }
+
+  const title = `Story: My ${sfActiveStoryType} Day`;
+  
+  const sections = [
+    { type: 'preflight', emotionalEntry: sfAnatomyState.lesson || '', whoFeels: 'My Audience', hookTest: sfAnatomyState.goal || '' }
+  ];
+
+  window.sfLastScriptOutline.forEach((sec, idx) => {
+    sections.push({
+      id: Date.now() + idx,
+      label: sec.label,
+      placeholder: 'Write details...',
+      text: sec.text
+    });
+  });
+
+  let newId = null;
+
+  if (supabaseClient && supabaseUser) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('learn_items')
+        .insert({
+          user_id: supabaseUser.id,
+          title,
+          category: 'storytelling',
+          status: 'unread',
+          sections,
+          updated_at: new Date().toISOString()
+        })
+        .select();
+      if (error) throw error;
+      if (data && data[0]) {
+        newId = data[0].id;
+        learnItems.unshift({
+          id: newId,
+          title: data[0].title,
+          category: data[0].category,
+          status: data[0].status,
+          sections: data[0].sections || [],
+          updatedAt: new Date(data[0].updated_at).getTime()
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save to database. Exporting locally...');
+    }
+  }
+
+  if (!newId) {
+    newId = Date.now();
+    learnItems.unshift({
+      id: newId,
+      title,
+      category: 'storytelling',
+      status: 'unread',
+      sections,
+      updatedAt: Date.now()
+    });
+    saveLearn();
+  }
+
+  // Automatically expand the script builder for this item
+  openScriptIds.add(newId);
+
+  // Restore Story Finder inputs
+  document.getElementById('sfSendBtn').disabled = false;
+  document.getElementById('sfChatInput').disabled = false;
+  document.getElementById('sfChatInput').placeholder = 'Type your answer to the coach...';
+
+  // Return to landing state in Story Finder
+  document.getElementById('sfActiveSessionState').style.display = 'none';
+  document.getElementById('sfLandingState').style.display = 'block';
+  sfActiveStoryType = null;
+  sfHistory = [];
+
+  // Update Learn UI & Redirect
+  renderLearnList();
+  updateLearnStats();
+  switchTab('learn');
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   authWallHTML = document.getElementById('authWall').innerHTML;
@@ -3004,6 +4049,15 @@ document.addEventListener('DOMContentLoaded', function(){
   updateStatsDisplay();
   renderLearnList();
   updateLearnStats();
+
+  const sfInput = document.getElementById('sfChatInput');
+  if (sfInput) {
+    sfInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        sendStoryMessage();
+      }
+    });
+  }
 });
 </script>
 </body>
