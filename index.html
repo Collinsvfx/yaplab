@@ -1242,41 +1242,6 @@
   }
 
   /* ── SOCRATIC GYM STYLE ADDITIONS ── */
-  .sf-reflection-card {
-    background: rgba(var(--accent-rgb, 200, 241, 53), 0.05);
-    border: 1px solid rgba(var(--accent-rgb, 200, 241, 53), 0.25);
-    border-left: 4px solid var(--accent);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin: 4px 0 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    animation: fadeIn 0.2s ease-out;
-  }
-  .sf-reflection-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-  }
-  .sf-reflection-points {
-    background: var(--accent-dim);
-    color: var(--accent);
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 800;
-  }
-  .sf-reflection-text {
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text);
-  }
   .sf-anatomy-item.locked {
     opacity: 0.35;
   }
@@ -1292,36 +1257,6 @@
   @keyframes activeStepPulse {
     0%, 100% { transform: scale(1); opacity: 0.6; }
     50% { transform: scale(1.3); opacity: 1; }
-  }
-  .sf-gym-stats-wrap {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  .sf-gym-stat-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    align-items: center;
-    text-align: center;
-  }
-  .sf-gym-stat-val {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--accent);
-  }
-  .sf-gym-stat-lbl {
-    font-size: 9px;
-    color: var(--muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
   }
 </style>
 </head>
@@ -1428,21 +1363,9 @@
 
         <!-- Sidebar / Analysis Area (Right Column) -->
         <div class="sf-analysis-column">
-          <!-- Socratic Gym Stats -->
-          <div class="sf-gym-stats-wrap">
-            <div class="sf-gym-stat-card">
-              <div class="sf-gym-stat-val" id="sfGymPoints">0</div>
-              <div class="sf-gym-stat-lbl">🔥 Gym Points</div>
-            </div>
-            <div class="sf-gym-stat-card">
-              <div class="sf-gym-stat-val" id="sfGymLevel" style="font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">Novice</div>
-              <div class="sf-gym-stat-lbl">🏆 Level</div>
-            </div>
-          </div>
-
           <!-- Story Anatomy -->
           <div class="sf-analysis-card">
-            <h3 class="sf-card-title">Story Puzzle Pieces</h3>
+            <h3 class="sf-card-title">Story Anatomy</h3>
             <div class="sf-anatomy-list">
               <div class="sf-anatomy-item locked" id="anat-mission">
                 <div class="sf-anatomy-indicator"></div>
@@ -1548,13 +1471,38 @@
             <div id="sfScoreCritique" style="font-size:12px; color:var(--text); line-height:1.5; margin-top:12px; padding-top:12px; border-top:1px solid var(--border);"></div>
           </div>
 
-          <!-- Replay & Export Card -->
-          <div class="sf-analysis-card" id="sfReplayCard" style="display:none;">
-            <h3 class="sf-card-title">Daily Story Replay</h3>
-            <div id="sfReplayText" style="font-size:13px; color:var(--text); line-height:1.6; white-space:pre-wrap; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:14px;"></div>
-            <button class="btn btn-primary" onclick="exportStoryToScriptBuilder()" style="width:100%; justify-content:center; font-weight:700;">
-              ⚡ Send to Script Builder
-            </button>
+          <!-- Story Review Card (Socratic v4) -->
+          <div class="sf-analysis-card" id="sfStoryReviewCard" style="display:none;">
+            <h3 class="sf-card-title">⭐ Story Review</h3>
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div>
+                <h4 style="font-size:12px; color:var(--easy); font-weight:700; text-transform:uppercase; margin-bottom:6px;">👍 What you did well</h4>
+                <div id="sfReviewWell" style="font-size:13px; color:var(--text); line-height:1.5; padding-left:14px;">
+                  <!-- Bullets inserted dynamically -->
+                </div>
+              </div>
+
+              <div>
+                <h4 style="font-size:12px; color:var(--warn); font-weight:700; text-transform:uppercase; margin-bottom:6px;">🌱 Next thing to practice</h4>
+                <div id="sfReviewPractice" style="font-size:13px; color:var(--text); line-height:1.5; padding-left:14px;">
+                  <!-- Bullets inserted dynamically -->
+                </div>
+              </div>
+
+              <div>
+                <h4 style="font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase; margin-bottom:6px;">📋 Story Checklist</h4>
+                <div id="sfReviewChecklist" style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px; font-family:'Syne',sans-serif; font-weight:600; padding:8px; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
+                  <!-- Items dynamically filled -->
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+              <button class="btn btn-primary" onclick="exportStoryToScriptBuilder()" style="width:100%; justify-content:center; font-weight:700;">
+                ⚡ Build My Script
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -3695,10 +3643,8 @@ function startStorySession(type) {
   document.getElementById('sfScoreCard').style.display = 'none';
   document.getElementById('sfReplayCard').style.display = 'none';
   
-  const mapCard = document.getElementById('sfStoryMapCard');
-  const instinctCard = document.getElementById('sfInstinctCard');
-  if (mapCard) mapCard.style.display = 'none';
-  if (instinctCard) instinctCard.style.display = 'none';
+  const reviewCard = document.getElementById('sfStoryReviewCard');
+  if (reviewCard) reviewCard.style.display = 'none';
   
   // Reset input state
   const chatInput = document.getElementById('sfChatInput');
@@ -3728,11 +3674,9 @@ function confirmExitStorySession() {
   document.getElementById('sfActiveSessionState').style.display = 'none';
   document.getElementById('sfLandingState').style.display = 'block';
   // Reset session-end cards
-  const mapCard = document.getElementById('sfStoryMapCard');
-  const instinctCard = document.getElementById('sfInstinctCard');
+  const reviewCard = document.getElementById('sfStoryReviewCard');
   const scoreCard = document.getElementById('sfScoreCard');
-  if (mapCard) mapCard.style.display = 'none';
-  if (instinctCard) instinctCard.style.display = 'none';
+  if (reviewCard) reviewCard.style.display = 'none';
   if (scoreCard) scoreCard.style.display = 'none';
   sfActiveStoryType = null;
   sfHistory = [];
@@ -3806,27 +3750,6 @@ async function sendStoryMessage(isInit = false) {
     const lb = document.getElementById('sfCoachLoadingBubble');
     if (lb) lb.remove();
 
-    // Render reflection card if present (Duolingo storytelling feedback)
-    if (result.reflection) {
-      const refCard = document.createElement('div');
-      refCard.className = 'sf-reflection-card';
-      refCard.innerHTML = `
-        <div class="sf-reflection-header">
-          <span>${esc(result.reflection.title || 'Storytelling Tip')}</span>
-          ${result.reflection.points ? `<span class="sf-reflection-points">${esc(result.reflection.points)}</span>` : ''}
-        </div>
-        <div class="sf-reflection-text">${esc(result.reflection.text)}</div>
-      `;
-      chatWindow.appendChild(refCard);
-
-      if (result.reflection.points) {
-        const pts = parseInt(result.reflection.points.replace(/\D/g, '')) || 0;
-        sfGymPoints += pts;
-        localStorage.setItem('sf_gym_points', sfGymPoints);
-        updateGymStatsUI();
-      }
-    }
-
     // Render coach bubble
     const coachBubble = document.createElement('div');
     coachBubble.className = 'sf-msg coach';
@@ -3854,18 +3777,6 @@ async function sendStoryMessage(isInit = false) {
 
       if (result.score) {
         renderStoryScore(result.score);
-      }
-
-      if (result.dailyReplay) {
-        document.getElementById('sfReplayText').textContent = result.dailyReplay;
-      }
-
-      // Render Story Map (replaces Replay card)
-      renderStoryMap();
-
-      // Save and display Instinct Note
-      if (result.instinctNote) {
-        saveInstinctNote(result.instinctNote);
       }
 
       window.sfLastScriptOutline = result.scriptOutline || [];
@@ -3936,80 +3847,48 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
     if (lb) lb.remove();
 
     let coachReply = '';
-    let reflection = null;
     sfOfflineStep++;
 
     if (sfOfflineStep === 1) {
       sfAnatomyState.mission = userText;
       coachReply = "Got it. Now — what blocked you? What was the first sign that something wasn't going to plan?";
-      reflection = {
-        title: "🎯 Goal",
-        text: "This sets up your audience's expectations. A clear goal is the absolute anchor of a good design story.",
-        points: "+5 Goal Points"
-      };
     } else if (sfOfflineStep === 2) {
       sfAnatomyState.obstacle = userText;
       coachReply = "What was your first guess about what was causing it? What did you think the problem was?";
-      reflection = {
-        title: "🚧 Obstacle",
-        text: "Nice! Stories are defined by change and roadblocks. An obstacle creates tension that makes people keep watching.",
-        points: "+5 Tension Points"
-      };
     } else if (sfOfflineStep === 3) {
       sfAnatomyState.firstGuess = userText;
       coachReply = "Did it work? And when you realized it didn't — what made you realize you were wrong?";
-      reflection = {
-        title: "🧪 False Assumption",
-        text: "Perfect. Debugging is storytelling. You had a belief, and reality proved you wrong. This false belief is what makes you human.",
-        points: "+5 Decision Points"
-      };
     } else if (sfOfflineStep === 4) {
       sfAnatomyState.discovery = userText;
       coachReply = "What's the one lesson you'd take from this that someone else could use tomorrow?";
-      reflection = {
-        title: "💡 Discovery",
-        text: "Great realization moment. The turning point is the most satisfying part of a story. It changes your worldview.",
-        points: "+5 Realization Points"
-      };
     } else if (sfOfflineStep === 5) {
       sfAnatomyState.lesson = userText;
       coachReply = "One more: when you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw.";
-      reflection = {
-        title: "🎁 Lesson",
-        text: "A strong takeaway is the 'value drop' that makes the video worth watching for another creator.",
-        points: "+5 Wisdom Points"
-      };
     } else if (sfOfflineStep === 6) {
       sfAnatomyState.visuals = userText;
       coachReply = "Last question. If you were telling this story to your best friend over dinner tonight, where would you naturally start?";
-      reflection = {
-        title: "👁️ Visuals",
-        text: "Describing what was literally on screen makes the story a visual movie, not a dry summary.",
-        points: "+5 Visual Points"
-      };
     } else {
       sfAnatomyState.naturalHook = userText;
-      coachReply = "Perfect. That right there — that's probably your strongest opening. Your Story Map is ready below.";
-      reflection = {
-        title: "🎯 Natural Hook",
-        text: "This is your strongest opening sentence. Starting how you would tell a best friend over dinner is always best.",
-        points: "+10 Hook Points"
-      };
+      coachReply = "Perfect. That right there — that's probably your strongest opening. Your Story Review is ready below.";
 
       const mockScore = {
-        overall: 84,
-        curiosity: 88,
-        conflict: 90,
-        visualScenes: 76,
-        emotionalJourney: 85,
-        lesson: 92,
-        specificity: 82,
-        critique: "[Offline Mode] Strong conflict and a clear discovery moment. To improve: next time, describe what you saw on screen before you describe what it meant."
+        whatWentWell: [
+          "You clearly explained your mission and roadblock.",
+          "You described a visual scene: '" + (sfAnatomyState.visuals || 'the captions Glowed but MP4 spat out standard block text') + "'"
+        ],
+        nextTimeToPractice: [
+          "Next time, make sure to describe your first guess's logic in detail rather than just the action."
+        ],
+        checklist: {
+          mission: true,
+          obstacle: true,
+          firstGuess: true,
+          visualScene: true,
+          discovery: true,
+          lesson: true
+        }
       };
       renderStoryScore(mockScore);
-
-      // Render Story Map (replaces Replay card)
-      renderStoryMap();
 
       // Seed Script Outline
       window.sfLastScriptOutline = [
@@ -4019,10 +3898,6 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
         { label: '💡 The Discovery', text: `The moment everything changed: "${sfAnatomyState.discovery}"` },
         { label: '🎁 The Lesson', text: `What anyone watching should take away: "${sfAnatomyState.lesson}"` }
       ];
-
-      // Save Instinct Note to localStorage
-      const instinctNote = "[Offline Mode] Today you found a strong turning point and a clear lesson. Next time, try to describe your first guess before jumping to the solution — that thinking gap is what makes stories human.";
-      saveInstinctNote(instinctNote);
 
       inputEl.placeholder = 'Session complete!';
       inputEl.disabled = true;
@@ -4229,19 +4104,66 @@ function updateMovieTestUI(movieTest) {
 }
 
 function renderStoryScore(score) {
-  document.getElementById('sfScoreCard').style.display = 'block';
-  document.getElementById('sfOverallScore').textContent = score.overall;
-  
-  const metrics = ['curiosity', 'conflict', 'visualScenes', 'emotionalJourney', 'lesson', 'specificity'];
-  metrics.forEach(m => {
-    const val = score[m] || 0;
-    const valEl = document.getElementById('val-' + m);
-    const fillEl = document.getElementById('fill-' + m);
-    if (valEl) valEl.textContent = val;
-    if (fillEl) fillEl.style.width = val + '%';
-  });
+  // Hide old legacy scorecard
+  const scoreCard = document.getElementById('sfScoreCard');
+  if (scoreCard) scoreCard.style.display = 'none';
 
-  document.getElementById('sfScoreCritique').textContent = score.critique;
+  const reviewCard = document.getElementById('sfStoryReviewCard');
+  if (!reviewCard) return;
+
+  const wellEl = document.getElementById('sfReviewWell');
+  const practiceEl = document.getElementById('sfReviewPractice');
+  const checklistEl = document.getElementById('sfReviewChecklist');
+
+  // Fill What you did well
+  if (wellEl && score.whatWentWell) {
+    wellEl.innerHTML = score.whatWentWell.map(w => `<div style="margin-bottom:4px;">• ${esc(w)}</div>`).join('');
+  } else if (wellEl) {
+    wellEl.innerHTML = `<div style="margin-bottom:4px;">• Great job establishing the stakes and outlining the conflict.</div>`;
+  }
+
+  // Fill Next thing to practice
+  if (practiceEl && score.nextTimeToPractice) {
+    practiceEl.innerHTML = score.nextTimeToPractice.map(p => `<div style="margin-bottom:4px;">• ${esc(p)}</div>`).join('');
+  } else if (practiceEl) {
+    practiceEl.innerHTML = `<div style="margin-bottom:4px;">• Next time, try to add more sensory detail about what was literally visible on your screen.</div>`;
+  }
+
+  // Fill Checklist Grid
+  if (checklistEl && score.checklist) {
+    const keys = [
+      { label: 'Mission', val: score.checklist.mission },
+      { label: 'Obstacle', val: score.checklist.obstacle },
+      { label: 'First Guess', val: score.checklist.firstGuess },
+      { label: 'Visual Scene', val: score.checklist.visualScene },
+      { label: 'Discovery', val: score.checklist.discovery },
+      { label: 'Lesson', val: score.checklist.lesson }
+    ];
+    checklistEl.innerHTML = keys.map(k => `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <span>${esc(k.label)}</span>
+        <span>${k.val ? '✅' : '⚠️'}</span>
+      </div>
+    `).join('');
+  } else if (checklistEl) {
+    // Fallback for mock/offline score structure
+    const keys = [
+      { label: 'Mission', val: true },
+      { label: 'Obstacle', val: true },
+      { label: 'First Guess', val: true },
+      { label: 'Visual Scene', val: true },
+      { label: 'Discovery', val: true },
+      { label: 'Lesson', val: true }
+    ];
+    checklistEl.innerHTML = keys.map(k => `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <span>${esc(k.label)}</span>
+        <span>${k.val ? '✅' : '⚠️'}</span>
+      </div>
+    `).join('');
+  }
+
+  reviewCard.style.display = 'block';
 }
 
 async function exportStoryToScriptBuilder() {

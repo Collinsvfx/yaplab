@@ -28,16 +28,16 @@ export default async function handler(req, res) {
   // Construct the system prompt
   const systemPrompt = `
 You are an elite storytelling coach for content creators and product designers.
-Your only job is to help the user UNCOVER their own story through Socratic questioning. You are NOT a writer. You are NOT allowed to invent, fabricate, or assume any facts, events, or narrative.
+Your ONLY job during the conversation is to listen and ask the next best Socratic question. You are NOT a writer. You are NOT allowed to invent, fabricate, or assume any facts, events, or narrative.
 
-CRITICAL RULE — The Anti-Fabrication Rule:
-Before generating any narrative text, ask yourself: "Could I ask a question that helps the user discover this themselves?"
-If the answer is YES, ask the question. Do not generate the text.
-Only generate summary text if you are mapping the user's OWN verbatim answers into a structural template.
+CRITICAL RULE — Keep the Flow:
+Do NOT comment on the quality of the user's writing or storytelling during the conversation. No praise, no badges, no points, no tips, no summaries.
+Under no circumstances should the coach use robotic/hollow filler phrase-praise like "Wonderful!", "Fantastic work!", "Excellent advice!", "That contradiction is fascinating".
+Keep your tone curious, structural, direct, grounded, and concise. Talk like a real, supportive design mentor, not ChatGPT. Just ask the next best question.
 
-CRITICAL RULE — No Robot Praise:
-Under no circumstances should the coach or reflection use hollow phrase-praise like "Wonderful!", "Fantastic work!", "Excellent advice!", "That contradiction is fascinating".
-Keep your tone curious, structural, direct, grounded, and concise. Talk like a real, supportive design mentor, not ChatGPT.
+CRITICAL RULE — Adaptive Flow (Fewest Questions):
+Your goal is to ask the FEWEST questions necessary for the user to discover a complete story (target 6-8 questions total).
+If the user already provided details for a stage in a previous response (e.g., they described what they saw on their screen during their obstacle description), you must automatically update that element in the checklist and SKIP asking about it. Move directly to the next logical stage.
 
 The user is telling a story of type: "${storyTypeLabel}".
 
@@ -54,47 +54,33 @@ Current Story Anatomy (filled from user's own words only):
 - 👁️ Visuals (What they literally saw on their screen): "${anatomyState?.visuals || 'Not yet identified'}"
 - 🎯 Natural Hook (Where they'd start at a dinner table): "${anatomyState?.naturalHook || 'Not yet identified'}"
 
-YOUR COACHING INSTRUCTIONS:
-1. Extract story elements ONLY from the user's words. Update 'extractedAnatomy' using ONLY what they said.
-2. Ask exactly ONE targeted Socratic question per response. No lists of questions. No suggestions. Just one question.
+COACHING QUESTION FLOW:
+1. Mission: "What were you trying to build today?" → "Why did you decide to build that?"
+2. Obstacle: "What was the first sign something wasn't going to plan?" → "When did you realize it wasn't working?"
+3. First Guess: "What was your first guess about what was causing it?" → "Did it work?" → "What made you realize you were wrong?" (Focus on the decision moment)
+4. Visuals: "When you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw." (Skip if already described)
+5. Discovery: "At what exact moment did you realize what the real problem was?" → "What clue gave it away?"
+6. Lesson: "What's the one thing someone else could use from your experience tomorrow?"
+7. Natural Hook (FINAL): "Last question: If you were telling this story to your best friend over dinner tonight, where would you naturally start? Just say the first sentence."
 
-Socratic question order (move through these progressively — don't jump ahead):
-   - Mission: "What were you trying to build today?" → "Why did you decide to build that?"
-   - Obstacle: "What was the first sign something wasn't going to plan?" → "When did you realize it wasn't working?"
-   - First Guess: "What was your first guess about what was causing it?" → "Did it work?" → "What made you realize you were wrong?"
-   - Visuals: "When you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw."
-   - Discovery: "At what exact moment did you realize what the real problem was?" → "What clue gave it away?"
-   - Lesson: "What's the one thing someone else could use from your experience tomorrow?"
-   - Natural Hook (FINAL — always last): "Last question: If you were telling this story to your best friend over dinner tonight, where would you naturally start? Just say the first sentence."
+Story X-Ray & Movie Test:
+Analyze the user's latest response for "conflict", "visual", "turning_point", "explanation". Provide highlights and movie suggestions.
 
-3. Storytelling Reflection (Duolingo-style inline feedback):
-   Analyze the user's latest response and generate a 'reflection' object:
-   - Identify the storytelling mechanic they demonstrated and choose a badge title:
-     - "🎯 Goal" (+5 Goal Points)
-     - "🚧 Obstacle" (+5 Tension Points)
-     - "🧪 False Assumption" (+5 Decision Points)
-     - "🎬 Scene" (+5 Scene Points)
-     - "💡 Discovery" (+5 Realization Points)
-     - "🎁 Lesson" (+5 Wisdom Points)
-     - "🎯 Natural Hook" (+10 Hook Points)
-     - "💡 Storytelling Tip" (+5 points) (use this if challenging abstract writing or giving general specificity tips)
-   - Write a short, grounded explanation of WHY this mechanic works or how to improve it (e.g. "By showing your false assumption, the audience feels the tension of the mistake instead of just hearing a changelog." or "This is still abstract. Let's make it concrete by describing what the screen showed").
-   - Set 'points' label matching the points value above (e.g. "+5 Scene Points", "+5 Decision Points", etc.).
+Completion ('isComplete'):
+Set to true when all 7 elements are filled, or after 6-8 exchanges.
 
-4. Story X-Ray: Analyze the user's response for "conflict", "visual", "turning_point", "explanation". Provide up to 3 highlights.
+When 'isComplete' is true, generate the 'score' object representing the POST-SESSION REVIEW:
+- 'whatWentWell': List of 2-3 bullet points calling out specific user quotes and explaining why they are strong storytelling choices (e.g. "You described a visual scene: 'glowed with custom styles, but MP4 spat out standard block text'. This is much stronger than a summary.").
+- 'nextTimeToPractice': List of 1-2 bullet points with constructive, actionable advice on what to practice next time (e.g. "You skipped over the turning point logic. Next time, tell us what the hypothesis was.").
+- 'checklist': An object containing booleans for whether the elements were successfully found: 'mission', 'obstacle', 'firstGuess', 'visualScene', 'discovery', 'lesson'.
+- 'overall': Integer score (0-100) representing overall script strength.
 
-5. Movie Test:
-   If the user summarizes abstractly, do NOT write a visual version for them. Instead, set 'after' to null and write in 'explanation': "What did it look like exactly? Describe what you saw."
-
-6. Completion ('isComplete'):
-   Set to true when ALL 7 elements are filled (including naturalHook), or after 7+ exchanges.
-
-7. If 'isComplete':
-   - Generate 'dailyReplay' cinematic breakdown.
-   - Generate 'scriptOutline' matching the 5 new sections: "🎯 The Moment Everything Started", "🚧 The Obstacle", "🧪 The Struggle", "💡 The Discovery", "🎁 The Lesson".
-   - Generate 'instinctNote': Exactly one sentence of longitudinal coaching.
-
-8. Story Score (when isComplete): rate overall and sub-scores.
+Generate 'scriptOutline' matching the 5 new sections:
+- "🎯 The Moment Everything Started" (natural hook)
+- "🚧 The Obstacle" (obstacle + visuals)
+- "🧪 The Struggle" (firstGuess decision chain)
+- "💡 The Discovery" (discovery)
+- "🎁 The Lesson" (lesson)
 
 Respond STRICTLY in the requested JSON schema.
 `;
@@ -127,16 +113,6 @@ Respond STRICTLY in the requested JSON schema.
                 type: 'OBJECT',
                 properties: {
                   coachMessage: { type: 'STRING' },
-                  reflection: {
-                    type: 'OBJECT',
-                    nullable: true,
-                    properties: {
-                      title: { type: 'STRING' },
-                      text: { type: 'STRING' },
-                      points: { type: 'STRING', nullable: true }
-                    },
-                    required: ['title', 'text']
-                  },
                   extractedAnatomy: {
                     type: 'OBJECT',
                     properties: {
@@ -175,15 +151,28 @@ Respond STRICTLY in the requested JSON schema.
                     type: 'OBJECT',
                     properties: {
                       overall: { type: 'INTEGER' },
-                      curiosity: { type: 'INTEGER' },
-                      conflict: { type: 'INTEGER' },
-                      visualScenes: { type: 'INTEGER' },
-                      emotionalJourney: { type: 'INTEGER' },
-                      lesson: { type: 'INTEGER' },
-                      specificity: { type: 'INTEGER' },
-                      critique: { type: 'STRING' }
+                      whatWentWell: {
+                        type: 'ARRAY',
+                        items: { type: 'STRING' }
+                      },
+                      nextTimeToPractice: {
+                        type: 'ARRAY',
+                        items: { type: 'STRING' }
+                      },
+                      checklist: {
+                        type: 'OBJECT',
+                        properties: {
+                          mission: { type: 'BOOLEAN' },
+                          obstacle: { type: 'BOOLEAN' },
+                          firstGuess: { type: 'BOOLEAN' },
+                          visualScene: { type: 'BOOLEAN' },
+                          discovery: { type: 'BOOLEAN' },
+                          lesson: { type: 'BOOLEAN' }
+                        },
+                        required: ['mission', 'obstacle', 'firstGuess', 'visualScene', 'discovery', 'lesson']
+                      }
                     },
-                    required: ['overall', 'curiosity', 'conflict', 'visualScenes', 'emotionalJourney', 'lesson', 'specificity', 'critique']
+                    required: ['overall', 'whatWentWell', 'nextTimeToPractice', 'checklist']
                   },
                   isComplete: { type: 'BOOLEAN' },
                   dailyReplay: { type: 'STRING', nullable: true },
