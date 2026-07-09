@@ -1310,6 +1310,13 @@
       </div>
     </div>
 
+      <!-- Storytelling Streak (7-day instinct coaching) -->
+      <div id="sfStreakSection" style="margin-top:20px; display:none;">
+        <div class="section-title" style="margin-bottom:10px;">ðŸ”¥ Your Storytelling Streak</div>
+        <div id="sfStreakList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+    </div>
+
     <!-- 2. Active Session Workspace (Split Screen) -->
     <div id="sfActiveSessionState" style="display:none;" class="fadeIn">
       <!-- Session Bar / Story Type indicator and Exit -->
@@ -1356,7 +1363,7 @@
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
-              <div class="sf-anatomy-item" id="anat-attempts">
+              <div class="sf-anatomy-item" id="anat-firstGuess">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
                   <div class="sf-anatomy-label">🔄 ATTEMPTS</div>
@@ -3526,7 +3533,7 @@ async function syncHistory() {
 // ── STORY FINDER STATE ────────────────────────────────────────────────────────
 let sfActiveStoryType = null;
 let sfHistory = [];
-let sfAnatomyState = { mission: null, obstacle: null, attempts: null, discovery: null, lesson: null };
+let sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, discovery: null, lesson: null, naturalHook: null };
 let sfIsLoading = false;
 let sfOfflineStep = 0;
 
@@ -3534,7 +3541,7 @@ let sfOfflineStep = 0;
 function startStorySession(type) {
   sfActiveStoryType = type;
   sfHistory = [];
-  sfAnatomyState = { mission: null, obstacle: null, attempts: null, discovery: null, lesson: null };
+  sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, discovery: null, lesson: null, naturalHook: null };
   sfIsLoading = false;
 
   const STORY_TYPES = {
@@ -3588,8 +3595,17 @@ function confirmExitStorySession() {
   document.getElementById('sfConfirmModal').style.display = 'none';
   document.getElementById('sfActiveSessionState').style.display = 'none';
   document.getElementById('sfLandingState').style.display = 'block';
+  // Reset session-end cards
+  const mapCard = document.getElementById('sfStoryMapCard');
+  const instinctCard = document.getElementById('sfInstinctCard');
+  const scoreCard = document.getElementById('sfScoreCard');
+  if (mapCard) mapCard.style.display = 'none';
+  if (instinctCard) instinctCard.style.display = 'none';
+  if (scoreCard) scoreCard.style.display = 'none';
   sfActiveStoryType = null;
   sfHistory = [];
+  // Refresh streak display on landing
+  renderStreakOnLanding();
 }
 
 async function sendStoryMessage(isInit = false) {
@@ -3689,7 +3705,14 @@ async function sendStoryMessage(isInit = false) {
 
       if (result.dailyReplay) {
         document.getElementById('sfReplayText').textContent = result.dailyReplay;
-        document.getElementById('sfReplayCard').style.display = 'block';
+      }
+
+      // Render Story Map (replaces Replay card)
+      renderStoryMap();
+
+      // Save and display Instinct Note
+      if (result.instinctNote) {
+        saveInstinctNote(result.instinctNote);
       }
 
       window.sfLastScriptOutline = result.scriptOutline || [];
@@ -3721,7 +3744,6 @@ async function sendStoryMessage(isInit = false) {
 }
 
 function simulateOfflineStorySession(isInit = false, userText = '') {
-  console.log('[StoryFinder] simulateOfflineStorySession called, isInit:', isInit, 'userText:', userText, 'offlineStep:', sfOfflineStep);
   const chatWindow = document.getElementById('sfChatWindow');
   const inputEl = document.getElementById('sfChatInput');
 
@@ -3731,22 +3753,8 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
     inputEl.disabled = true;
     document.getElementById('sfSendBtn').disabled = true;
     
-    // Simulate loading delay for offline natural feel
     setTimeout(() => {
-      const greetQuestions = {
-        built: "Mission: Let's discover today's story. What were you trying to build or accomplish today?",
-        failed: "Mission: Let's discover today's story. What exactly did you fail at or struggle with today?",
-        learned: "Mission: Let's discover today's story. What was the key lesson or discovery you learned today?",
-        surprised: "Mission: Let's discover today's story. What unexpected thing happened or surprised you today?",
-        changedMind: "Mission: Let's discover today's story. What did you decide to change your mind about today?",
-        opinion: "Mission: Let's discover today's story. What hot take or strong design opinion is on your mind today?",
-        disagree: "Mission: Let's discover today's story. What design rule or trend do you disagree with today?",
-        beforeAfter: "Mission: Let's discover today's story. What UI screen did you transform or improve today?",
-        decision: "Mission: Let's discover today's story. What was the single critical decision you made today?"
-      };
-      
-      const welcome = greetQuestions[sfActiveStoryType] || "Mission: Let's discover today's story. What were you trying to accomplish today?";
-      
+      const welcome = "Mission: Let's discover today's story. What were you trying to accomplish?";
       const bubble = document.createElement('div');
       bubble.className = 'sf-msg coach';
       bubble.textContent = `[Offline Mode] ${welcome}`;
@@ -3778,32 +3786,35 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
 
     if (sfOfflineStep === 1) {
       sfAnatomyState.mission = userText;
-      coachReply = "Obstacle: Got it. What stood in your way? E.g., what roadblock or constraint stopped you?";
+      coachReply = "Got it. Now — what blocked you? What was the first sign that something wasn't going to plan?";
     } else if (sfOfflineStep === 2) {
       sfAnatomyState.obstacle = userText;
-      coachReply = "Attempts: That sounds frustrating. What did you try first to solve it, and what failed?";
+      coachReply = "What was your first guess about what was causing it? What did you think the problem was?";
     } else if (sfOfflineStep === 3) {
-      sfAnatomyState.attempts = userText;
-      coachReply = "Discovery: At what moment did you realize what the real problem was, and what did you change?";
+      sfAnatomyState.firstGuess = userText;
+      coachReply = "Did it work? And when you realized it didn't — what made you realize you were wrong?";
     } else if (sfOfflineStep === 4) {
       sfAnatomyState.discovery = userText;
-      coachReply = "Lesson: Excellent discovery. What's the key lesson or takeaway from this experience?";
+      coachReply = "What's the one lesson you'd take from this that someone else could use tomorrow?";
     } else if (sfOfflineStep === 5) {
       sfAnatomyState.lesson = userText;
-      coachReply = "Movie Test: Let's make it visual. When you realized something was wrong, what was actually on your screen? E.g. what did it look like?";
+      coachReply = "One more: when you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw.";
+    } else if (sfOfflineStep === 6) {
+      sfAnatomyState.visuals = userText;
+      coachReply = "Last question. If you were telling this story to your best friend over dinner tonight, where would you naturally start?";
     } else {
-      coachReply = "Amazing job! We have a complete story structure now. Look at your Story Score and Replay below!";
-      
-      // Calculate story score
+      sfAnatomyState.naturalHook = userText;
+      coachReply = "Perfect. That right there — that's probably your strongest opening. Your Story Map is ready below.";
+
       const mockScore = {
         overall: 84,
         curiosity: 88,
         conflict: 90,
-        visualScenes: 72,
+        visualScenes: 76,
         emotionalJourney: 85,
         lesson: 92,
-        specificity: 78,
-        critique: "[Offline Mode Review] Your story has strong conflict and a very clear structural pivot. To improve visual scenes, focus more on sensory details (like red error dialogs or loading spinner freezes) instead of abstract summaries."
+        specificity: 82,
+        critique: "[Offline Mode] Strong conflict and a clear discovery moment. To improve: next time, describe what you saw on screen before you describe what it meant."
       };
       renderStoryScore(mockScore);
 
@@ -3868,7 +3879,7 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
 }
 
 function updateAnatomyUI() {
-  const steps = ['mission', 'obstacle', 'attempts', 'discovery', 'lesson'];
+  const steps = ['mission', 'obstacle', 'firstGuess', 'discovery', 'lesson'];
   steps.forEach(step => {
     const val = sfAnatomyState[step];
     const el = document.getElementById('anat-' + step);
@@ -3882,6 +3893,78 @@ function updateAnatomyUI() {
       }
     }
   });
+}
+
+function renderStoryMap() {
+  const mapEl = document.getElementById('sfStoryMapFlow');
+  if (!mapEl) return;
+
+  const stages = [
+    { icon: '🎯', label: 'Natural Hook', key: 'naturalHook' },
+    { icon: '🧭', label: 'Mission', key: 'mission' },
+    { icon: '🚧', label: 'Obstacle', key: 'obstacle' },
+    { icon: '🧪', label: 'First Guess', key: 'firstGuess' },
+    { icon: '💡', label: 'Discovery', key: 'discovery' },
+    { icon: '🎁', label: 'Lesson', key: 'lesson' }
+  ];
+
+  const mapBoxStyle = 'background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:4px;';
+  const arrowStyle = 'text-align:center; color:var(--muted); font-size:18px; line-height:1.2; padding:2px 0;';
+
+  let html = '';
+  stages.forEach((s, i) => {
+    const val = sfAnatomyState[s.key];
+    const displayVal = val && val.trim() ? val : '<span style="color:var(--muted); font-style:italic;">Not captured</span>';
+    html += `<div style="${mapBoxStyle}">
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted);">${s.icon} ${s.label}</div>
+      <div style="font-size:13px; color:var(--text); line-height:1.5;">${displayVal}</div>
+    </div>`;
+    if (i < stages.length - 1) {
+      html += `<div style="${arrowStyle}">↓</div>`;
+    }
+  });
+
+  mapEl.innerHTML = html;
+  document.getElementById('sfStoryMapCard').style.display = 'block';
+}
+
+function saveInstinctNote(note) {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const stored = JSON.parse(localStorage.getItem('sf_instinct_notes') || '[]');
+  // Keep only last 7 unique days
+  const filtered = stored.filter(n => n.date !== today);
+  filtered.unshift({ date: today, note });
+  const trimmed = filtered.slice(0, 7);
+  localStorage.setItem('sf_instinct_notes', JSON.stringify(trimmed));
+
+  // Show on instinct card
+  const card = document.getElementById('sfInstinctCard');
+  const textEl = document.getElementById('sfInstinctText');
+  if (card && textEl) {
+    textEl.textContent = note;
+    card.style.display = 'block';
+  }
+}
+
+function renderStreakOnLanding() {
+  const stored = JSON.parse(localStorage.getItem('sf_instinct_notes') || '[]');
+  const section = document.getElementById('sfStreakSection');
+  const list = document.getElementById('sfStreakList');
+  if (!section || !list || stored.length === 0) return;
+
+  const fmt = dateStr => {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+
+  list.innerHTML = stored.map(n => `
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 14px; display:flex; flex-direction:column; gap:4px;">
+      <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">${fmt(n.date)}</div>
+      <div style="font-size:12px; color:var(--text); line-height:1.5; font-style:italic;">"${n.note}"</div>
+    </div>
+  `).join('');
+
+  section.style.display = 'block';
 }
 
 function updateXrayUI(highlights) {
@@ -4049,6 +4132,7 @@ document.addEventListener('DOMContentLoaded', function(){
   updateStatsDisplay();
   renderLearnList();
   updateLearnStats();
+  renderStreakOnLanding();
 
   const sfInput = document.getElementById('sfChatInput');
   if (sfInput) {
@@ -4062,3 +4146,4 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 </body>
 </html>
+
