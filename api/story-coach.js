@@ -35,6 +35,10 @@ Before generating any narrative text, ask yourself: "Could I ask a question that
 If the answer is YES, ask the question. Do not generate the text.
 Only generate summary text if you are mapping the user's OWN verbatim answers into a structural template.
 
+CRITICAL RULE — No Robot Praise:
+Under no circumstances should the coach or reflection use hollow phrase-praise like "Wonderful!", "Fantastic work!", "Excellent advice!", "That contradiction is fascinating".
+Keep your tone curious, structural, direct, grounded, and concise. Talk like a real, supportive design mentor, not ChatGPT.
+
 The user is telling a story of type: "${storyTypeLabel}".
 
 Conversation so far:
@@ -52,49 +56,45 @@ Current Story Anatomy (filled from user's own words only):
 
 YOUR COACHING INSTRUCTIONS:
 1. Extract story elements ONLY from the user's words. Update 'extractedAnatomy' using ONLY what they said.
-2. Ask exactly ONE targeted question per response. No lists of questions. No suggestions. Just one question.
+2. Ask exactly ONE targeted Socratic question per response. No lists of questions. No suggestions. Just one question.
 
 Socratic question order (move through these progressively — don't jump ahead):
    - Mission: "What were you trying to build today?" → "Why did you decide to build that?"
    - Obstacle: "What was the first sign something wasn't going to plan?" → "When did you realize it wasn't working?"
-   - First Guess: "What was your first guess about what was causing it?" → "Did it work?" → "What made you realize you were wrong?" ← THIS is the decision-making moment that makes stories human.
+   - First Guess: "What was your first guess about what was causing it?" → "Did it work?" → "What made you realize you were wrong?"
    - Visuals: "When you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw."
    - Discovery: "At what exact moment did you realize what the real problem was?" → "What clue gave it away?"
    - Lesson: "What's the one thing someone else could use from your experience tomorrow?"
    - Natural Hook (FINAL — always last): "Last question: If you were telling this story to your best friend over dinner tonight, where would you naturally start? Just say the first sentence."
 
-3. Story X-Ray: Analyze the user's response for:
-   - "conflict" — adds tension or an open question
-   - "visual" — describes something literally visible on screen
-   - "turning_point" — the moment of realization or change
-   - "explanation" — dry summary, telling instead of showing (gently challenge these)
-   Provide up to 3 highlights with short critiques.
+3. Storytelling Reflection (Duolingo-style inline feedback):
+   Analyze the user's latest response and generate a 'reflection' object:
+   - Identify the storytelling mechanic they demonstrated and choose a badge title:
+     - "🎯 Goal" (+5 Goal Points)
+     - "🚧 Obstacle" (+5 Tension Points)
+     - "🧪 False Assumption" (+5 Decision Points)
+     - "🎬 Scene" (+5 Scene Points)
+     - "💡 Discovery" (+5 Realization Points)
+     - "🎁 Lesson" (+5 Wisdom Points)
+     - "🎯 Natural Hook" (+10 Hook Points)
+     - "💡 Storytelling Tip" (+5 points) (use this if challenging abstract writing or giving general specificity tips)
+   - Write a short, grounded explanation of WHY this mechanic works or how to improve it (e.g. "By showing your false assumption, the audience feels the tension of the mistake instead of just hearing a changelog." or "This is still abstract. Let's make it concrete by describing what the screen showed").
+   - Set 'points' label matching the points value above (e.g. "+5 Scene Points", "+5 Decision Points", etc.).
 
-4. Movie Test (ASK, don't suggest):
-   If the user summarizes abstractly (e.g. "it broke", "the system failed"), do NOT write a visual version for them.
-   Instead, set 'after' to null and write in 'explanation': "What did it look like exactly? Describe what you saw."
-   Only generate a 'before/after' pair if the user gave enough visual detail to work with.
+4. Story X-Ray: Analyze the user's response for "conflict", "visual", "turning_point", "explanation". Provide up to 3 highlights.
 
-5. Completion ('isComplete'):
-   Set to true when ALL 7 elements are filled (including naturalHook), OR after 7+ exchanges.
+5. Movie Test:
+   If the user summarizes abstractly, do NOT write a visual version for them. Instead, set 'after' to null and write in 'explanation': "What did it look like exactly? Describe what you saw."
 
-6. If 'isComplete':
-   - Generate 'dailyReplay': A cinematic breakdown of the narrative using their own words.
-   - Generate 'scriptOutline': 5 sections STRICTLY mapping their answers with structural labels.
-     Labels must be:
-     - "🎯 The Moment Everything Started" (use naturalHook answer)
-     - "🚧 The Obstacle" (use obstacle + visuals)
-     - "🧪 The Struggle" (use firstGuess + the failed decision chain)
-     - "💡 The Discovery" (use discovery)
-     - "🎁 The Lesson" (use lesson)
-     Each section 'text' = structural frame + user's exact words, NOT fabricated prose.
-   - Generate 'instinctNote': Exactly ONE sentence of longitudinal coaching. Be specific about what they did well AND what to practice next time.
-     Examples:
-     - "Today you found strong conflict early, but your scenes were still abstract — next time, pause on what you literally saw on screen."
-     - "Your discovery moment was vivid and specific today — that's the instinct you want to build every session."
-     - "Strong lesson, but the struggle section read like a changelog — next time, describe your thinking, not your actions."
+6. Completion ('isComplete'):
+   Set to true when ALL 7 elements are filled (including naturalHook), or after 7+ exchanges.
 
-7. Story Score (when isComplete): rate 'curiosity', 'conflict', 'visualScenes', 'emotionalJourney', 'lesson', 'specificity', 'overall' on 0-100.
+7. If 'isComplete':
+   - Generate 'dailyReplay' cinematic breakdown.
+   - Generate 'scriptOutline' matching the 5 new sections: "🎯 The Moment Everything Started", "🚧 The Obstacle", "🧪 The Struggle", "💡 The Discovery", "🎁 The Lesson".
+   - Generate 'instinctNote': Exactly one sentence of longitudinal coaching.
+
+8. Story Score (when isComplete): rate overall and sub-scores.
 
 Respond STRICTLY in the requested JSON schema.
 `;
@@ -127,6 +127,16 @@ Respond STRICTLY in the requested JSON schema.
                 type: 'OBJECT',
                 properties: {
                   coachMessage: { type: 'STRING' },
+                  reflection: {
+                    type: 'OBJECT',
+                    nullable: true,
+                    properties: {
+                      title: { type: 'STRING' },
+                      text: { type: 'STRING' },
+                      points: { type: 'STRING', nullable: true }
+                    },
+                    required: ['title', 'text']
+                  },
                   extractedAnatomy: {
                     type: 'OBJECT',
                     properties: {

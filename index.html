@@ -1240,6 +1240,89 @@
     .sf-score-overall { font-size: 72px !important; }
     .sf-score-bar-label { font-size: 14px !important; }
   }
+
+  /* ── SOCRATIC GYM STYLE ADDITIONS ── */
+  .sf-reflection-card {
+    background: rgba(var(--accent-rgb, 200, 241, 53), 0.05);
+    border: 1px solid rgba(var(--accent-rgb, 200, 241, 53), 0.25);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 4px 0 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeIn 0.2s ease-out;
+  }
+  .sf-reflection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+  }
+  .sf-reflection-points {
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .sf-reflection-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .sf-anatomy-item.locked {
+    opacity: 0.35;
+  }
+  .sf-anatomy-item.locked .sf-anatomy-indicator {
+    background: var(--border);
+    box-shadow: none;
+  }
+  .sf-anatomy-item.active-step .sf-anatomy-indicator {
+    background: var(--medium);
+    box-shadow: 0 0 10px var(--medium);
+    animation: activeStepPulse 1.5s infinite ease-in-out;
+  }
+  @keyframes activeStepPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+  .sf-gym-stats-wrap {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .sf-gym-stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    text-align: center;
+  }
+  .sf-gym-stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .sf-gym-stat-lbl {
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
 </style>
 </head>
 <body>
@@ -1345,42 +1428,68 @@
 
         <!-- Sidebar / Analysis Area (Right Column) -->
         <div class="sf-analysis-column">
+          <!-- Socratic Gym Stats -->
+          <div class="sf-gym-stats-wrap">
+            <div class="sf-gym-stat-card">
+              <div class="sf-gym-stat-val" id="sfGymPoints">0</div>
+              <div class="sf-gym-stat-lbl">🔥 Gym Points</div>
+            </div>
+            <div class="sf-gym-stat-card">
+              <div class="sf-gym-stat-val" id="sfGymLevel" style="font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">Novice</div>
+              <div class="sf-gym-stat-lbl">🏆 Level</div>
+            </div>
+          </div>
+
           <!-- Story Anatomy -->
           <div class="sf-analysis-card">
-            <h3 class="sf-card-title">Story Anatomy</h3>
+            <h3 class="sf-card-title">Story Puzzle Pieces</h3>
             <div class="sf-anatomy-list">
-              <div class="sf-anatomy-item" id="anat-mission">
+              <div class="sf-anatomy-item locked" id="anat-mission">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
                   <div class="sf-anatomy-label">🧭 MISSION</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
-              <div class="sf-anatomy-item" id="anat-obstacle">
+              <div class="sf-anatomy-item locked" id="anat-obstacle">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
                   <div class="sf-anatomy-label">🚧 OBSTACLE</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
-              <div class="sf-anatomy-item" id="anat-firstGuess">
+              <div class="sf-anatomy-item locked" id="anat-firstGuess">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
-                  <div class="sf-anatomy-label">🔄 ATTEMPTS</div>
+                  <div class="sf-anatomy-label">🧪 FIRST GUESS</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
-              <div class="sf-anatomy-item" id="anat-discovery">
+              <div class="sf-anatomy-item locked" id="anat-visuals">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">👁️ VISUAL SCENE</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+              <div class="sf-anatomy-item locked" id="anat-discovery">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
                   <div class="sf-anatomy-label">💡 DISCOVERY</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
-              <div class="sf-anatomy-item" id="anat-lesson">
+              <div class="sf-anatomy-item locked" id="anat-lesson">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
                   <div class="sf-anatomy-label">🎁 LESSON</div>
+                  <div class="sf-anatomy-value">—</div>
+                </div>
+              </div>
+              <div class="sf-anatomy-item locked" id="anat-naturalHook">
+                <div class="sf-anatomy-indicator"></div>
+                <div class="sf-anatomy-content">
+                  <div class="sf-anatomy-label">🎯 NATURAL HOOK</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
@@ -3536,13 +3645,31 @@ let sfHistory = [];
 let sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, discovery: null, lesson: null, naturalHook: null };
 let sfIsLoading = false;
 let sfOfflineStep = 0;
+let sfGymPoints = 0;
+
+function updateGymStatsUI() {
+  const ptsEl = document.getElementById('sfGymPoints');
+  const lvlEl = document.getElementById('sfGymLevel');
+  if (ptsEl) ptsEl.textContent = sfGymPoints;
+  if (lvlEl) {
+    let levelName = "Novice Creator";
+    if (sfGymPoints >= 30) levelName = "Scene Builder";
+    if (sfGymPoints >= 60) levelName = "Plot Architect";
+    if (sfGymPoints >= 100) levelName = "Story Master";
+    lvlEl.textContent = levelName;
+  }
+}
 
 // ── STORY FINDER ACTIONS ──────────────────────────────────────────────────────
 function startStorySession(type) {
   sfActiveStoryType = type;
   sfHistory = [];
-  sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, discovery: null, lesson: null, naturalHook: null };
+  sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, visuals: null, discovery: null, lesson: null, naturalHook: null };
   sfIsLoading = false;
+
+  // Load Socratic Gym Points
+  sfGymPoints = parseInt(localStorage.getItem('sf_gym_points') || '0');
+  updateGymStatsUI();
 
   const STORY_TYPES = {
     built: { label: 'I Built Something', icon: '🧱' },
@@ -3567,6 +3694,11 @@ function startStorySession(type) {
   document.getElementById('sfMovieContent').innerHTML = '<div style="font-size:12px; color:var(--muted); font-style:italic;">Visual suggestions (Show vs Tell) will appear here as you tell your story.</div>';
   document.getElementById('sfScoreCard').style.display = 'none';
   document.getElementById('sfReplayCard').style.display = 'none';
+  
+  const mapCard = document.getElementById('sfStoryMapCard');
+  const instinctCard = document.getElementById('sfInstinctCard');
+  if (mapCard) mapCard.style.display = 'none';
+  if (instinctCard) instinctCard.style.display = 'none';
   
   // Reset input state
   const chatInput = document.getElementById('sfChatInput');
@@ -3674,6 +3806,27 @@ async function sendStoryMessage(isInit = false) {
     const lb = document.getElementById('sfCoachLoadingBubble');
     if (lb) lb.remove();
 
+    // Render reflection card if present (Duolingo storytelling feedback)
+    if (result.reflection) {
+      const refCard = document.createElement('div');
+      refCard.className = 'sf-reflection-card';
+      refCard.innerHTML = `
+        <div class="sf-reflection-header">
+          <span>${esc(result.reflection.title || 'Storytelling Tip')}</span>
+          ${result.reflection.points ? `<span class="sf-reflection-points">${esc(result.reflection.points)}</span>` : ''}
+        </div>
+        <div class="sf-reflection-text">${esc(result.reflection.text)}</div>
+      `;
+      chatWindow.appendChild(refCard);
+
+      if (result.reflection.points) {
+        const pts = parseInt(result.reflection.points.replace(/\D/g, '')) || 0;
+        sfGymPoints += pts;
+        localStorage.setItem('sf_gym_points', sfGymPoints);
+        updateGymStatsUI();
+      }
+    }
+
     // Render coach bubble
     const coachBubble = document.createElement('div');
     coachBubble.className = 'sf-msg coach';
@@ -3765,6 +3918,7 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
       inputEl.disabled = false;
       document.getElementById('sfSendBtn').disabled = false;
       inputEl.focus();
+      updateAnatomyUI();
     }, 800);
     return;
   }
@@ -3782,29 +3936,65 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
     if (lb) lb.remove();
 
     let coachReply = '';
+    let reflection = null;
     sfOfflineStep++;
 
     if (sfOfflineStep === 1) {
       sfAnatomyState.mission = userText;
       coachReply = "Got it. Now — what blocked you? What was the first sign that something wasn't going to plan?";
+      reflection = {
+        title: "🎯 Goal",
+        text: "This sets up your audience's expectations. A clear goal is the absolute anchor of a good design story.",
+        points: "+5 Goal Points"
+      };
     } else if (sfOfflineStep === 2) {
       sfAnatomyState.obstacle = userText;
       coachReply = "What was your first guess about what was causing it? What did you think the problem was?";
+      reflection = {
+        title: "🚧 Obstacle",
+        text: "Nice! Stories are defined by change and roadblocks. An obstacle creates tension that makes people keep watching.",
+        points: "+5 Tension Points"
+      };
     } else if (sfOfflineStep === 3) {
       sfAnatomyState.firstGuess = userText;
       coachReply = "Did it work? And when you realized it didn't — what made you realize you were wrong?";
+      reflection = {
+        title: "🧪 False Assumption",
+        text: "Perfect. Debugging is storytelling. You had a belief, and reality proved you wrong. This false belief is what makes you human.",
+        points: "+5 Decision Points"
+      };
     } else if (sfOfflineStep === 4) {
       sfAnatomyState.discovery = userText;
       coachReply = "What's the one lesson you'd take from this that someone else could use tomorrow?";
+      reflection = {
+        title: "💡 Discovery",
+        text: "Great realization moment. The turning point is the most satisfying part of a story. It changes your worldview.",
+        points: "+5 Realization Points"
+      };
     } else if (sfOfflineStep === 5) {
       sfAnatomyState.lesson = userText;
       coachReply = "One more: when you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw.";
+      reflection = {
+        title: "🎁 Lesson",
+        text: "A strong takeaway is the 'value drop' that makes the video worth watching for another creator.",
+        points: "+5 Wisdom Points"
+      };
     } else if (sfOfflineStep === 6) {
       sfAnatomyState.visuals = userText;
       coachReply = "Last question. If you were telling this story to your best friend over dinner tonight, where would you naturally start?";
+      reflection = {
+        title: "👁️ Visuals",
+        text: "Describing what was literally on screen makes the story a visual movie, not a dry summary.",
+        points: "+5 Visual Points"
+      };
     } else {
       sfAnatomyState.naturalHook = userText;
       coachReply = "Perfect. That right there — that's probably your strongest opening. Your Story Map is ready below.";
+      reflection = {
+        title: "🎯 Natural Hook",
+        text: "This is your strongest opening sentence. Starting how you would tell a best friend over dinner is always best.",
+        points: "+10 Hook Points"
+      };
 
       const mockScore = {
         overall: 84,
@@ -3818,26 +4008,21 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
       };
       renderStoryScore(mockScore);
 
-      // Generate replay
-      const mockReplay = `🎬 MOVIE REPLAY: My ${sfActiveStoryType.toUpperCase()} Day\n\n` +
-        `🏁 MISSION: ${sfAnatomyState.mission}\n` +
-        `❌ OBSTACLE: ${sfAnatomyState.obstacle}\n` +
-        `🛠️ ATTEMPTS: ${sfAnatomyState.attempts}\n` +
-        `💡 DISCOVERY: ${sfAnatomyState.discovery}\n` +
-        `🎓 LESSON: ${sfAnatomyState.lesson}\n` +
-        `👁️ VISUALS: ${userText}`;
-      
-      document.getElementById('sfReplayText').textContent = mockReplay;
-      document.getElementById('sfReplayCard').style.display = 'block';
+      // Render Story Map (replaces Replay card)
+      renderStoryMap();
 
-      // Seed Script Outline (Strict Socratic Mapping without fabricating details)
+      // Seed Script Outline
       window.sfLastScriptOutline = [
-        { label: 'Hook', text: `Hook: Start with your mission: "${sfAnatomyState.mission}". But it failed because of "${sfAnatomyState.obstacle}".` },
-        { label: 'Obstacle', text: `Detail the roadblock: "${sfAnatomyState.obstacle}". Focus on the visual scene: "${userText}".` },
-        { label: 'Struggle', text: `Show what failed: "${sfAnatomyState.attempts}".` },
-        { label: 'Pivot', text: `Reveal the moment of discovery: "${sfAnatomyState.discovery}".` },
-        { label: 'Value Drop', text: `Conclude with the lesson: "${sfAnatomyState.lesson}".` }
+        { label: '🎯 The Moment Everything Started', text: `Your natural opening: "${sfAnatomyState.naturalHook}"` },
+        { label: '🚧 The Obstacle', text: `The roadblock you hit: "${sfAnatomyState.obstacle}". Visual scene: "${sfAnatomyState.visuals || 'Describe what you saw on screen'}"` },
+        { label: '🧪 The Struggle', text: `Your first guess was: "${sfAnatomyState.firstGuess}". Describe the decision-making process, not just the action.` },
+        { label: '💡 The Discovery', text: `The moment everything changed: "${sfAnatomyState.discovery}"` },
+        { label: '🎁 The Lesson', text: `What anyone watching should take away: "${sfAnatomyState.lesson}"` }
       ];
+
+      // Save Instinct Note to localStorage
+      const instinctNote = "[Offline Mode] Today you found a strong turning point and a clear lesson. Next time, try to describe your first guess before jumping to the solution — that thinking gap is what makes stories human.";
+      saveInstinctNote(instinctNote);
 
       inputEl.placeholder = 'Session complete!';
       inputEl.disabled = true;
@@ -3869,7 +4054,7 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 
     sfIsLoading = false;
-    if (sfOfflineStep <= 5) {
+    if (sfOfflineStep <= 6) {
       inputEl.disabled = false;
       document.getElementById('sfSendBtn').disabled = false;
       inputEl.placeholder = 'Type your answer to the coach...';
@@ -3879,17 +4064,27 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
 }
 
 function updateAnatomyUI() {
-  const steps = ['mission', 'obstacle', 'firstGuess', 'discovery', 'lesson'];
+  const steps = ['mission', 'obstacle', 'firstGuess', 'visuals', 'discovery', 'lesson', 'naturalHook'];
+  let foundActive = false;
   steps.forEach(step => {
     const val = sfAnatomyState[step];
     const el = document.getElementById('anat-' + step);
     if (el) {
       if (val && val.trim() !== '' && val !== 'Not yet identified') {
         el.classList.add('filled');
+        el.classList.remove('locked', 'active-step');
         el.querySelector('.sf-anatomy-value').textContent = val;
       } else {
         el.classList.remove('filled');
         el.querySelector('.sf-anatomy-value').textContent = '—';
+        if (!foundActive) {
+          el.classList.add('active-step');
+          el.classList.remove('locked');
+          foundActive = true;
+        } else {
+          el.classList.add('locked');
+          el.classList.remove('active-step');
+        }
       }
     }
   });
@@ -3904,6 +4099,7 @@ function renderStoryMap() {
     { icon: '🧭', label: 'Mission', key: 'mission' },
     { icon: '🚧', label: 'Obstacle', key: 'obstacle' },
     { icon: '🧪', label: 'First Guess', key: 'firstGuess' },
+    { icon: '👁️', label: 'Visual Scene', key: 'visuals' },
     { icon: '💡', label: 'Discovery', key: 'discovery' },
     { icon: '🎁', label: 'Lesson', key: 'lesson' }
   ];
@@ -4000,6 +4196,22 @@ function updateMovieTestUI(movieTest) {
     return;
   }
 
+  // When 'after' is null, the AI is asking the user to describe what they saw
+  if (!movieTest.after) {
+    movieDiv.innerHTML = `
+      <div class="sf-movie-comp fadeIn">
+        <div class="sf-movie-box before" style="margin-bottom:6px;">
+          <div class="lbl">Too Abstract</div>
+          <div style="font-style:italic; color:var(--muted);">"${esc(movieTest.before)}"</div>
+        </div>
+        <div style="background:rgba(var(--accent-rgb,99,102,241),0.08); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--text); line-height:1.5;">
+          💬 ${esc(movieTest.explanation || 'Describe exactly what you saw on screen.')}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   movieDiv.innerHTML = `
     <div class="sf-movie-comp fadeIn">
       <div class="sf-movie-box before" style="margin-bottom:6px;">
@@ -4013,6 +4225,7 @@ function updateMovieTestUI(movieTest) {
       <div style="font-size:11px; color:var(--muted); line-height:1.4;">${esc(movieTest.explanation)}</div>
     </div>
   `;
+
 }
 
 function renderStoryScore(score) {
@@ -4133,6 +4346,9 @@ document.addEventListener('DOMContentLoaded', function(){
   renderLearnList();
   updateLearnStats();
   renderStreakOnLanding();
+
+  sfGymPoints = parseInt(localStorage.getItem('sf_gym_points') || '0');
+  updateGymStatsUI();
 
   const sfInput = document.getElementById('sfChatInput');
   if (sfInput) {
