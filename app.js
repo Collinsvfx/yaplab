@@ -53,6 +53,7 @@ var sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, discover
 var sfIsLoading = false;
 var sfOfflineStep = 0;
 var sfGymPoints = 0;
+var sfStoryAngles = [];
 
 // ── LOCALSTORAGE KEYS ────────────────────────────────────────────────────────
 const LS_KEY = 'yaplab_learn_v3';

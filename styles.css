@@ -1157,6 +1157,12 @@
     border-bottom: 2px solid var(--muted);
     color: var(--muted);
   }
+  .xr-story_drift {
+    background: rgba(245, 158, 11, 0.15);
+    border-bottom: 2px dashed #f59e0b;
+    color: #f59e0b;
+    text-decoration: none;
+  }
   
   .sf-xray-legend {
     display: flex;

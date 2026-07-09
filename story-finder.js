@@ -17,7 +17,7 @@ function updateGymStatsUI() {
 function startStorySession(type) {
   sfActiveStoryType = type;
   sfHistory = [];
-  sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, visuals: null, discovery: null, lesson: null, naturalHook: null };
+  sfAnatomyState = { mission: null, obstacle: null, firstGuess: null, visuals: null, discovery: null, lesson: null, outcome: null, naturalHook: null };
   sfIsLoading = false;
 
   // Load Socratic Gym Points
@@ -49,6 +49,10 @@ function startStorySession(type) {
   
   const reviewCard = document.getElementById('sfStoryReviewCard');
   if (reviewCard) reviewCard.style.display = 'none';
+
+  const anglesCard = document.getElementById('sfStoryAnglesCard');
+  if (anglesCard) anglesCard.style.display = 'none';
+  sfStoryAngles = [];
   
   // Reset input state
   const chatInput = document.getElementById('sfChatInput');
@@ -80,8 +84,11 @@ function confirmExitStorySession() {
   // Reset session-end cards
   const reviewCard = document.getElementById('sfStoryReviewCard');
   const scoreCard = document.getElementById('sfScoreCard');
+  const anglesCard = document.getElementById('sfStoryAnglesCard');
   if (reviewCard) reviewCard.style.display = 'none';
   if (scoreCard) scoreCard.style.display = 'none';
+  if (anglesCard) anglesCard.style.display = 'none';
+  sfStoryAngles = [];
   sfActiveStoryType = null;
   sfHistory = [];
   // Refresh streak display on landing
@@ -179,11 +186,22 @@ async function sendStoryMessage(isInit = false) {
       inputEl.disabled = true;
       document.getElementById('sfSendBtn').disabled = true;
 
-      if (result.score) {
-        renderStoryScore(result.score);
-      }
-
       window.sfLastScriptOutline = result.scriptOutline || [];
+      sfStoryAngles = result.storyAngles || [];
+
+      // If multiple story angles were found, show the picker first
+      if (sfStoryAngles.length > 1) {
+        renderStoryAngles(sfStoryAngles);
+        // Pre-load the strongest angle's score into the review card (hidden)
+        if (result.score) {
+          renderStoryScore(result.score);
+        }
+      } else {
+        // Single story — go straight to review
+        if (result.score) {
+          renderStoryScore(result.score);
+        }
+      }
     } else {
       inputEl.disabled = false;
       document.getElementById('sfSendBtn').disabled = false;
@@ -343,7 +361,7 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
 }
 
 function updateAnatomyUI() {
-  const steps = ['mission', 'obstacle', 'firstGuess', 'visuals', 'discovery', 'lesson', 'naturalHook'];
+  const steps = ['mission', 'obstacle', 'firstGuess', 'visuals', 'discovery', 'lesson', 'outcome', 'naturalHook'];
   let foundActive = false;
   steps.forEach(step => {
     const val = sfAnatomyState[step];
@@ -380,7 +398,8 @@ function renderStoryMap() {
     { icon: `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="vertical-align:middle;margin-right:4px;"><path d="M10 2v7.31L4.75 17c-.77 1.08-.02 2.59 1.31 2.59h11.88c1.33 0 2.08-1.5 1.31-2.59L14 9.31V2h-4z"></path><line x1="8.5" y1="2" x2="15.5" y2="2"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>`, label: 'First Guess', key: 'firstGuess' },
     { icon: `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="vertical-align:middle;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`, label: 'Visual Scene', key: 'visuals' },
     { icon: `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="vertical-align:middle;margin-right:4px;"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>`, label: 'Discovery', key: 'discovery' },
-    { icon: `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="vertical-align:middle;margin-right:4px;"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>`, label: 'Lesson', key: 'lesson' }
+    { icon: `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="vertical-align:middle;margin-right:4px;"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>`, label: 'Lesson', key: 'lesson' },
+    { icon: `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`, label: 'Outcome', key: 'outcome' }
   ];
 
   const mapBoxStyle = 'background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:4px;';
@@ -468,6 +487,7 @@ function updateXrayUI(highlights) {
       <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:var(--medium); display:inline-block; vertical-align:middle; margin-right:3px;"></span>Conflict</span>
       <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:#a855f7; display:inline-block; vertical-align:middle; margin-right:3px;"></span>Turn</span>
       <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:var(--hard); display:inline-block; vertical-align:middle; margin-right:3px;"></span>Explanation</span>
+      <span class="sf-legend-item"><span style="width:6px; height:6px; border-radius:50%; background:#f59e0b; display:inline-block; vertical-align:middle; margin-right:3px;"></span>Story Drift</span>
     </div>
   `;
 
@@ -547,7 +567,8 @@ function renderStoryScore(score) {
       { label: 'First Guess', val: score.checklist.firstGuess },
       { label: 'Visual Scene', val: score.checklist.visualScene },
       { label: 'Discovery', val: score.checklist.discovery },
-      { label: 'Lesson', val: score.checklist.lesson }
+      { label: 'Lesson', val: score.checklist.lesson },
+      { label: 'Outcome', val: score.checklist.outcome }
     ];
     checklistEl.innerHTML = keys.map(k => `
       <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -563,7 +584,8 @@ function renderStoryScore(score) {
       { label: 'First Guess', val: true },
       { label: 'Visual Scene', val: true },
       { label: 'Discovery', val: true },
-      { label: 'Lesson', val: true }
+      { label: 'Lesson', val: true },
+      { label: 'Outcome', val: true }
     ];
     checklistEl.innerHTML = keys.map(k => `
       <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -575,6 +597,53 @@ function renderStoryScore(score) {
 
   reviewCard.style.display = 'block';
 }
+
+function renderStoryAngles(angles) {
+  const card = document.getElementById('sfStoryAnglesCard');
+  const subtitle = document.getElementById('sfAnglesSubtitle');
+  const list = document.getElementById('sfAnglesList');
+  if (!card || !subtitle || !list) return;
+
+  subtitle.textContent = `I found ${angles.length} stories in your session. Which one would you like to tell?`;
+
+  list.innerHTML = angles.map((angle, i) => `
+    <div style="background:var(--bg); border:1px solid ${i === 0 ? 'var(--accent)' : 'var(--border)'}; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; transition:border-color 0.15s;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:20px; line-height:1;">${esc(angle.emoji)}</span>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text);">${esc(angle.title)}</div>
+          ${i === 0 ? '<div style="font-size:10px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-top:1px;">Strongest angle</div>' : ''}
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.5;">${esc(angle.focus)}</div>
+      <div style="font-size:12px; color:var(--text); font-style:italic; border-left:2px solid var(--border); padding-left:10px; margin:2px 0; line-height:1.5;">&ldquo;${esc(angle.hook)}&rdquo;</div>
+      <button class="btn btn-primary" onclick="selectStoryAngle(${i})" style="align-self:flex-start; font-size:12px; padding:6px 14px; font-weight:600; margin-top:4px;">Tell This Story →</button>
+    </div>
+  `).join('');
+
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function selectStoryAngle(index) {
+  const angle = sfStoryAngles[index];
+  if (!angle) return;
+
+  // Set the selected angle's script outline as the active one
+  window.sfLastScriptOutline = angle.scriptOutline || [];
+
+  // Hide the angles picker
+  const anglesCard = document.getElementById('sfStoryAnglesCard');
+  if (anglesCard) anglesCard.style.display = 'none';
+
+  // Show the story review card
+  const reviewCard = document.getElementById('sfStoryReviewCard');
+  if (reviewCard) {
+    reviewCard.style.display = 'block';
+    reviewCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
 
 async function exportStoryToScriptBuilder() {
   if (!window.sfLastScriptOutline || window.sfLastScriptOutline.length === 0) {

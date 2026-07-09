@@ -33,8 +33,9 @@ QUESTION FLOW (I Solved a Problem):
 3. "What was your first assumption about what was causing it?" → "Why was it wrong?"
 4. "What was actually on your screen when you realized it wasn't working? Describe exactly what you saw."
 5. "What helped you finally solve it?" → "What was the exact moment the fix clicked?"
-6. "What did you learn that someone else could use tomorrow?"
-7. FINAL: "If you were telling this to a friend over dinner, what's the first sentence you'd say?"`,
+6. "What happened after you fixed it? Describe the result — what is now working that wasn't before?"
+7. "What did you learn that someone else could use tomorrow?"
+8. FINAL: "If you were telling this to a friend over dinner, what's the first sentence you'd say?"`,
 
     builtSomething: `
 QUESTION FLOW (I Built Something New):
@@ -141,11 +142,13 @@ Current Story Anatomy (filled from user's own words only):
 - 🧪 First Guess (What they THOUGHT was the problem): "${anatomyState?.firstGuess || 'Not yet identified'}"
 - 💡 Discovery (The real problem / turning point): "${anatomyState?.discovery || 'Not yet identified'}"
 - 🎁 Lesson: "${anatomyState?.lesson || 'Not yet identified'}"
+- 🎉 Outcome (What was actually working after the fix): "${anatomyState?.outcome || 'Not yet identified'}"
 - 👁️ Visuals (What they literally saw on their screen): "${anatomyState?.visuals || 'Not yet identified'}"
 - 🎯 Natural Hook (Where they'd start at a dinner table): "${anatomyState?.naturalHook || 'Not yet identified'}"
 
 Story X-Ray & Movie Test:
 Analyze the user's latest response for "conflict", "visual", "turning_point", "explanation". Provide highlights and movie suggestions.
+Story Drift Detection: If the user's response contains two distinct story threads (e.g., describing both a feature build AND a debugging journey, or switching between two unrelated problems), identify the diverging passage and mark it with type "story_drift". The critique should explain which story the passage belongs to and why removing it would make the main story stronger. Only flag genuine narrative splits — do not flag supporting context or background detail.
 
 Completion ('isComplete'):
 Set to true when all relevant anatomy elements are filled for this story type, or after 6-8 exchanges.
@@ -156,12 +159,21 @@ When 'isComplete' is true, generate the 'score' object representing the POST-SES
 - 'checklist': An object containing booleans for whether the elements were successfully found: 'mission', 'obstacle', 'firstGuess', 'visualScene', 'discovery', 'lesson'.
 - 'overall': Integer score (0-100) representing overall script strength.
 
-Generate 'scriptOutline' matching the 5 new sections:
+Generate 'scriptOutline' matching the 6 sections:
 - "🎯 The Moment Everything Started" (natural hook)
 - "🚧 The Obstacle" (obstacle + visuals)
 - "🧪 The Struggle" (firstGuess decision chain)
 - "💡 The Discovery" (discovery)
+- "🎉 The Outcome" (what was now working after the fix — concrete and satisfying)
 - "🎁 The Lesson" (lesson)
+
+Generate 'storyAngles' — an array of 1-3 distinct story angles found in the conversation:
+- If the conversation contains evidence of only ONE coherent story, return 1 angle.
+- If the conversation contains evidence of TWO or more genuinely distinct stories (e.g., a feature build update AND a debugging journey, or two separate lessons), return 2-3 angles.
+- Do NOT fabricate angles from thin air. Only return an angle if the user's words clearly support it.
+- Each angle has: 'id' (short slug like 'debugging' or 'build-update'), 'emoji', 'title' (short, punchy, 3-6 words), 'focus' (one sentence on the specific angle), 'hook' (one sentence opening line for this story — written like the user would say it), and 'scriptOutline' (the same 6-section outline but written for this specific angle).
+- Rank angles by narrative strength (most compelling first).
+- 'scriptOutline' on the top-level response should always equal the first (strongest) angle's scriptOutline.
 
 Respond STRICTLY in the requested JSON schema.
 `;
@@ -202,6 +214,7 @@ Respond STRICTLY in the requested JSON schema.
                       firstGuess: { type: 'STRING', nullable: true },
                       discovery: { type: 'STRING', nullable: true },
                       lesson: { type: 'STRING', nullable: true },
+                      outcome: { type: 'STRING', nullable: true },
                       visuals: { type: 'STRING', nullable: true },
                       naturalHook: { type: 'STRING', nullable: true }
                     },
@@ -213,7 +226,7 @@ Respond STRICTLY in the requested JSON schema.
                       type: 'OBJECT',
                       properties: {
                         text: { type: 'STRING' },
-                        type: { type: 'STRING', enum: ['conflict', 'visual', 'turning_point', 'explanation', 'redundant', 'neutral'] },
+                        type: { type: 'STRING', enum: ['conflict', 'visual', 'turning_point', 'explanation', 'story_drift', 'redundant', 'neutral'] },
                         critique: { type: 'STRING' }
                       },
                       required: ['text', 'type', 'critique']
@@ -248,9 +261,10 @@ Respond STRICTLY in the requested JSON schema.
                           firstGuess: { type: 'BOOLEAN' },
                           visualScene: { type: 'BOOLEAN' },
                           discovery: { type: 'BOOLEAN' },
-                          lesson: { type: 'BOOLEAN' }
+                          lesson: { type: 'BOOLEAN' },
+                          outcome: { type: 'BOOLEAN' }
                         },
-                        required: ['mission', 'obstacle', 'firstGuess', 'visualScene', 'discovery', 'lesson']
+                        required: ['mission', 'obstacle', 'firstGuess', 'visualScene', 'discovery', 'lesson', 'outcome']
                       }
                     },
                     required: ['overall', 'whatWentWell', 'nextTimeToPractice', 'checklist']
@@ -267,6 +281,31 @@ Respond STRICTLY in the requested JSON schema.
                         text: { type: 'STRING' }
                       },
                       required: ['label', 'text']
+                    }
+                  },
+                  storyAngles: {
+                    type: 'ARRAY',
+                    items: {
+                      type: 'OBJECT',
+                      properties: {
+                        id: { type: 'STRING' },
+                        emoji: { type: 'STRING' },
+                        title: { type: 'STRING' },
+                        focus: { type: 'STRING' },
+                        hook: { type: 'STRING' },
+                        scriptOutline: {
+                          type: 'ARRAY',
+                          items: {
+                            type: 'OBJECT',
+                            properties: {
+                              label: { type: 'STRING' },
+                              text: { type: 'STRING' }
+                            },
+                            required: ['label', 'text']
+                          }
+                        }
+                      },
+                      required: ['id', 'emoji', 'title', 'focus', 'hook', 'scriptOutline']
                     }
                   }
                 },
