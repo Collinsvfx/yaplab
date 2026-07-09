@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 
-const indexPath = path.join(__dirname, 'index.html');
-if (!fs.existsSync(indexPath)) {
-  console.error('Error: index.html not found!');
+const appJsPath = path.join(__dirname, 'app.js');
+if (!fs.existsSync(appJsPath)) {
+  console.error('Error: app.js not found!');
   process.exit(1);
 }
 
-let content = fs.readFileSync(indexPath, 'utf8');
+let content = fs.readFileSync(appJsPath, 'utf8');
 
 const url = process.env.SUPABASE_URL || 'INJECT_SUPABASE_URL';
 const key = process.env.SUPABASE_ANON_KEY || 'INJECT_SUPABASE_ANON_KEY';
@@ -22,5 +22,6 @@ if (url === 'INJECT_SUPABASE_URL' || key === 'INJECT_SUPABASE_ANON_KEY') {
 content = content.replace('INJECT_SUPABASE_URL', url);
 content = content.replace('INJECT_SUPABASE_ANON_KEY', key);
 
-fs.writeFileSync(indexPath, content);
-console.log('✓ Successfully injected credentials into index.html for Vercel deployment!');
+fs.writeFileSync(appJsPath, content);
+console.log('✓ Successfully injected credentials into app.js for Vercel deployment!');
+

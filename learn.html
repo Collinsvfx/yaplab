@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YapLab — Learn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="header" style="justify-content:center;">
+  <div class="wordmark" style="font-size:28px;">Yap<span>Lab</span></div>
+</div>
+
+<div class="main" style="display: none;">
+  <!-- LEARN TAB -->
+  <div class="tab-panel active" id="panelLearn">
+    <div class="learn-stats">
+      <div class="learn-stat"><div class="learn-stat-num c-unread" id="lsUnread">0</div><div class="learn-stat-label">To Read</div></div>
+      <div class="learn-stat"><div class="learn-stat-num c-read" id="lsRead">0</div><div class="learn-stat-label">Read</div></div>
+      <div class="learn-stat"><div class="learn-stat-num c-ready" id="lsReady">0</div><div class="learn-stat-label">Ready to Speak</div></div>
+    </div>
+
+    <div class="add-item-card">
+      <div class="section-title" style="margin-bottom:0">Add topic to learn</div>
+      <div class="add-row">
+        <input class="add-input" id="learnInput" type="text" placeholder="e.g. Why UI is important, what it means…" autocomplete="off" />
+        <select class="add-select" id="learnCatSelect">
+          <option value="design">Design</option>
+          <option value="opinions">Opinions</option>
+          <option value="persuasion">Persuasion</option>
+          <option value="storytelling">Storytelling</option>
+          <option value="impromptu">Impromptu</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="addLearnItem()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add
+        </button>
+      </div>
+    </div>
+
+    <div class="learn-list-wrap">
+      <div class="learn-list-header">
+        <div class="section-title" style="margin-bottom:0">Your reading list</div>
+        <div class="learn-filter-row">
+          <button class="learn-filter-btn active" data-filter="all" onclick="setLearnFilter('all',this)">All</button>
+          <button class="learn-filter-btn" data-filter="unread" onclick="setLearnFilter('unread',this)">To Read</button>
+          <button class="learn-filter-btn" data-filter="read" onclick="setLearnFilter('read',this)">Read</button>
+          <button class="learn-filter-btn" data-filter="ready" onclick="setLearnFilter('ready',this)">Ready</button>
+        </div>
+      </div>
+      <div class="learn-list" id="learnList">
+        <div class="learn-empty"><strong>Nothing here yet</strong>Add a topic above to start your reading list.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Auth Wall -->
+<div id="authWall" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px;">
+  <div class="modal-card" style="max-width:380px; width:100%; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+    <div style="text-align:center; margin-bottom:8px;">
+      <div class="wordmark" style="font-size:28px;">Yap<span>Lab</span></div>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;">Speech practice & script builder</div>
+    </div>
+    
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="authWallTabSignInBtn" onclick="switchAuthWallTab('signIn')">Sign In</button>
+      <button class="modal-tab" id="authWallTabSignUpBtn" onclick="switchAuthWallTab('signUp')">Sign Up</button>
+    </div>
+
+    <div class="modal-body" style="gap:12px;">
+      <div class="modal-status" id="authWallStatus"></div>
+      
+      <div class="modal-section">
+        <label class="modal-label" for="authWallEmail">Email Address</label>
+        <input class="modal-input" id="authWallEmail" type="email" placeholder="you@example.com">
+      </div>
+      <div class="modal-section">
+        <label class="modal-label" for="authWallPassword">Password</label>
+        <input class="modal-input" id="authWallPassword" type="password" placeholder="••••••••">
+      </div>
+      
+      <button class="btn btn-primary" id="authWallSubmitBtn" onclick="submitAuthWall()" style="justify-content:center; margin-top:10px; font-weight:600;">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav" id="bottomNav" style="display: none;">
+  <a href="index.html" class="bottom-nav-item" id="btnNavStoryFinder">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+    </svg>
+    <span>Story Finder</span>
+  </a>
+  <a href="learn.html" class="bottom-nav-item active" id="btnNavLearn">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    <span>Learn</span>
+  </a>
+  <a href="practice.html" class="bottom-nav-item" id="btnNavPractice">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span>Practice</span>
+  </a>
+  <a href="settings.html" class="bottom-nav-item" id="btnNavSettings">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Settings</span>
+  </a>
+</div>
+
+<script src="app.js"></script>
+<script src="learn.js"></script>
+</body>
+</html>

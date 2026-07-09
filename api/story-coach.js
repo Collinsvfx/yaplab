@@ -12,18 +12,106 @@ export default async function handler(req, res) {
 
   // Define the story type labels
   const STORY_TYPES = {
-    built: 'I Built Something',
-    failed: 'I Failed At Something',
-    learned: 'I Learned Something',
-    surprised: 'Something Surprised Me',
-    changedMind: 'I Changed My Mind',
-    opinion: 'I Have An Opinion',
-    disagree: 'I Disagree With Something',
-    beforeAfter: 'Before vs After',
-    decision: 'One Decision Changed Everything'
+    solvedProblem:    'I Solved a Problem',
+    builtSomething:   'I Built Something New',
+    madeProgress:     'I Made Progress',
+    learnedSomething: 'I Learned Something',
+    surprisedMe:      'Something Surprised Me',
+    changedMind:      'I Changed My Mind',
+    haveOpinion:      'I Have An Opinion',
+    dayInLife:        'A Day In My Life'
   };
 
   const storyTypeLabel = STORY_TYPES[storyType] || 'General Storytelling';
+
+  // Per-type question flows
+  const QUESTION_FLOWS = {
+    solvedProblem: `
+QUESTION FLOW (I Solved a Problem):
+1. "What were you trying to accomplish?"
+2. "What problem appeared?" → "When did you first notice something was wrong?"
+3. "What was your first assumption about what was causing it?" → "Why was it wrong?"
+4. "What was actually on your screen when you realized it wasn't working? Describe exactly what you saw."
+5. "What helped you finally solve it?" → "What was the exact moment the fix clicked?"
+6. "What did you learn that someone else could use tomorrow?"
+7. FINAL: "If you were telling this to a friend over dinner, what's the first sentence you'd say?"`,
+
+    builtSomething: `
+QUESTION FLOW (I Built Something New):
+1. "What did you build?"
+2. "Why did you decide to build it?" → "What was missing before this existed?"
+3. "What part are you most proud of? What makes it work well?"
+4. "What was surprisingly easy — something you expected to struggle with?"
+5. "What's still unfinished or imperfect?"
+6. "What's next for this?"
+7. FINAL: "If you were telling a friend about this tonight, where would you start?"`,
+
+    madeProgress: `
+QUESTION FLOW (I Made Progress):
+1. "What changed since yesterday / last week?"
+2. "What's now working that wasn't before?"
+3. "What are you most excited about right now?"
+4. "What's the one thing blocking you from moving faster?"
+5. "What's the next milestone you're working toward?"
+6. FINAL: "If you were posting about this tonight, what would be the first sentence?"`,
+
+    learnedSomething: `
+QUESTION FLOW (I Learned Something):
+1. "What did you learn?"
+2. "What made you look into this in the first place?"
+3. "What did you think before you learned this?"
+4. "What was the specific moment the new insight landed for you?"
+5. "How does this change what you'll do differently?"
+6. "Who most needs to hear this, and why?"
+7. FINAL: "How would you explain this to a curious friend in one sentence?"`,
+
+    surprisedMe: `
+QUESTION FLOW (Something Surprised Me):
+1. "What happened that surprised you?"
+2. "What were you expecting instead?"
+3. "What was your first reaction when you saw it?"
+4. "Why do you think it happened — what was the real reason?"
+5. "What did you do differently because of this?"
+6. "What should other people know about this?"
+7. FINAL: "If you were telling this story tonight, where would you start?"`,
+
+    changedMind: `
+QUESTION FLOW (I Changed My Mind):
+1. "What did you change your mind about?"
+2. "What did you believe before?"
+3. "What happened that made you question it?"
+4. "Was there a specific moment, piece of evidence, or conversation that tipped you?"
+5. "What do you believe now — and why is it better?"
+6. "What would you tell your past self?"
+7. FINAL: "How would you summarize this flip in one sentence?"`,
+
+    haveOpinion: `
+QUESTION FLOW (I Have An Opinion):
+1. "What's your opinion? State it plainly."
+2. "What do most people believe instead — and why?"
+3. "What's the specific evidence or experience that formed your view?"
+4. "Where does your opinion have limits? Where could you be wrong?"
+5. "Who most needs to hear this, and what would change if they believed it?"
+6. FINAL: "Say your opinion out loud as if you were starting a LinkedIn post with it."`,
+
+    dayInLife: `
+QUESTION FLOW (A Day In My Life):
+1. "Walk me through your day — what happened first?"
+2. "What was the highlight — the moment that stood out most?"
+3. "What was harder than expected today?"
+4. "What surprised you about how the day went?"
+5. "What did you accomplish that you're proud of?"
+6. "What's the one thing you'd do differently tomorrow?"
+7. FINAL: "If someone asked 'how was your day?' at dinner tonight, what's the honest first sentence?"`,
+  };
+
+  const questionFlow = QUESTION_FLOWS[storyType] || `
+QUESTION FLOW (General):
+1. "What happened?"
+2. "What were you expecting instead?"
+3. "What was the turning point?"
+4. "What did you learn?"
+5. FINAL: "How would you start this story at a dinner table?"`;
 
   // Construct the system prompt
   const systemPrompt = `
@@ -37,9 +125,11 @@ Keep your tone curious, structural, direct, grounded, and concise. Talk like a r
 
 CRITICAL RULE — Adaptive Flow (Fewest Questions):
 Your goal is to ask the FEWEST questions necessary for the user to discover a complete story (target 6-8 questions total).
-If the user already provided details for a stage in a previous response (e.g., they described what they saw on their screen during their obstacle description), you must automatically update that element in the checklist and SKIP asking about it. Move directly to the next logical stage.
+If the user already provided details for a stage in a previous response, automatically update that element in the anatomy and SKIP asking about it. Move directly to the next logical stage.
 
 The user is telling a story of type: "${storyTypeLabel}".
+
+${questionFlow}
 
 Conversation so far:
 ${(history || []).map(m => `${m.role === 'user' ? 'User' : 'Coach'}: ${m.text}`).join('\n')}
@@ -54,24 +144,15 @@ Current Story Anatomy (filled from user's own words only):
 - 👁️ Visuals (What they literally saw on their screen): "${anatomyState?.visuals || 'Not yet identified'}"
 - 🎯 Natural Hook (Where they'd start at a dinner table): "${anatomyState?.naturalHook || 'Not yet identified'}"
 
-COACHING QUESTION FLOW:
-1. Mission: "What were you trying to build today?" → "Why did you decide to build that?"
-2. Obstacle: "What was the first sign something wasn't going to plan?" → "When did you realize it wasn't working?"
-3. First Guess: "What was your first guess about what was causing it?" → "Did it work?" → "What made you realize you were wrong?" (Focus on the decision moment)
-4. Visuals: "When you realized something was wrong, what was actually on your screen? Don't interpret it — just describe exactly what you saw." (Skip if already described)
-5. Discovery: "At what exact moment did you realize what the real problem was?" → "What clue gave it away?"
-6. Lesson: "What's the one thing someone else could use from your experience tomorrow?"
-7. Natural Hook (FINAL): "Last question: If you were telling this story to your best friend over dinner tonight, where would you naturally start? Just say the first sentence."
-
 Story X-Ray & Movie Test:
 Analyze the user's latest response for "conflict", "visual", "turning_point", "explanation". Provide highlights and movie suggestions.
 
 Completion ('isComplete'):
-Set to true when all 7 elements are filled, or after 6-8 exchanges.
+Set to true when all relevant anatomy elements are filled for this story type, or after 6-8 exchanges.
 
 When 'isComplete' is true, generate the 'score' object representing the POST-SESSION REVIEW:
-- 'whatWentWell': List of 2-3 bullet points calling out specific user quotes and explaining why they are strong storytelling choices (e.g. "You described a visual scene: 'glowed with custom styles, but MP4 spat out standard block text'. This is much stronger than a summary.").
-- 'nextTimeToPractice': List of 1-2 bullet points with constructive, actionable advice on what to practice next time (e.g. "You skipped over the turning point logic. Next time, tell us what the hypothesis was.").
+- 'whatWentWell': List of 2-3 bullet points calling out specific user quotes and explaining why they are strong storytelling choices.
+- 'nextTimeToPractice': List of 1-2 bullet points with constructive, actionable advice on what to practice next time.
 - 'checklist': An object containing booleans for whether the elements were successfully found: 'mission', 'obstacle', 'firstGuess', 'visualScene', 'discovery', 'lesson'.
 - 'overall': Integer score (0-100) representing overall script strength.
 

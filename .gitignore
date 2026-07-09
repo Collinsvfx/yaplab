@@ -2,3 +2,14 @@
 Thumbs.db
 *.log
 .gemini/
+
+.vercel
+
+# Environment variable files — never commit these
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# Audit helper — not needed in repo
+security-check.js

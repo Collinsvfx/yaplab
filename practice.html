@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YapLab — Practice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="header" style="justify-content:center;">
+  <div class="wordmark" style="font-size:28px;">Yap<span>Lab</span></div>
+</div>
+
+<div class="main" style="display: none;">
+  <!-- PRACTICE TAB -->
+  <div class="tab-panel active" id="panelPractice">
+    <div class="topic-card" id="topicCard">
+      <div class="topic-label">
+        <span>Your topic</span>
+        <span class="topic-badge" id="catBadge">random</span>
+      </div>
+      <div class="topic-text" id="topicText">Hit "New topic" to get started</div>
+      <div class="topic-meta">
+        <div class="meta-pill" id="diffPill">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>—
+        </div>
+        <span class="diff-badge" id="difficultyBadge" style="display:none"></span>
+        <div class="meta-pill" id="tipPill" style="display:none">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.4 4.7-3.5 5.9V17a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-2.1C6.4 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/><path d="M9 21h6"/></svg>
+          <span id="tipText"></span>
+        </div>
+      </div>
+      <div class="topic-actions">
+        <button class="bookmark-btn" id="bookmarkBtn" onclick="toggleBookmark()" style="display:none">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span id="bookmarkLabel">Save topic</span>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Difficulty</div>
+      <div class="diff-filter-row">
+        <button class="diff-filter-btn active-all" data-diff="all" onclick="setDiffFilter('all',this)">All</button>
+        <button class="diff-filter-btn" data-diff="easy" onclick="setDiffFilter('easy',this)"><svg width="10" height="10" fill="var(--easy)" viewBox="0 0 24 24" class="inline-svg"><circle cx="12" cy="12" r="10"></circle></svg>Easy</button>
+        <button class="diff-filter-btn" data-diff="medium" onclick="setDiffFilter('medium',this)"><svg width="10" height="10" fill="var(--medium)" viewBox="0 0 24 24" class="inline-svg"><circle cx="12" cy="12" r="10"></circle></svg>Medium</button>
+        <button class="diff-filter-btn" data-diff="hard" onclick="setDiffFilter('hard',this)" id="hardFilterBtn"><svg width="10" height="10" fill="var(--hard)" viewBox="0 0 24 24" class="inline-svg"><circle cx="12" cy="12" r="10"></circle></svg>Hard <span id="hardLockLabel" style="font-size:10px;margin-left:2px;">— unlock at 10 reps</span></button>
+      </div>
+    </div>
+
+    <div class="unlock-bar-wrap" id="unlockBar">
+      <div style="font-size:12px;color:var(--muted);font-weight:500;display:flex;align-items:center;"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>Hard topics unlock at <strong style="color:var(--text);margin-left:4px;">10 completed reps</strong></div>
+      <div class="unlock-row">
+        <span class="unlock-label">Progress</span>
+        <div class="unlock-track"><div class="unlock-fill hard" id="unlockFill" style="width:0%"></div></div>
+        <span class="unlock-label"><strong id="unlockCount">0</strong>/10</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Topic categories</div>
+      <div class="cat-row" id="catRow"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="timer-wrap">
+      <div class="timer-display" id="timerDisplay">1:00</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+      <div>
+        <div class="section-title" style="text-align:center;margin-bottom:8px">Duration</div>
+        <div class="duration-row" id="durRow">
+          <button class="dur-btn" data-sec="30">30s</button>
+          <button class="dur-btn selected" data-sec="60">1 min</button>
+          <button class="dur-btn" data-sec="120">2 min</button>
+          <button class="dur-btn" data-sec="180">3 min</button>
+          <button class="dur-btn" data-sec="300">5 min</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="newTopic()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
+          New topic
+        </button>
+        <button class="btn btn-primary" id="startBtn" onclick="startStop()">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          Start
+        </button>
+        <button class="btn btn-ghost" id="resetBtn" onclick="resetTimer()" disabled>Reset</button>
+      </div>
+    </div>
+
+    <div class="filler-wrap" id="fillerWrap">
+      <div class="filler-header">
+        <div class="filler-title"><div class="mic-indicator" id="micIndicator"></div>Filler word tracker</div>
+        <div class="mic-error" id="micError">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Mic access denied
+        </div>
+      </div>
+      <div class="filler-grid" id="fillerGrid"></div>
+      <div class="filler-total" id="fillerTotal"></div>
+    </div>
+
+    <div class="feedback-wrap" id="feedbackWrap">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div class="feedback-text" id="feedbackText"></div>
+      <div class="feedback-filler-note" id="feedbackFillerNote"></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="statReps">0</div><div class="stat-label">Reps today</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBest">—</div><div class="stat-label">Longest</div></div>
+      <div class="stat-card"><div class="stat-num" id="statStreak">0</div><div class="stat-label">Completed</div></div>
+    </div>
+
+    <div class="bookmarks-wrap" id="bookmarksWrap">
+      <div class="section-title">Saved topics</div>
+      <div class="bookmark-list" id="bookmarkList"><div class="bookmark-empty">No saved topics yet.</div></div>
+    </div>
+
+    <div class="history-wrap">
+      <div class="section-title">Session log</div>
+      <div class="history-list" id="historyList"><div class="history-empty">No sessions yet. Start your first rep.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Auth Wall -->
+<div id="authWall" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px;">
+  <div class="modal-card" style="max-width:380px; width:100%; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+    <div style="text-align:center; margin-bottom:8px;">
+      <div class="wordmark" style="font-size:28px;">Yap<span>Lab</span></div>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;">Speech practice & script builder</div>
+    </div>
+    
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="authWallTabSignInBtn" onclick="switchAuthWallTab('signIn')">Sign In</button>
+      <button class="modal-tab" id="authWallTabSignUpBtn" onclick="switchAuthWallTab('signUp')">Sign Up</button>
+    </div>
+
+    <div class="modal-body" style="gap:12px;">
+      <div class="modal-status" id="authWallStatus"></div>
+      
+      <div class="modal-section">
+        <label class="modal-label" for="authWallEmail">Email Address</label>
+        <input class="modal-input" id="authWallEmail" type="email" placeholder="you@example.com">
+      </div>
+      <div class="modal-section">
+        <label class="modal-label" for="authWallPassword">Password</label>
+        <input class="modal-input" id="authWallPassword" type="password" placeholder="••••••••">
+      </div>
+      
+      <button class="btn btn-primary" id="authWallSubmitBtn" onclick="submitAuthWall()" style="justify-content:center; margin-top:10px; font-weight:600;">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav" id="bottomNav" style="display: none;">
+  <a href="index.html" class="bottom-nav-item" id="btnNavStoryFinder">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+    </svg>
+    <span>Story Finder</span>
+  </a>
+  <a href="learn.html" class="bottom-nav-item" id="btnNavLearn">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    <span>Learn</span>
+  </a>
+  <a href="practice.html" class="bottom-nav-item active" id="btnNavPractice">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span>Practice</span>
+  </a>
+  <a href="settings.html" class="bottom-nav-item" id="btnNavSettings">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Settings</span>
+  </a>
+</div>
+
+<script src="app.js"></script>
+<script src="practice.js"></script>
+</body>
+</html>
