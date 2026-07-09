@@ -1342,38 +1342,38 @@
           <div class="sf-analysis-card">
             <h3 class="sf-card-title">Story Anatomy</h3>
             <div class="sf-anatomy-list">
-              <div class="sf-anatomy-item" id="anat-goal">
+              <div class="sf-anatomy-item" id="anat-mission">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
-                  <div class="sf-anatomy-label">GOAL</div>
+                  <div class="sf-anatomy-label">🧭 MISSION</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
               <div class="sf-anatomy-item" id="anat-obstacle">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
-                  <div class="sf-anatomy-label">OBSTACLE</div>
+                  <div class="sf-anatomy-label">🚧 OBSTACLE</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
               <div class="sf-anatomy-item" id="anat-attempts">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
-                  <div class="sf-anatomy-label">ATTEMPTS</div>
+                  <div class="sf-anatomy-label">🔄 ATTEMPTS</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
-              <div class="sf-anatomy-item" id="anat-breakthrough">
+              <div class="sf-anatomy-item" id="anat-discovery">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
-                  <div class="sf-anatomy-label">BREAKTHROUGH</div>
+                  <div class="sf-anatomy-label">💡 DISCOVERY</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
               <div class="sf-anatomy-item" id="anat-lesson">
                 <div class="sf-anatomy-indicator"></div>
                 <div class="sf-anatomy-content">
-                  <div class="sf-anatomy-label">LESSON</div>
+                  <div class="sf-anatomy-label">🎁 LESSON</div>
                   <div class="sf-anatomy-value">—</div>
                 </div>
               </div>
@@ -3526,7 +3526,7 @@ async function syncHistory() {
 // ── STORY FINDER STATE ────────────────────────────────────────────────────────
 let sfActiveStoryType = null;
 let sfHistory = [];
-let sfAnatomyState = { goal: null, obstacle: null, attempts: null, breakthrough: null, lesson: null };
+let sfAnatomyState = { mission: null, obstacle: null, attempts: null, discovery: null, lesson: null };
 let sfIsLoading = false;
 let sfOfflineStep = 0;
 
@@ -3534,7 +3534,7 @@ let sfOfflineStep = 0;
 function startStorySession(type) {
   sfActiveStoryType = type;
   sfHistory = [];
-  sfAnatomyState = { goal: null, obstacle: null, attempts: null, breakthrough: null, lesson: null };
+  sfAnatomyState = { mission: null, obstacle: null, attempts: null, discovery: null, lesson: null };
   sfIsLoading = false;
 
   const STORY_TYPES = {
@@ -3734,18 +3734,18 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
     // Simulate loading delay for offline natural feel
     setTimeout(() => {
       const greetQuestions = {
-        built: "Goal: Let's discover today's story. What were you trying to build or accomplish today?",
-        failed: "Goal: Let's discover today's story. What exactly did you fail at or struggle with today?",
-        learned: "Goal: Let's discover today's story. What was the key lesson or breakthrough you learned today?",
-        surprised: "Goal: Let's discover today's story. What unexpected thing happened or surprised you today?",
-        changedMind: "Goal: Let's discover today's story. What did you decide to change your mind about today?",
-        opinion: "Goal: Let's discover today's story. What hot take or strong design opinion is on your mind today?",
-        disagree: "Goal: Let's discover today's story. What design rule or trend do you disagree with today?",
-        beforeAfter: "Goal: Let's discover today's story. What UI screen did you transform or improve today?",
-        decision: "Goal: Let's discover today's story. What was the single critical decision you made today?"
+        built: "Mission: Let's discover today's story. What were you trying to build or accomplish today?",
+        failed: "Mission: Let's discover today's story. What exactly did you fail at or struggle with today?",
+        learned: "Mission: Let's discover today's story. What was the key lesson or discovery you learned today?",
+        surprised: "Mission: Let's discover today's story. What unexpected thing happened or surprised you today?",
+        changedMind: "Mission: Let's discover today's story. What did you decide to change your mind about today?",
+        opinion: "Mission: Let's discover today's story. What hot take or strong design opinion is on your mind today?",
+        disagree: "Mission: Let's discover today's story. What design rule or trend do you disagree with today?",
+        beforeAfter: "Mission: Let's discover today's story. What UI screen did you transform or improve today?",
+        decision: "Mission: Let's discover today's story. What was the single critical decision you made today?"
       };
       
-      const welcome = greetQuestions[sfActiveStoryType] || "Goal: Let's discover today's story. What were you trying to accomplish today?";
+      const welcome = greetQuestions[sfActiveStoryType] || "Mission: Let's discover today's story. What were you trying to accomplish today?";
       
       const bubble = document.createElement('div');
       bubble.className = 'sf-msg coach';
@@ -3777,20 +3777,20 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
     sfOfflineStep++;
 
     if (sfOfflineStep === 1) {
-      sfAnatomyState.goal = userText;
-      coachReply = "Obstacle: Got it. What stopped you? E.g., what roadblock or design constraint stood in your way?";
+      sfAnatomyState.mission = userText;
+      coachReply = "Obstacle: Got it. What stood in your way? E.g., what roadblock or constraint stopped you?";
     } else if (sfOfflineStep === 2) {
       sfAnatomyState.obstacle = userText;
-      coachReply = "Attempts: That sounds like a challenge. What did you try to fix it, and what failed?";
+      coachReply = "Attempts: That sounds frustrating. What did you try first to solve it, and what failed?";
     } else if (sfOfflineStep === 3) {
       sfAnatomyState.attempts = userText;
-      coachReply = "Breakthrough: Interesting. How did you eventually solve it or make a breakthrough?";
+      coachReply = "Discovery: At what moment did you realize what the real problem was, and what did you change?";
     } else if (sfOfflineStep === 4) {
-      sfAnatomyState.breakthrough = userText;
-      coachReply = "Lesson: Excellent. What was the key lesson or takeaway from this experience?";
+      sfAnatomyState.discovery = userText;
+      coachReply = "Lesson: Excellent discovery. What's the key lesson or takeaway from this experience?";
     } else if (sfOfflineStep === 5) {
       sfAnatomyState.lesson = userText;
-      coachReply = "Movie Test: Let's make it visual. If this were a scene in a movie, what would the camera see? What did your screen show?";
+      coachReply = "Movie Test: Let's make it visual. When you realized something was wrong, what was actually on your screen? E.g. what did it look like?";
     } else {
       coachReply = "Amazing job! We have a complete story structure now. Look at your Story Score and Replay below!";
       
@@ -3809,23 +3809,23 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
 
       // Generate replay
       const mockReplay = `🎬 MOVIE REPLAY: My ${sfActiveStoryType.toUpperCase()} Day\n\n` +
-        `🏁 GOAL: ${sfAnatomyState.goal}\n` +
+        `🏁 MISSION: ${sfAnatomyState.mission}\n` +
         `❌ OBSTACLE: ${sfAnatomyState.obstacle}\n` +
         `🛠️ ATTEMPTS: ${sfAnatomyState.attempts}\n` +
-        `💡 BREAKTHROUGH: ${sfAnatomyState.breakthrough}\n` +
+        `💡 DISCOVERY: ${sfAnatomyState.discovery}\n` +
         `🎓 LESSON: ${sfAnatomyState.lesson}\n` +
         `👁️ VISUALS: ${userText}`;
       
       document.getElementById('sfReplayText').textContent = mockReplay;
       document.getElementById('sfReplayCard').style.display = 'block';
 
-      // Seed Script Outline
+      // Seed Script Outline (Strict Socratic Mapping without fabricating details)
       window.sfLastScriptOutline = [
-        { label: 'Hook', text: `Open with the core challenge: "I wanted to ${sfAnatomyState.goal.toLowerCase()} today. But it failed."` },
-        { label: 'Conflict', text: `Describe the roadblock: ${sfAnatomyState.obstacle}. It looked like: ${userText}.` },
-        { label: 'Struggle', text: `Detail your failed attempts: ${sfAnatomyState.attempts}.` },
-        { label: 'Pivot', text: `Reveal the turning point: ${sfAnatomyState.breakthrough}.` },
-        { label: 'Value Drop', text: `Conclude with the lesson: ${sfAnatomyState.lesson}.` }
+        { label: 'Hook', text: `Hook: Start with your mission: "${sfAnatomyState.mission}". But it failed because of "${sfAnatomyState.obstacle}".` },
+        { label: 'Obstacle', text: `Detail the roadblock: "${sfAnatomyState.obstacle}". Focus on the visual scene: "${userText}".` },
+        { label: 'Struggle', text: `Show what failed: "${sfAnatomyState.attempts}".` },
+        { label: 'Pivot', text: `Reveal the moment of discovery: "${sfAnatomyState.discovery}".` },
+        { label: 'Value Drop', text: `Conclude with the lesson: "${sfAnatomyState.lesson}".` }
       ];
 
       inputEl.placeholder = 'Session complete!';
@@ -3868,7 +3868,7 @@ function simulateOfflineStorySession(isInit = false, userText = '') {
 }
 
 function updateAnatomyUI() {
-  const steps = ['goal', 'obstacle', 'attempts', 'breakthrough', 'lesson'];
+  const steps = ['mission', 'obstacle', 'attempts', 'discovery', 'lesson'];
   steps.forEach(step => {
     const val = sfAnatomyState[step];
     const el = document.getElementById('anat-' + step);
@@ -3957,7 +3957,7 @@ async function exportStoryToScriptBuilder() {
   const title = `Story: My ${sfActiveStoryType} Day`;
   
   const sections = [
-    { type: 'preflight', emotionalEntry: sfAnatomyState.lesson || '', whoFeels: 'My Audience', hookTest: sfAnatomyState.goal || '' }
+    { type: 'preflight', emotionalEntry: sfAnatomyState.lesson || '', whoFeels: 'My Audience', hookTest: sfAnatomyState.mission || '' }
   ];
 
   window.sfLastScriptOutline.forEach((sec, idx) => {
