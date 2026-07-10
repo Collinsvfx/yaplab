@@ -721,7 +721,7 @@ function startStorySession(type) {
   document.getElementById('sfSendBtn').disabled = false;
 
   // Transition UI
-  document.getElementById('sfLandingState').style.display = 'none';
+  document.getElementById('sfStoryLabContainer').style.display = 'none';
   document.getElementById('sfActiveSessionState').style.display = 'block';
 
   // Seed with coach's first greeting / question

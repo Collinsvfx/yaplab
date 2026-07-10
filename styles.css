@@ -1683,6 +1683,10 @@
     padding: 0;
   }
 
+  .storylab-theme .sf-type-card {
+    padding: 20px;
+  }
+
   .storylab-theme header.sl-header {
     display: flex;
     align-items: baseline;
