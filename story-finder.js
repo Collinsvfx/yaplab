@@ -196,9 +196,12 @@ function getNormalizedQuestionKey(q) {
     .trim();
 }
 
-// Global click handler to dismiss any active Story Lab tooltips
+// Global click handler to dismiss any active Story Lab tooltips and export menus
 document.addEventListener('click', () => {
   document.querySelectorAll('.sl-tooltip-container.active').forEach(el => {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.entry-export-container.active').forEach(el => {
     el.classList.remove('active');
   });
 });
@@ -518,8 +521,56 @@ function renderSlLog() {
         </div>
         <div class="entry-actions">
           <button class="entry-pack" data-id="${entry.id}">Content Pack</button>
-          <button class="entry-edit" data-id="${entry.id}">Edit</button>
-          <button class="entry-delete" data-id="${entry.id}">Delete</button>
+          
+          <div class="entry-export-container">
+            <button class="entry-export-btn" data-id="${entry.id}">
+              Export
+              <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-left:4px">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+            <div class="entry-export-menu">
+              <button class="export-opt-copy" data-id="${entry.id}">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy to Clipboard
+              </button>
+              <button class="export-opt-word" data-id="${entry.id}">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Word Document (.doc)
+              </button>
+              <button class="export-opt-txt" data-id="${entry.id}">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Plain Text (.txt)
+              </button>
+            </div>
+          </div>
+
+          <button class="entry-edit" data-id="${entry.id}" title="Edit Entry">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          
+          <button class="entry-delete" data-id="${entry.id}" title="Delete Entry">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
         </div>
       </div>
       <div class="entry-detail">
@@ -533,7 +584,17 @@ function renderSlLog() {
     `;
 
     el.addEventListener('click', (e) => {
-      if (e.target.classList.contains('entry-delete') || e.target.classList.contains('entry-edit') || e.target.classList.contains('entry-pack')) return;
+      if (
+        e.target.classList.contains('entry-delete') || 
+        e.target.closest('.entry-delete') ||
+        e.target.classList.contains('entry-edit') || 
+        e.target.closest('.entry-edit') ||
+        e.target.classList.contains('entry-pack') ||
+        e.target.closest('.entry-pack') ||
+        e.target.classList.contains('entry-export-btn') ||
+        e.target.closest('.entry-export-btn') ||
+        e.target.closest('.entry-export-menu')
+      ) return;
       el.classList.toggle('expanded');
     });
 
@@ -563,6 +624,35 @@ function renderSlLog() {
     el.querySelector('.entry-pack').addEventListener('click', (e) => {
       e.stopPropagation();
       openCpModal(entry);
+    });
+
+    const exportContainer = el.querySelector('.entry-export-container');
+    const exportBtn = el.querySelector('.entry-export-btn');
+    
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.entry-export-container.active').forEach(c => {
+        if (c !== exportContainer) c.classList.remove('active');
+      });
+      exportContainer.classList.toggle('active');
+    });
+
+    el.querySelector('.export-opt-copy').addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportContainer.classList.remove('active');
+      copyStoryToClipboard(entry, exportBtn);
+    });
+
+    el.querySelector('.export-opt-txt').addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportContainer.classList.remove('active');
+      exportStoryToText(entry);
+    });
+
+    el.querySelector('.export-opt-word').addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportContainer.classList.remove('active');
+      exportStoryToWord(entry);
     });
 
     list.appendChild(el);
@@ -1513,4 +1603,92 @@ if (window.yaplabStateReady) {
   initStoryFinderPage();
 } else {
   window.addEventListener('yaplabStateReady', initStoryFinderPage);
+}
+
+// ── EXPORT STORIES FUNCTIONS ──────────────────────────────────────────────────
+function copyStoryToClipboard(entry, btn) {
+  const s = QL_SCENARIOS[entry.scenario] || { label: entry.scenario };
+  let content = `STORY LAB - ${s.label.toUpperCase()}\n`;
+  content += `Date Logged: ${fmtQlDate(entry.date)}\n`;
+  content += `====================================================\n\n`;
+  
+  entry.answers.filter(ans => ans.a).forEach((ans, idx) => {
+    content += `Q${idx + 1}: ${ans.q}\n`;
+    content += `A: ${ans.a}\n\n`;
+  });
+  
+  navigator.clipboard.writeText(content.trim()).then(() => {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg> Copied!`;
+    setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy text: ', err);
+  });
+}
+
+function exportStoryToText(entry) {
+  const s = QL_SCENARIOS[entry.scenario] || { label: entry.scenario };
+  let content = `STORY LAB - ${s.label.toUpperCase()}\n`;
+  content += `Date Logged: ${fmtQlDate(entry.date)}\n`;
+  content += `====================================================\n\n`;
+  
+  entry.answers.filter(ans => ans.a).forEach((ans, idx) => {
+    content += `Q${idx + 1}: ${ans.q}\n`;
+    content += `A: ${ans.a}\n\n`;
+  });
+  
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const filename = `${s.label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_story.txt`;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportStoryToWord(entry) {
+  const s = QL_SCENARIOS[entry.scenario] || { label: entry.scenario };
+  
+  let html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <title>Story Lab - ${esc(s.label)}</title>
+      <style>
+        body { font-family: 'Arial', sans-serif; line-height: 1.6; margin: 1in; }
+        h1 { font-size: 24pt; color: #111; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
+        .meta { font-size: 10pt; color: #777; margin-bottom: 30px; font-style: italic; }
+        .qa { margin-bottom: 20px; }
+        .q { font-size: 11pt; font-weight: bold; color: #555; margin-bottom: 4px; }
+        .a { font-size: 11pt; color: #111; line-height: 1.5; }
+      </style>
+    </head>
+    <body>
+      <h1>Story Lab - ${esc(s.label)}</h1>
+      <div class="meta">Date Logged: ${fmtQlDate(entry.date)}</div>
+  `;
+  
+  entry.answers.filter(ans => ans.a).forEach((ans, idx) => {
+    html += `
+      <div class="qa">
+        <div class="q">Q${idx + 1}: ${esc(ans.q)}</div>
+        <div class="a">${esc(ans.a).replace(/\n/g, '<br>')}</div>
+      </div>
+    `;
+  });
+  
+  html += `</body></html>`;
+  
+  const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const filename = `${s.label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_story.doc`;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
