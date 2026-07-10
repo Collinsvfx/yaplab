@@ -120,36 +120,32 @@ const QL_SCENARIOS = {
 // ── STORY LAB NAVIGATION & UTILITIES ──────────────────────────────────────────
 
 function showQuickLogPanel() {
-  document.getElementById('sfLandingState').style.display = 'none';
   document.getElementById('sfStoryLabContainer').style.display = 'block';
-  const sfHeader = document.getElementById('sfHeader');
-  if (sfHeader) sfHeader.style.display = 'none';
   renderSlScenarioGrid();
   switchSlTab('today');
 }
 
 function showLogHistoryPanel() {
-  document.getElementById('sfLandingState').style.display = 'none';
   document.getElementById('sfStoryLabContainer').style.display = 'block';
-  const sfHeader = document.getElementById('sfHeader');
-  if (sfHeader) sfHeader.style.display = 'none';
   switchSlTab('log');
 }
 
-function exitStoryLab() {
-  document.getElementById('sfStoryLabContainer').style.display = 'none';
-  document.getElementById('sfLandingState').style.display = 'block';
-  const sfHeader = document.getElementById('sfHeader');
-  if (sfHeader) sfHeader.style.display = 'flex';
+function showAiCoachGrid() {
+  document.getElementById('sfStoryLabContainer').style.display = 'block';
+  switchSlTab('coach');
 }
 
 function switchSlTab(name) {
   document.getElementById('view-today').classList.toggle('active', name === 'today');
   document.getElementById('view-log').classList.toggle('active', name === 'log');
   document.getElementById('view-interview').classList.toggle('active', name === 'interview');
+  document.getElementById('view-coach').classList.toggle('active', name === 'coach');
   
   document.getElementById('slNavTodayBtn').classList.toggle('active', name === 'today');
   document.getElementById('slNavLogBtn').classList.toggle('active', name === 'log');
+  
+  const coachBtn = document.getElementById('slNavCoachBtn');
+  if (coachBtn) coachBtn.classList.toggle('active', name === 'coach');
 
   if (name === 'log') {
     renderSlLog();
@@ -215,7 +211,7 @@ function updateSlProgress() {
   document.getElementById('slProgressFill').style.width = pct + '%';
 }
 
-// ── SAVE ENTRY (Dual LocalStorage + Supabase) ────────────────────────────────
+// ── SAVE ENTRY (Dual LocalStorage + Supabase learn_items) ────────────────────
 
 async function saveSlEntry() {
   const s = QL_SCENARIOS[qlCurrentScenario];
@@ -257,22 +253,55 @@ async function saveSlEntry() {
   // Supabase save
   if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
     try {
+      const dbPayload = {
+        user_id: supabaseUser.id,
+        title: qlCurrentScenario,
+        category: 'storylab',
+        status: 'unread',
+        sections: answers.map(ans => ({ label: ans.q, text: ans.a })),
+        updated_at: new Date().toISOString()
+      };
+
       if (qlEditingId) {
         await supabaseClient
-          .from('quick_log_entries')
-          .update({ answers, scenario: qlCurrentScenario })
-          .eq('local_id', qlEditingId)
+          .from('learn_items')
+          .update(dbPayload)
+          .eq('id', qlEditingId)
           .eq('user_id', supabaseUser.id);
+          
+        // Update local learnItems memory array
+        const globalIdx = learnItems.findIndex(item => item.id === qlEditingId);
+        if (globalIdx !== -1) {
+          learnItems[globalIdx].sections = dbPayload.sections;
+          learnItems[globalIdx].updatedAt = Date.now();
+        }
       } else {
-        await supabaseClient
-          .from('quick_log_entries')
-          .insert({
-            user_id: supabaseUser.id,
-            local_id: savedEntry.id,
-            scenario: savedEntry.scenario,
-            date: savedEntry.date,
-            answers: savedEntry.answers
+        const { data, error } = await supabaseClient
+          .from('learn_items')
+          .insert(dbPayload)
+          .select();
+        if (error) throw error;
+        if (data && data[0]) {
+          savedEntry.id = data[0].id;
+          
+          // Add to global learnItems memory array
+          learnItems.unshift({
+            id: data[0].id,
+            title: data[0].title,
+            category: data[0].category,
+            status: data[0].status,
+            sections: data[0].sections || [],
+            updatedAt: new Date(data[0].updated_at).getTime()
           });
+
+          // Sync local ID
+          const localEntries = getQlEntries();
+          const firstLocal = localEntries[0];
+          if (firstLocal) {
+            firstLocal.id = data[0].id;
+            saveQlLocal(localEntries);
+          }
+        }
       }
     } catch (e) {
       console.warn('[QuickLog] Supabase save failed (local copy preserved):', e.message);
@@ -320,8 +349,24 @@ function fmtQlDate(iso) {
 }
 
 function getQlEntries() {
-  try { return JSON.parse(localStorage.getItem(QL_STORAGE_KEY)) || []; }
-  catch (e) { return []; }
+  const local = [];
+  try {
+    const raw = localStorage.getItem(QL_STORAGE_KEY);
+    if (raw) Object.assign(local, JSON.parse(raw));
+  } catch (e) {}
+
+  if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
+    const remote = learnItems
+      .filter(item => item.category === 'storylab')
+      .map(item => ({
+        id: item.id,
+        scenario: item.title,
+        date: item.date || new Date(item.updatedAt).toISOString(),
+        answers: item.sections.map(sec => ({ q: sec.label || sec.q, a: sec.text || sec.a }))
+      }));
+    if (remote.length > 0) return remote;
+  }
+  return local;
 }
 
 function saveQlLocal(entries) {
@@ -403,8 +448,11 @@ function renderSlLog() {
         const remaining = getQlEntries().filter(en => en.id !== entry.id);
         saveQlLocal(remaining);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
-          supabaseClient.from('quick_log_entries').delete().eq('local_id', entry.id).eq('user_id', supabaseUser.id)
+          supabaseClient.from('learn_items').delete().eq('id', entry.id).eq('user_id', supabaseUser.id)
             .catch(err => console.warn('[QuickLog] Supabase delete failed:', err.message));
+          
+          const globalIdx = learnItems.findIndex(item => item.id === entry.id);
+          if (globalIdx !== -1) learnItems.splice(globalIdx, 1);
         }
         renderSlLog();
         updateSlStreakBox();
@@ -428,8 +476,14 @@ function renderSlLog() {
       if (confirm('This will permanently delete every logged entry. Continue?')) {
         localStorage.removeItem(QL_STORAGE_KEY);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
-          supabaseClient.from('quick_log_entries').delete().eq('user_id', supabaseUser.id)
+          supabaseClient.from('learn_items').delete().eq('category', 'storylab').eq('user_id', supabaseUser.id)
             .catch(err => console.warn('[QuickLog] Supabase clear failed:', err.message));
+          
+          for (let i = learnItems.length - 1; i >= 0; i--) {
+            if (learnItems[i].category === 'storylab') {
+              learnItems.splice(i, 1);
+            }
+          }
         }
         renderSlLog();
         updateSlStreakBox();
@@ -685,7 +739,7 @@ function closeSfConfirmModal() {
 function confirmExitStorySession() {
   document.getElementById('sfConfirmModal').style.display = 'none';
   document.getElementById('sfActiveSessionState').style.display = 'none';
-  document.getElementById('sfLandingState').style.display = 'block';
+  showQuickLogPanel();
   // Reset session-end cards
   const reviewCard = document.getElementById('sfStoryReviewCard');
   const scoreCard = document.getElementById('sfScoreCard');
@@ -1327,7 +1381,7 @@ async function exportStoryToScriptBuilder() {
 
   // Return to landing state in Story Finder
   document.getElementById('sfActiveSessionState').style.display = 'none';
-  document.getElementById('sfLandingState').style.display = 'block';
+  showQuickLogPanel();
   sfActiveStoryType = null;
   sfHistory = [];
 
@@ -1340,6 +1394,9 @@ function initStoryFinderPage() {
   sfGymPoints = parseInt(localStorage.getItem('sf_gym_points') || '0');
   updateGymStatsUI();
   renderStreakOnLanding();
+  
+  // Load Story Lab as the primary view
+  showQuickLogPanel();
 
   const sfInput = document.getElementById('sfChatInput');
   if (sfInput) {
