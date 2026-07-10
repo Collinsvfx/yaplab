@@ -53,11 +53,12 @@ const QL_SCENARIOS = {
     label: 'I learned something', stamp: 'INSIGHT LOG',
     desc: 'Your thinking shifted on something.',
     questions: [
-      'What did you believe this morning?',
-      'What changed it \u2014 a specific moment, conversation, or result?',
-      'Why did it change?',
+      'What belief are you changing?',
+      'Why did you believe that in the first place?',
+      'What changed your mind?',
+      'What was the single idea or example that convinced you?',
       'What do you believe now?',
-      'If someone only remembers one thing from this story, what should it be?'
+      'What\'s the one thing people should remember?'
     ]
   },
   surprisedMe: {
