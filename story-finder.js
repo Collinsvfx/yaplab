@@ -118,6 +118,91 @@ const QL_SCENARIOS = {
   }
 };
 
+const QL_TOOLTIPS = {
+  // Solved Problem
+  'What were you trying to do?': 'e.g., "Implement a search bar with auto-suggestions"',
+  'What went wrong?': 'e.g., "The API requests rate-limited the client after 3 keystrokes"',
+  'What did you think was happening?': 'e.g., "Thought the debounce timer was too short"',
+  'What actually happened?': 'e.g., "The keyup event was triggering multiple times because of duplicate event listeners"',
+  'What\'s the exact moment you realized what was really going on?': 'e.g., "When I added console.log to the listener and saw it printed 5 times on one keypress"',
+  'How did you solve it?': 'e.g., "Cleaned up old event listeners in useEffect"',
+  'What did you learn?': 'e.g., "Always clean up side-effects in React component mounts"',
+  
+  // Built Something
+  'What did you build?': 'e.g., "A real-time notification widget"',
+  'Why did it matter?': 'e.g., "Users were missing mentions when offline"',
+  'What does it let people do now?': 'e.g., "Get immediate updates on their screen without reloading"',
+  'What part are you most proud of?': 'e.g., "The smooth animation transitions using pure CSS keyframes"',
+  'What surprised you while building it?': 'e.g., "WebSockets connection was incredibly easy to set up with Socket.io"',
+  'What\'s one specific detail - a number, a decision, a moment - someone outside your head wouldn\'t guess?': 'e.g., "I refactored the database schema three times to ensure notification reads are fast"',
+  "What's next?": 'e.g., "Add push notifications for mobile devices"',
+  
+  // Made Progress
+  'What moved forward today?': 'e.g., "Finished 80% of the settings page layout"',
+  'What almost didn\'t happen today?': 'e.g., "Adding the dark mode toggle due to CSS variable inheritance issues"',
+  'What\'s still unfinished or stuck?': 'e.g., "Database persistence for user preferences"',
+  'What\'s one concrete number or detail that shows the progress?': 'e.g., "Reduced page load time by 30% after optimizing images"',
+  'What\'s the next small unlock?': 'e.g., "Connecting the settings panel API endpoints"',
+  
+  // Learned Something
+  'What belief are you changing?': 'e.g., "I used to believe storytelling was about writing scripts."',
+  'Why did you believe that in the first place?': 'e.g., "Because I spent four months practicing scripts and nothing felt engaging."',
+  'What changed your mind?': 'e.g., "I read Storytelling 101."',
+  'What was the single idea or example that convinced you?': 'e.g., "The book explained that every great story starts with identifying a moment before writing."',
+  'What do you believe now?': 'e.g., "Storytelling starts with identifying moments, not writing."',
+  'What\'s the one thing people should remember?': 'e.g., "Never start writing until you\'ve identified the moment."',
+  
+  // Surprised Me
+  'What happened that surprised you?': 'e.g., "50% of beta users disabled dark mode within an hour"',
+  'What were you expecting instead?': 'e.g., "Expected everyone to prefer dark mode by default"',
+  'What was your first reaction when you saw it?': 'e.g., "I thought the theme selector had a bug"',
+  'Why do you think it happened - what was the real reason?': 'e.g., "The contrast on the light-gray text on dark-gray cards was too low for readability"',
+  'What did you do differently because of this?': 'e.g., "Increased the default contrast ratios for all dark theme text elements"',
+  'What should other people know about this?': 'e.g., "Always test your interfaces under various light conditions"',
+  
+  // Changed Mind
+  'What did you change your mind about?': 'e.g., "Using TailwindCSS for styling"',
+  'What did you believe before?': 'e.g., "I believed TailwindCSS was too verbose and cluttered the HTML"',
+  'What happened that made you question it?': 'e.g., "I built a project with vanilla CSS and spent 3 hours resolving flexbox alignments"',
+  'Was there a specific moment, piece of evidence, or conversation that tipped you?': 'e.g., "I watched a coworker build a complete dashboard in 15 minutes using Tailwind utility classes"',
+  'What do you believe now - and why is it better?': 'e.g., "Tailwind reduces CSS bloat and speeds up UI prototyping"',
+  'What would you tell your past self?': 'e.g., "Stop fighting utility classes and just try it for one small build"',
+  
+  // Have Opinion
+  'What\'s the opinion?': 'e.g., "Single-page apps are overused for content-heavy sites"',
+  'Why do most people think the opposite?': 'e.g., "Because SPA frameworks are hyped and have great developer experience"',
+  'What experience changed your mind?': 'e.g., "I had to optimize SEO on a client\'s website built with pure client-side React"',
+  'Tell me the story that made you believe this.': 'e.g., "Google Search couldn\'t index our pricing tables for 3 weeks because of client-side loading"',
+  'Why does this matter?': 'e.g., "Organic traffic drops cost real money to business clients"',
+  'What should people do instead?': 'e.g., "Use SSR or static site generation for public-facing content pages"',
+  
+  // Day in Life
+  'What did you spend most of your time on?': 'e.g., "Reviewing and resolving 12 pull requests"',
+  'Why was it important?': 'e.g., "Needed to clear the queue before the production release on Friday"',
+  'What small decision did you make today?': 'e.g., "Approved a refactor of the user profile component rather than deferring it"',
+  'What\'s one specific detail from today worth remembering - a number, a quote, a moment?': 'e.g., "A teammate said: \'This is the cleanest state machine I have ever seen.\'"',
+  'What\'s one thing you\'d tell someone who asked how your day went?': 'e.g., "It was a productive code-review marathon that saved us from potential bugs"',
+  
+  // Shared signature
+  'If someone only remembers one thing from this story, what should it be?': 'e.g., "Choose technical stack based on user search patterns, not developer preferences"'
+};
+
+function getNormalizedQuestionKey(q) {
+  if (!q) return '';
+  return q
+    .replace(/[\u2018\u2019]/g, "'") // Normalize curly single quotes / apostrophes to '
+    .replace(/[\u201C\u201D]/g, '"') // Normalize curly double quotes to "
+    .replace(/[\u2013\u2014]/g, '-') // Normalize en/em dashes to -
+    .trim();
+}
+
+// Global click handler to dismiss any active Story Lab tooltips
+document.addEventListener('click', () => {
+  document.querySelectorAll('.sl-tooltip-container.active').forEach(el => {
+    el.classList.remove('active');
+  });
+});
+
 // ── STORY LAB NAVIGATION & UTILITIES ──────────────────────────────────────────
 
 function showQuickLogPanel() {
@@ -191,10 +276,25 @@ function openSlInterview(key, existingEntry) {
   list.innerHTML = '';
   s.questions.forEach((q, i) => {
     const existingAnswer = existingEntry ? (existingEntry.answers[i]?.a || '') : '';
+    const tooltipText = QL_TOOLTIPS[getNormalizedQuestionKey(q)] || '';
     const block = document.createElement('div');
     block.className = 'question-block';
     block.innerHTML = `
-      <label><span class="qnum">Q${i + 1}</span>${q}</label>
+      <label style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span><span class="qnum">Q${i + 1}</span>${q}</span>
+        ${tooltipText ? `
+          <span class="sl-tooltip-container" onclick="event.stopPropagation(); this.classList.toggle('active')">
+            <button type="button" class="sl-tooltip-btn" aria-label="Show example">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+            </button>
+            <span class="sl-tooltip-popup">${tooltipText}</span>
+          </span>
+        ` : ''}
+      </label>
       <textarea data-q="${i}" placeholder="Write a sentence or two...">${existingAnswer}</textarea>
     `;
     list.appendChild(block);
