@@ -6,7 +6,7 @@
   <title>YapLab — Story Finder</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,13 +20,24 @@
   <!-- STORY FINDER TAB -->
   <div class="tab-panel active" id="panelStoryFinder">
     <!-- Story Finder Header -->
-    <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+    <div id="sfHeader" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
       <h2 style="font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:var(--text); margin-bottom: 4px; display:flex; align-items:center;">Story Finder <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="margin-left:6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></h2>
       <p style="font-size:14px; color:var(--muted);">Let's discover today's story together. Spot conflict, build visual scenes, and find the lesson hiding in your day.</p>
     </div>
 
     <!-- 1. Landing Screen (Story Type Selector) -->
     <div id="sfLandingState" class="fadeIn">
+      <!-- Quick Log + Log History Toggle Buttons -->
+      <div style="display:flex; gap:10px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border);">
+        <button class="btn btn-secondary" id="sfQuickLogBtn" onclick="showQuickLogPanel()" style="flex:1; justify-content:center; gap:8px; font-weight:600;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="margin:0;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+          Quick Log
+        </button>
+        <button class="btn btn-secondary" id="sfLogHistoryBtn" onclick="showLogHistoryPanel()" style="flex:1; justify-content:center; gap:8px; font-weight:600;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="margin:0;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="3"></line></svg>
+          Log History
+        </button>
+      </div>
       <div class="section-title">What happened today?</div>
       <div class="sf-types-grid">
         <button class="sf-type-card" onclick="startStorySession('solvedProblem')">
@@ -76,6 +87,58 @@
         <div class="section-title" style="margin-bottom:10px; display:flex; align-items:center;"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>Your Storytelling Streak</div>
         <div id="sfStreakList" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
+    </div>
+
+    <!-- STORY LAB CONTAINER (Exact Story Lab v3 structure and styling) -->
+    <div id="sfStoryLabContainer" class="storylab-theme fadeIn" style="display:none;">
+      <!-- Header -->
+      <header class="sl-header">
+        <div class="brand">
+          <span class="mark">SL</span>
+          <h1>Story Lab</h1>
+        </div>
+        <div class="streak" id="slStreakBox">— entries logged</div>
+      </header>
+
+      <!-- Nav -->
+      <nav class="sl-nav">
+        <button class="active" id="slNavTodayBtn" onclick="switchSlTab('today')">Today</button>
+        <button id="slNavLogBtn" onclick="switchSlTab('log')">Log</button>
+        <button class="sl-exit-btn" onclick="exitStoryLab()">✕ Close</button>
+      </nav>
+
+      <!-- TODAY VIEW -->
+      <section class="view active" id="view-today">
+        <div class="prompt-eyebrow">Daily check-in</div>
+        <div class="prompt-headline">What best describes today?</div>
+        <div class="prompt-sub">The event decides the questions — not the other way around. Pick the shape of the day you actually had.</div>
+        <div class="scenario-grid" id="slScenarioGrid"></div>
+      </section>
+
+      <!-- INTERVIEW VIEW -->
+      <section class="view" id="view-interview">
+        <div class="interview-header">
+          <button class="back-link" onclick="backToTodayView()">← BACK</button>
+          <div class="interview-stamp" id="slInterviewStamp"></div>
+          <div class="interview-title" id="slInterviewTitle"></div>
+          <div class="progress-track"><div class="progress-fill" id="slProgressFill"></div></div>
+        </div>
+        <div id="slQuestionList"></div>
+        <div class="save-row">
+          <button class="save-btn" id="slSaveBtn" onclick="saveSlEntry()">Save entry</button>
+          <span class="save-hint" id="slSaveHint">Answer what applies — skip the rest.</span>
+        </div>
+      </section>
+
+      <!-- LOG VIEW -->
+      <section class="view" id="view-log">
+        <div class="stats-row">
+          <div class="stat-box"><div class="num" id="slStatTotal">0</div><div class="lbl">Entries</div></div>
+          <div class="stat-box"><div class="num" id="slStatWeek">0</div><div class="lbl">This week</div></div>
+          <div class="stat-box"><div class="num" id="slStatStreak">0</div><div class="lbl">Day streak</div></div>
+        </div>
+        <div id="slLogList"></div>
+      </section>
     </div>
 
     <!-- 2. Active Session Workspace (Split Screen) -->
@@ -222,10 +285,62 @@
               </div>
             </div>
 
-            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:10px;">
               <button class="btn btn-primary" onclick="exportStoryToScriptBuilder()" style="width:100%; justify-content:center; font-weight:700; display:flex; align-items:center; gap:6px;">
                 <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" class="inline-svg" style="margin:0;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Build My Script
               </button>
+              <button class="btn btn-secondary" id="sfSessionContentPackBtn" onclick="generateContentPack('session', null)" style="width:100%; justify-content:center; font-weight:700; display:flex; align-items:center; gap:6px;">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg" style="margin:0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                Generate Content Pack
+              </button>
+            </div>
+          </div>
+
+          <!-- Content Pack Card -->
+          <div class="sf-analysis-card" id="sfContentPackCard" style="display:none;">
+            <h3 class="sf-card-title" style="display:flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              Content Pack
+            </h3>
+            <!-- Tab switcher -->
+            <div class="sf-cp-tabs" id="sfCpTabs">
+              <button class="sf-cp-tab active" data-tab="short" onclick="switchCpTab('short')">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                Short
+              </button>
+              <button class="sf-cp-tab" data-tab="linkedin" onclick="switchCpTab('linkedin')">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                LinkedIn
+              </button>
+              <button class="sf-cp-tab" data-tab="xthread" onclick="switchCpTab('xthread')">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                X Thread
+              </button>
+              <button class="sf-cp-tab" data-tab="youtube" onclick="switchCpTab('youtube')">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                YouTube
+              </button>
+            </div>
+            <!-- Tab panels -->
+            <div id="sfCpPanelShort" class="sf-cp-panel active">
+              <div class="sf-cp-loading" id="sfCpLoadingShort"><span class="preflight-spinner"></span> Generating...</div>
+              <div class="sf-cp-content" id="sfCpContentShort"></div>
+              <button class="sf-cp-copy-btn" onclick="copyCpContent('short')">Copy</button>
+            </div>
+            <div id="sfCpPanelLinkedin" class="sf-cp-panel">
+              <div class="sf-cp-loading" id="sfCpLoadingLinkedin"><span class="preflight-spinner"></span> Generating...</div>
+              <div class="sf-cp-content" id="sfCpContentLinkedin"></div>
+              <button class="sf-cp-copy-btn" onclick="copyCpContent('linkedin')">Copy</button>
+            </div>
+            <div id="sfCpPanelXthread" class="sf-cp-panel">
+              <div class="sf-cp-loading" id="sfCpLoadingXthread"><span class="preflight-spinner"></span> Generating...</div>
+              <div class="sf-cp-content" id="sfCpContentXthread"></div>
+              <button class="sf-cp-copy-btn" onclick="copyCpContent('xthread')">Copy</button>
+            </div>
+            <div id="sfCpPanelYoutube" class="sf-cp-panel">
+              <div class="sf-cp-loading" id="sfCpLoadingYoutube"><span class="preflight-spinner"></span> Generating...</div>
+              <div class="sf-cp-content" id="sfCpContentYoutube"></div>
+              <button class="sf-cp-copy-btn" onclick="copyCpContent('youtube')">Copy</button>
             </div>
           </div>
         </div>
@@ -242,6 +357,56 @@
     <div style="display:flex; justify-content:center; gap:12px; margin-top:8px;">
       <button class="btn btn-secondary" onclick="closeSfConfirmModal()" style="font-size:12px; padding:8px 16px; font-weight:600;">Cancel</button>
       <button class="btn" onclick="confirmExitStorySession()" style="background:var(--danger); color:#fff; font-size:12px; padding:8px 16px; border:none; font-weight:600; border-radius:8px; cursor:pointer;">Exit</button>
+    </div>
+  </div>
+</div>
+<!-- Content Pack Modal (for Quick Log entries) -->
+<div id="sfContentPackModal">
+  <div class="sf-cp-modal-inner">
+    <div class="sf-cp-modal-header">
+      <div class="sf-cp-modal-title">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        Content Pack
+      </div>
+      <button class="sf-cp-modal-close" onclick="closeCpModal()">✕</button>
+    </div>
+    <div class="sf-cp-tabs" id="sfCpModalTabs">
+      <button class="sf-cp-tab active" data-tab="mshort" onclick="switchCpModalTab('mshort')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        Short
+      </button>
+      <button class="sf-cp-tab" data-tab="mlinkedin" onclick="switchCpModalTab('mlinkedin')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        LinkedIn
+      </button>
+      <button class="sf-cp-tab" data-tab="mxthread" onclick="switchCpModalTab('mxthread')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        X Thread
+      </button>
+      <button class="sf-cp-tab" data-tab="myoutube" onclick="switchCpModalTab('myoutube')">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="inline-svg"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+        YouTube
+      </button>
+    </div>
+    <div id="sfCpModalPanelMshort" class="sf-cp-panel active">
+      <div class="sf-cp-loading" id="sfCpModalLoadingMshort"><span class="preflight-spinner"></span> Generating...</div>
+      <div class="sf-cp-content" id="sfCpModalContentMshort"></div>
+      <button class="sf-cp-copy-btn" onclick="copyCpModalContent('mshort')">Copy</button>
+    </div>
+    <div id="sfCpModalPanelMlinkedin" class="sf-cp-panel">
+      <div class="sf-cp-loading" id="sfCpModalLoadingMlinkedin"><span class="preflight-spinner"></span> Generating...</div>
+      <div class="sf-cp-content" id="sfCpModalContentMlinkedin"></div>
+      <button class="sf-cp-copy-btn" onclick="copyCpModalContent('mlinkedin')">Copy</button>
+    </div>
+    <div id="sfCpModalPanelMxthread" class="sf-cp-panel">
+      <div class="sf-cp-loading" id="sfCpModalLoadingMxthread"><span class="preflight-spinner"></span> Generating...</div>
+      <div class="sf-cp-content" id="sfCpModalContentMxthread"></div>
+      <button class="sf-cp-copy-btn" onclick="copyCpModalContent('mxthread')">Copy</button>
+    </div>
+    <div id="sfCpModalPanelMyoutube" class="sf-cp-panel">
+      <div class="sf-cp-loading" id="sfCpModalLoadingMyoutube"><span class="preflight-spinner"></span> Generating...</div>
+      <div class="sf-cp-content" id="sfCpModalContentMyoutube"></div>
+      <button class="sf-cp-copy-btn" onclick="copyCpModalContent('myoutube')">Copy</button>
     </div>
   </div>
 </div>

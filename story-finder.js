@@ -1,3 +1,608 @@
+// ── QUICK LOG DATA — Exact Story Lab v3 Questions ────────────────────────────
+
+const QL_STORAGE_KEY = 'sf_quick_log';
+let qlCurrentScenario = null;
+let qlEditingId = null;
+
+const QL_SCENARIOS = {
+  solvedProblem: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="13" rx="6" ry="7"/><path d="M12 6V3"/><path d="M9 4 7 2"/><path d="M15 4 17 2"/><path d="M6 11H2"/><path d="M6 15H2"/><path d="M18 11H22"/><path d="M18 15H22"/><path d="M9 20 7 22"/><path d="M15 20 17 22"/></svg>`,
+    label: 'I solved a problem', stamp: 'INCIDENT LOG',
+    desc: 'Something broke or blocked you, and you fixed it.',
+    questions: [
+      'What were you trying to do?',
+      'What went wrong?',
+      'What did you think was happening?',
+      'What actually happened?',
+      'What\u2019s the exact moment you realized what was really going on?',
+      'How did you solve it?',
+      'What did you learn?',
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  builtSomething: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2 21 7 21 17 12 22 3 17 3 7Z"/><path d="M12 2 12 22"/><path d="M3 7 12 12 21 7"/></svg>`,
+    label: 'I built something new', stamp: 'BUILD LOG',
+    desc: 'Shipped a feature, a screen, a flow.',
+    questions: [
+      'What did you build?',
+      'Why did it matter?',
+      'What does it let people do now?',
+      'What part are you most proud of?',
+      'What surprised you while building it?',
+      'What\u2019s one specific detail \u2014 a number, a decision, a moment \u2014 someone outside your head wouldn\u2019t guess?',
+      "What's next?",
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  madeProgress: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="15,6 21,6 21,12"/></svg>`,
+    label: 'I made progress', stamp: 'PROGRESS LOG',
+    desc: 'No drama \u2014 just forward motion.',
+    questions: [
+      'What moved forward today?',
+      'What almost didn\u2019t happen today?',
+      "What's still unfinished or stuck?",
+      'What\u2019s one concrete number or detail that shows the progress?',
+      "What's the next small unlock?",
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  learnedSomething: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2Z"/></svg>`,
+    label: 'I learned something', stamp: 'INSIGHT LOG',
+    desc: 'Your thinking shifted on something.',
+    questions: [
+      'What did you believe this morning?',
+      'What changed it \u2014 a specific moment, conversation, or result?',
+      'Why did it change?',
+      'What do you believe now?',
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  surprisedMe: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><circle cx="12" cy="14" r="1.5"/></svg>`,
+    label: 'Something surprised me', stamp: 'SURPRISE LOG',
+    desc: 'An unexpected result, reaction, or discovery.',
+    questions: [
+      'What happened that surprised you?',
+      'What were you expecting instead?',
+      'What was your first reaction when you saw it?',
+      'Why do you think it happened \u2014 what was the real reason?',
+      'What did you do differently because of this?',
+      'What should other people know about this?',
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  changedMind: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`,
+    label: 'I changed my mind', stamp: 'FLIP LOG',
+    desc: 'A belief, approach, or opinion that flipped.',
+    questions: [
+      'What did you change your mind about?',
+      'What did you believe before?',
+      'What happened that made you question it?',
+      'Was there a specific moment, piece of evidence, or conversation that tipped you?',
+      'What do you believe now \u2014 and why is it better?',
+      'What would you tell your past self?',
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  haveOpinion: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2c1 3-3 4-3 8a3 3 0 0 0 6 0c0-1-1-2-1-2 2 1 3 3 3 5a5 5 0 0 1-10 0c0-4 3-5 3-9 0-1 1-2 2-2Z"/></svg>`,
+    label: 'I have an opinion', stamp: 'HOT TAKE',
+    desc: 'You want to say something, not report something.',
+    questions: [
+      "What's the opinion?",
+      'Why do most people think the opposite?',
+      'What experience changed your mind?',
+      'Tell me the story that made you believe this.',
+      'Why does this matter?',
+      'What should people do instead?',
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  },
+  dayInLife: {
+    icon: `<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`,
+    label: 'I want to document my day', stamp: 'FIELD NOTE',
+    desc: 'Nothing exciting happened \u2014 that\u2019s fine too.',
+    questions: [
+      'What did you spend most of your time on?',
+      'Why was it important?',
+      'What small decision did you make today?',
+      'What\u2019s one specific detail from today worth remembering \u2014 a number, a quote, a moment?',
+      'What\u2019s one thing you\u2019d tell someone who asked how your day went?',
+      'If someone only remembers one thing from this story, what should it be?'
+    ]
+  }
+};
+
+// ── STORY LAB NAVIGATION & UTILITIES ──────────────────────────────────────────
+
+function showQuickLogPanel() {
+  document.getElementById('sfLandingState').style.display = 'none';
+  document.getElementById('sfStoryLabContainer').style.display = 'block';
+  const sfHeader = document.getElementById('sfHeader');
+  if (sfHeader) sfHeader.style.display = 'none';
+  renderSlScenarioGrid();
+  switchSlTab('today');
+}
+
+function showLogHistoryPanel() {
+  document.getElementById('sfLandingState').style.display = 'none';
+  document.getElementById('sfStoryLabContainer').style.display = 'block';
+  const sfHeader = document.getElementById('sfHeader');
+  if (sfHeader) sfHeader.style.display = 'none';
+  switchSlTab('log');
+}
+
+function exitStoryLab() {
+  document.getElementById('sfStoryLabContainer').style.display = 'none';
+  document.getElementById('sfLandingState').style.display = 'block';
+  const sfHeader = document.getElementById('sfHeader');
+  if (sfHeader) sfHeader.style.display = 'flex';
+}
+
+function switchSlTab(name) {
+  document.getElementById('view-today').classList.toggle('active', name === 'today');
+  document.getElementById('view-log').classList.toggle('active', name === 'log');
+  document.getElementById('view-interview').classList.toggle('active', name === 'interview');
+  
+  document.getElementById('slNavTodayBtn').classList.toggle('active', name === 'today');
+  document.getElementById('slNavLogBtn').classList.toggle('active', name === 'log');
+
+  if (name === 'log') {
+    renderSlLog();
+  }
+  updateSlStreakBox();
+}
+
+function backToTodayView() {
+  qlEditingId = null;
+  switchSlTab('today');
+}
+
+// ── STORY LAB RENDERING (Matching Story Lab v3) ───────────────────────────────
+
+function renderSlScenarioGrid() {
+  const grid = document.getElementById('slScenarioGrid');
+  grid.innerHTML = '';
+  Object.entries(QL_SCENARIOS).forEach(([key, s]) => {
+    const card = document.createElement('button');
+    card.className = 'scenario-card';
+    card.innerHTML = `
+      <span class="icon">${s.icon}</span>
+      <div class="label">${s.label}</div>
+      <div class="desc">${s.desc}</div>
+    `;
+    card.addEventListener('click', () => openSlInterview(key));
+    grid.appendChild(card);
+  });
+}
+
+function openSlInterview(key, existingEntry) {
+  qlCurrentScenario = key;
+  qlEditingId = existingEntry ? existingEntry.id : null;
+  const s = QL_SCENARIOS[key];
+
+  document.getElementById('slInterviewStamp').innerHTML = `${s.icon} ${s.stamp}`;
+  document.getElementById('slInterviewTitle').textContent = qlEditingId ? `Editing: ${s.label}` : s.label;
+  document.getElementById('slSaveBtn').textContent = qlEditingId ? 'Update entry' : 'Save entry';
+  document.getElementById('slSaveHint').textContent = qlEditingId ? 'Changes overwrite this entry.' : 'Answer what applies — skip the rest.';
+
+  const list = document.getElementById('slQuestionList');
+  list.innerHTML = '';
+  s.questions.forEach((q, i) => {
+    const existingAnswer = existingEntry ? (existingEntry.answers[i]?.a || '') : '';
+    const block = document.createElement('div');
+    block.className = 'question-block';
+    block.innerHTML = `
+      <label><span class="qnum">Q${i + 1}</span>${q}</label>
+      <textarea data-q="${i}" placeholder="Write a sentence or two...">${existingAnswer}</textarea>
+    `;
+    list.appendChild(block);
+  });
+
+  list.querySelectorAll('textarea').forEach(t => t.addEventListener('input', updateSlProgress));
+  updateSlProgress();
+  switchSlTab('interview');
+}
+
+function updateSlProgress() {
+  const textareas = document.querySelectorAll('#slQuestionList textarea');
+  const filled = Array.from(textareas).filter(t => t.value.trim().length > 0).length;
+  const pct = textareas.length ? Math.round((filled / textareas.length) * 100) : 0;
+  document.getElementById('slProgressFill').style.width = pct + '%';
+}
+
+// ── SAVE ENTRY (Dual LocalStorage + Supabase) ────────────────────────────────
+
+async function saveSlEntry() {
+  const s = QL_SCENARIOS[qlCurrentScenario];
+  const textareas = document.querySelectorAll('#slQuestionList textarea');
+  const answers = [];
+  let anyFilled = false;
+  textareas.forEach((t, i) => {
+    const val = t.value.trim();
+    if (val) anyFilled = true;
+    answers.push({ q: s.questions[i], a: val });
+  });
+
+  if (!anyFilled) {
+    alert('Answer at least one question before saving.');
+    return;
+  }
+
+  const entries = getQlEntries();
+  let savedEntry;
+
+  if (qlEditingId) {
+    const idx = entries.findIndex(e => e.id === qlEditingId);
+    if (idx !== -1) {
+      entries[idx] = { ...entries[idx], answers };
+      savedEntry = entries[idx];
+    }
+    saveQlLocal(entries);
+  } else {
+    savedEntry = {
+      id: Date.now().toString(),
+      scenario: qlCurrentScenario,
+      date: new Date().toISOString(),
+      answers
+    };
+    entries.unshift(savedEntry);
+    saveQlLocal(entries);
+  }
+
+  // Supabase save
+  if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
+    try {
+      if (qlEditingId) {
+        await supabaseClient
+          .from('quick_log_entries')
+          .update({ answers, scenario: qlCurrentScenario })
+          .eq('local_id', qlEditingId)
+          .eq('user_id', supabaseUser.id);
+      } else {
+        await supabaseClient
+          .from('quick_log_entries')
+          .insert({
+            user_id: supabaseUser.id,
+            local_id: savedEntry.id,
+            scenario: savedEntry.scenario,
+            date: savedEntry.date,
+            answers: savedEntry.answers
+          });
+      }
+    } catch (e) {
+      console.warn('[QuickLog] Supabase save failed (local copy preserved):', e.message);
+    }
+  }
+
+  qlEditingId = null;
+  switchSlTab('log');
+}
+
+function updateSlStreakBox() {
+  const entries = getQlEntries();
+  const streak = computeQlStreak(entries);
+  const box = document.getElementById('slStreakBox');
+  if (box) {
+    if (entries.length === 0) {
+      box.innerHTML = 'No entries yet';
+    } else {
+      box.innerHTML = `<b>${entries.length}</b> logged &middot; <b>${streak}</b> day streak`;
+    }
+  }
+}
+
+// ── LOG HISTORY RENDERING ─────────────────────────────────────────────────────
+
+function computeQlStreak(entries) {
+  if (entries.length === 0) return 0;
+  const days = new Set(entries.map(e => new Date(e.date).toDateString()));
+  let streak = 0;
+  const cursor = new Date();
+  while (true) {
+    if (days.has(cursor.toDateString())) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function fmtQlDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getQlEntries() {
+  try { return JSON.parse(localStorage.getItem(QL_STORAGE_KEY)) || []; }
+  catch (e) { return []; }
+}
+
+function saveQlLocal(entries) {
+  localStorage.setItem(QL_STORAGE_KEY, JSON.stringify(entries));
+}
+
+function renderSlLog() {
+  const entries = getQlEntries();
+  
+  const totalEl = document.getElementById('slStatTotal');
+  const weekEl = document.getElementById('slStatWeek');
+  const streakEl = document.getElementById('slStatStreak');
+  
+  if (totalEl) totalEl.textContent = entries.length;
+  if (weekEl) {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    weekEl.textContent = entries.filter(e => new Date(e.date) >= weekAgo).length;
+  }
+  if (streakEl) streakEl.textContent = computeQlStreak(entries);
+
+  const list = document.getElementById('slLogList');
+  list.innerHTML = '';
+
+  if (entries.length === 0) {
+    list.innerHTML = `
+      <div class="empty-log">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;margin:0 auto;display:block;"><rect x="4" y="3" width="14" height="18" rx="1"/><path d="M8 3v18"/><path d="M11 8h4"/><path d="M11 12h4"/></svg></span>
+        No entries yet. Log today's experience to start your record.
+      </div>`;
+    return;
+  }
+
+  entries.forEach(entry => {
+    const s = QL_SCENARIOS[entry.scenario] || { label: entry.scenario, stamp: 'LOG', icon: '' };
+    const firstAnswer = entry.answers.find(a => a.a)?.a || '';
+    const snippet = firstAnswer.length > 90 ? firstAnswer.slice(0, 90) + '…' : firstAnswer;
+
+    const el = document.createElement('div');
+    el.className = 'entry';
+    el.innerHTML = `
+      <div class="entry-top">
+        <div class="entry-stamp">${s.icon}</div>
+        <div class="entry-meta">
+          <div class="entry-label">${s.label}</div>
+          <div class="entry-date">${fmtQlDate(entry.date)}</div>
+          <div class="entry-snippet">${snippet}</div>
+        </div>
+        <div class="entry-actions">
+          <button class="entry-pack" data-id="${entry.id}">Content Pack</button>
+          <button class="entry-edit" data-id="${entry.id}">Edit</button>
+          <button class="entry-delete" data-id="${entry.id}">Delete</button>
+        </div>
+      </div>
+      <div class="entry-detail">
+        ${entry.answers.filter(a => a.a).map(a => `
+          <div class="qa">
+            <div class="q">${a.q}</div>
+            <div class="a">${a.a}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('entry-delete') || e.target.classList.contains('entry-edit') || e.target.classList.contains('entry-pack')) return;
+      el.classList.toggle('expanded');
+    });
+
+    el.querySelector('.entry-edit').addEventListener('click', (e) => {
+      e.stopPropagation();
+      showQuickLogPanel();
+      openSlInterview(entry.scenario, entry);
+    });
+
+    el.querySelector('.entry-delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm('Delete this entry?')) {
+        const remaining = getQlEntries().filter(en => en.id !== entry.id);
+        saveQlLocal(remaining);
+        if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
+          supabaseClient.from('quick_log_entries').delete().eq('local_id', entry.id).eq('user_id', supabaseUser.id)
+            .catch(err => console.warn('[QuickLog] Supabase delete failed:', err.message));
+        }
+        renderSlLog();
+        updateSlStreakBox();
+      }
+    });
+
+    el.querySelector('.entry-pack').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openCpModal(entry);
+    });
+
+    list.appendChild(el);
+  });
+
+  let clearBtn = document.querySelector('.storylab-theme .clear-all');
+  if (!clearBtn) {
+    clearBtn = document.createElement('button');
+    clearBtn.className = 'clear-all';
+    clearBtn.textContent = 'Clear all entries';
+    clearBtn.addEventListener('click', () => {
+      if (confirm('This will permanently delete every logged entry. Continue?')) {
+        localStorage.removeItem(QL_STORAGE_KEY);
+        if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
+          supabaseClient.from('quick_log_entries').delete().eq('user_id', supabaseUser.id)
+            .catch(err => console.warn('[QuickLog] Supabase clear failed:', err.message));
+        }
+        renderSlLog();
+        updateSlStreakBox();
+      }
+    });
+    document.getElementById('view-log').appendChild(clearBtn);
+  }
+}
+
+// ── CONTENT PACK — MODAL (for Quick Log entries) ──────────────────────────────
+
+let cpModalCurrentEntry = null;
+let cpModalData = null;
+
+function openCpModal(entry) {
+  cpModalCurrentEntry = entry;
+  cpModalData = null;
+
+  // Reset all tabs to loading state
+  ['mshort', 'mlinkedin', 'mxthread', 'myoutube'].forEach(tab => {
+    const loading = document.getElementById('sfCpModalLoading' + capitalizeFirst(tab));
+    const content = document.getElementById('sfCpModalContent' + capitalizeFirst(tab));
+    const btn = content ? content.nextElementSibling : null;
+    if (loading) { loading.style.display = 'flex'; }
+    if (content) { content.classList.remove('visible'); content.textContent = ''; }
+    if (btn) btn.classList.remove('visible');
+  });
+
+  // Reset to first tab
+  switchCpModalTab('mshort');
+
+  document.getElementById('sfContentPackModal').classList.add('open');
+  generateContentPack('quicklog', { storyType: entry.scenario, answers: entry.answers });
+}
+
+function closeCpModal() {
+  document.getElementById('sfContentPackModal').classList.remove('open');
+  cpModalCurrentEntry = null;
+  cpModalData = null;
+}
+
+function switchCpModalTab(tab) {
+  document.querySelectorAll('#sfCpModalTabs .sf-cp-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  ['mshort', 'mlinkedin', 'mxthread', 'myoutube'].forEach(t => {
+    const panel = document.getElementById('sfCpModalPanel' + capitalizeFirst(t));
+    if (panel) panel.classList.toggle('active', t === tab);
+  });
+}
+
+function copyCpModalContent(tab) {
+  const contentEl = document.getElementById('sfCpModalContent' + capitalizeFirst(tab));
+  if (!contentEl || !contentEl.textContent) return;
+  navigator.clipboard.writeText(contentEl.textContent).then(() => {
+    const btn = contentEl.nextElementSibling;
+    if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000); }
+  });
+}
+
+// ── CONTENT PACK — SIDEBAR (for AI sessions) ──────────────────────────────────
+
+function switchCpTab(tab) {
+  document.querySelectorAll('#sfCpTabs .sf-cp-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  ['short', 'linkedin', 'xthread', 'youtube'].forEach(t => {
+    const panel = document.getElementById('sfCpPanel' + capitalizeFirst(t));
+    if (panel) panel.classList.toggle('active', t === tab);
+  });
+}
+
+function copyCpContent(tab) {
+  const contentEl = document.getElementById('sfCpContent' + capitalizeFirst(tab));
+  if (!contentEl || !contentEl.textContent) return;
+  navigator.clipboard.writeText(contentEl.textContent).then(() => {
+    const btn = contentEl.nextElementSibling;
+    if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000); }
+  });
+}
+
+// ── CONTENT PACK — SHARED API CALL ────────────────────────────────────────────
+
+async function generateContentPack(source, payload) {
+  // Determine which UI to update
+  const isModal = (source === 'quicklog');
+  const prefix = isModal ? 'sfCpModal' : 'sfCp';
+  const tabIds = isModal
+    ? ['mshort', 'mlinkedin', 'mxthread', 'myoutube']
+    : ['short', 'linkedin', 'xthread', 'youtube'];
+
+  // Show the sidebar card if session source
+  if (!isModal) {
+    const card = document.getElementById('sfContentPackCard');
+    if (card) {
+      card.style.display = 'block';
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    // Reset sidebar panels to loading
+    tabIds.forEach(tab => {
+      const loading = document.getElementById('sfCpLoading' + capitalizeFirst(tab));
+      const content = document.getElementById('sfCpContent' + capitalizeFirst(tab));
+      const btn = content ? content.nextElementSibling : null;
+      if (loading) loading.style.display = 'flex';
+      if (content) { content.classList.remove('visible'); content.textContent = ''; }
+      if (btn) btn.classList.remove('visible');
+    });
+    // Build session payload from current state
+    payload = {
+      storyType: sfActiveStoryType,
+      anatomy: sfAnatomyState,
+      history: sfHistory
+    };
+  }
+
+  if (!supabaseClient) {
+    // Offline fallback — brief placeholder
+    const fallbackData = {
+      shortFormScript: '[Offline] Connect to the internet to generate your Content Pack.',
+      linkedInPost: '[Offline] Connect to the internet to generate your Content Pack.',
+      xThread: ['[Offline] Connect to the internet to generate your Content Pack.'],
+      youtubeOutline: '[Offline] Connect to the internet to generate your Content Pack.'
+    };
+    renderContentPackResult(source, fallbackData);
+    return;
+  }
+
+  try {
+    const body = { source, ...payload };
+    const res = await fetch('/api/content-pack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) throw new Error('Content Pack API failed. Check server logs.');
+    const result = await res.json();
+    renderContentPackResult(source, result);
+  } catch (err) {
+    const errorData = {
+      shortFormScript: 'Error generating content: ' + err.message,
+      linkedInPost: 'Error generating content: ' + err.message,
+      xThread: ['Error generating content: ' + err.message],
+      youtubeOutline: 'Error generating content: ' + err.message
+    };
+    renderContentPackResult(source, errorData);
+  }
+}
+
+function renderContentPackResult(source, data) {
+  const isModal = (source === 'quicklog');
+  const pfx = isModal ? 'sfCpModal' : 'sfCp';
+  const tabMap = isModal
+    ? { short: 'Mshort', linkedin: 'Mlinkedin', xthread: 'Mxthread', youtube: 'Myoutube' }
+    : { short: 'Short', linkedin: 'Linkedin', xthread: 'Xthread', youtube: 'Youtube' };
+
+  const pairs = [
+    { key: 'short',    suffix: tabMap.short,    text: data.shortFormScript || '' },
+    { key: 'linkedin', suffix: tabMap.linkedin,  text: data.linkedInPost || '' },
+    { key: 'xthread',  suffix: tabMap.xthread,   text: Array.isArray(data.xThread) ? data.xThread.join('\n\n---\n\n') : (data.xThread || '') },
+    { key: 'youtube',  suffix: tabMap.youtube,   text: data.youtubeOutline || '' }
+  ];
+
+  pairs.forEach(({ suffix, text }) => {
+    const loading = document.getElementById(pfx + 'Loading' + suffix);
+    const content = document.getElementById(pfx + 'Content' + suffix);
+    const btn = content ? content.nextElementSibling : null;
+    if (loading) loading.style.display = 'none';
+    if (content) { content.textContent = text; content.classList.add('visible'); }
+    if (btn) btn.classList.add('visible');
+  });
+}
+
+function capitalizeFirst(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // ── STORY FINDER STATE ────────────────────────────────────────────────────────
 
 function updateGymStatsUI() {
