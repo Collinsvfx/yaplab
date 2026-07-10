@@ -1660,7 +1660,6 @@
     --paper-dim: var(--surface2);
     --paper-ink: var(--text);
     --paper-ink-soft: var(--muted);
-    --text: var(--text);
     --text-soft: var(--muted);
     --brass: var(--accent);
     --brass-soft: var(--accent-dark);
@@ -2046,10 +2045,7 @@
     padding: 16px 18px;
     margin-bottom: 12px;
     cursor: pointer;
-    border-left: 4px solid var(--brass);
-    border-top: 1px solid var(--ink-border);
-    border-right: 1px solid var(--ink-border);
-    border-bottom: 1px solid var(--ink-border);
+    border: 1px solid var(--ink-border);
     position: relative;
     text-align: left;
   }
