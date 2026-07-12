@@ -627,7 +627,7 @@ function renderSlLog() {
         saveQlLocal(remaining);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
           const dbId = /^\d+$/.test(entry.id) ? parseInt(entry.id, 10) : entry.id;
-          supabaseClient.from('learn_items').delete().eq('id', dbId).eq('user_id', supabaseUser.id)
+          supabaseClient.from('learn_items').delete().eq('id', dbId)
             .catch(err => console.warn('[QuickLog] Supabase delete failed:', err.message));
           
           const globalIdx = learnItems.findIndex(item => String(item.id) === String(entry.id));
