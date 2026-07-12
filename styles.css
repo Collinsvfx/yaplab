@@ -2365,3 +2365,32 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
   }
+
+  /* ── STORYLAB MOBILE RESPONSIVENESS ── */
+  @media (max-width: 520px) {
+    .storylab-theme .entry-top {
+      flex-wrap: wrap;
+    }
+    .storylab-theme .entry-actions {
+      width: 100%;
+      margin-top: 12px;
+      justify-content: flex-start;
+    }
+    .storylab-theme .save-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .storylab-theme .stat-box {
+      padding: 10px 8px;
+    }
+    .storylab-theme .stat-box .num {
+      font-size: 18px;
+    }
+    .storylab-theme .stat-box .lbl {
+      font-size: 8.5px;
+    }
+  }

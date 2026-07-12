@@ -622,7 +622,7 @@ function renderSlLog() {
 
     el.querySelector('.entry-delete').addEventListener('click', (e) => {
       e.stopPropagation();
-      if (confirm('Delete this entry?')) {
+      showSlConfirmModal('Delete Entry?', 'Are you sure you want to delete this entry? This action cannot be undone.', () => {
         const remaining = getQlEntries().filter(en => String(en.id) !== String(entry.id));
         saveQlLocal(remaining);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
@@ -635,7 +635,7 @@ function renderSlLog() {
         }
         renderSlLog();
         updateSlStreakBox();
-      }
+      });
     });
 
     el.querySelector('.entry-pack').addEventListener('click', (e) => {
@@ -681,7 +681,7 @@ function renderSlLog() {
     clearBtn.className = 'clear-all';
     clearBtn.textContent = 'Clear all entries';
     clearBtn.addEventListener('click', () => {
-      if (confirm('This will permanently delete every logged entry. Continue?')) {
+      showSlConfirmModal('Clear All Entries?', 'This will permanently delete every logged entry. Continue?', () => {
         localStorage.removeItem(QL_STORAGE_KEY);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
           supabaseClient.from('learn_items').delete().eq('category', 'storylab').eq('user_id', supabaseUser.id)
@@ -695,7 +695,7 @@ function renderSlLog() {
         }
         renderSlLog();
         updateSlStreakBox();
-      }
+      });
     });
     document.getElementById('view-log').appendChild(clearBtn);
   }
@@ -942,6 +942,27 @@ function exitStorySession() {
 
 function closeSfConfirmModal() {
   document.getElementById('sfConfirmModal').style.display = 'none';
+}
+
+let slConfirmCallback = null;
+
+function showSlConfirmModal(title, message, onConfirm) {
+  document.getElementById('slConfirmTitle').textContent = title;
+  document.getElementById('slConfirmMessage').textContent = message;
+  slConfirmCallback = onConfirm;
+  document.getElementById('slConfirmModal').style.display = 'flex';
+}
+
+function closeSlConfirmModal() {
+  document.getElementById('slConfirmModal').style.display = 'none';
+  slConfirmCallback = null;
+}
+
+function executeSlConfirm() {
+  if (typeof slConfirmCallback === 'function') {
+    slConfirmCallback();
+  }
+  closeSlConfirmModal();
 }
 
 function confirmExitStorySession() {
