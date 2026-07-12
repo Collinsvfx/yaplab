@@ -272,7 +272,11 @@ function openSlInterview(key, existingEntry) {
 
   document.getElementById('slInterviewStamp').innerHTML = `${s.icon} ${s.stamp}`;
   document.getElementById('slInterviewTitle').textContent = qlEditingId ? `Editing: ${s.label}` : s.label;
-  document.getElementById('slSaveBtn').textContent = qlEditingId ? 'Update entry' : 'Save entry';
+  const saveBtn = document.getElementById('slSaveBtn');
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.textContent = qlEditingId ? 'Update entry' : 'Save entry';
+  }
   document.getElementById('slSaveHint').textContent = qlEditingId ? 'Changes overwrite this entry.' : 'Answer what applies — skip the rest.';
 
   const list = document.getElementById('slQuestionList');
@@ -333,30 +337,36 @@ async function saveSlEntry() {
     return;
   }
 
-  const entries = getQlEntries();
-  let savedEntry;
-
-  if (qlEditingId) {
-    const idx = entries.findIndex(e => e.id === qlEditingId);
-    if (idx !== -1) {
-      entries[idx] = { ...entries[idx], answers };
-      savedEntry = entries[idx];
-    }
-    saveQlLocal(entries);
-  } else {
-    savedEntry = {
-      id: Date.now().toString(),
-      scenario: qlCurrentScenario,
-      date: new Date().toISOString(),
-      answers
-    };
-    entries.unshift(savedEntry);
-    saveQlLocal(entries);
+  const saveBtn = document.getElementById('slSaveBtn');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = qlEditingId ? 'Updating...' : 'Saving...';
   }
 
-  // Supabase save
-  if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
-    try {
+  try {
+    const entries = getQlEntries();
+    let savedEntry;
+
+    if (qlEditingId) {
+      const idx = entries.findIndex(e => String(e.id) === String(qlEditingId));
+      if (idx !== -1) {
+        entries[idx] = { ...entries[idx], answers };
+        savedEntry = entries[idx];
+      }
+      saveQlLocal(entries);
+    } else {
+      savedEntry = {
+        id: Date.now().toString(),
+        scenario: qlCurrentScenario,
+        date: new Date().toISOString(),
+        answers
+      };
+      entries.unshift(savedEntry);
+      saveQlLocal(entries);
+    }
+
+    // Supabase save
+    if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
       const dbPayload = {
         user_id: supabaseUser.id,
         title: qlCurrentScenario,
@@ -367,14 +377,15 @@ async function saveSlEntry() {
       };
 
       if (qlEditingId) {
+        const dbId = /^\d+$/.test(qlEditingId) ? parseInt(qlEditingId, 10) : qlEditingId;
         await supabaseClient
           .from('learn_items')
           .update(dbPayload)
-          .eq('id', qlEditingId)
+          .eq('id', dbId)
           .eq('user_id', supabaseUser.id);
           
         // Update local learnItems memory array
-        const globalIdx = learnItems.findIndex(item => item.id === qlEditingId);
+        const globalIdx = learnItems.findIndex(item => String(item.id) === String(qlEditingId));
         if (globalIdx !== -1) {
           learnItems[globalIdx].sections = dbPayload.sections;
           learnItems[globalIdx].updatedAt = Date.now();
@@ -407,8 +418,13 @@ async function saveSlEntry() {
           }
         }
       }
-    } catch (e) {
-      console.warn('[QuickLog] Supabase save failed (local copy preserved):', e.message);
+    }
+  } catch (e) {
+    console.warn('[QuickLog] Supabase save failed (local copy preserved):', e.message);
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = qlEditingId ? 'Update entry' : 'Save entry';
     }
   }
 
@@ -607,13 +623,14 @@ function renderSlLog() {
     el.querySelector('.entry-delete').addEventListener('click', (e) => {
       e.stopPropagation();
       if (confirm('Delete this entry?')) {
-        const remaining = getQlEntries().filter(en => en.id !== entry.id);
+        const remaining = getQlEntries().filter(en => String(en.id) !== String(entry.id));
         saveQlLocal(remaining);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
-          supabaseClient.from('learn_items').delete().eq('id', entry.id).eq('user_id', supabaseUser.id)
+          const dbId = /^\d+$/.test(entry.id) ? parseInt(entry.id, 10) : entry.id;
+          supabaseClient.from('learn_items').delete().eq('id', dbId).eq('user_id', supabaseUser.id)
             .catch(err => console.warn('[QuickLog] Supabase delete failed:', err.message));
           
-          const globalIdx = learnItems.findIndex(item => item.id === entry.id);
+          const globalIdx = learnItems.findIndex(item => String(item.id) === String(entry.id));
           if (globalIdx !== -1) learnItems.splice(globalIdx, 1);
         }
         renderSlLog();
@@ -1501,83 +1518,99 @@ async function exportStoryToScriptBuilder() {
     return;
   }
 
-  const title = `Story: My ${sfActiveStoryType} Day`;
-  
-  const sections = [
-    { type: 'preflight', emotionalEntry: sfAnatomyState.lesson || '', whoFeels: 'My Audience', hookTest: sfAnatomyState.mission || '' }
-  ];
+  const buildBtn = document.getElementById('sfBuildScriptBtn');
+  let origText = '';
+  if (buildBtn) {
+    buildBtn.disabled = true;
+    origText = buildBtn.innerHTML;
+    buildBtn.innerHTML = 'Building...';
+  }
 
-  window.sfLastScriptOutline.forEach((sec, idx) => {
-    sections.push({
-      id: Date.now() + idx,
-      label: sec.label,
-      placeholder: 'Write details...',
-      text: sec.text
+  try {
+    const title = `Story: My ${sfActiveStoryType} Day`;
+    
+    const sections = [
+      { type: 'preflight', emotionalEntry: sfAnatomyState.lesson || '', whoFeels: 'My Audience', hookTest: sfAnatomyState.mission || '' }
+    ];
+
+    window.sfLastScriptOutline.forEach((sec, idx) => {
+      sections.push({
+        id: Date.now() + idx,
+        label: sec.label,
+        placeholder: 'Write details...',
+        text: sec.text
+      });
     });
-  });
 
-  let newId = null;
+    let newId = null;
 
-  if (supabaseClient && supabaseUser) {
-    try {
-      const { data, error } = await supabaseClient
-        .from('learn_items')
-        .insert({
-          user_id: supabaseUser.id,
-          title,
-          category: 'storytelling',
-          status: 'unread',
-          sections,
-          updated_at: new Date().toISOString()
-        })
-        .select();
-      if (error) throw error;
-      if (data && data[0]) {
-        newId = data[0].id;
-        learnItems.unshift({
-          id: newId,
-          title: data[0].title,
-          category: data[0].category,
-          status: data[0].status,
-          sections: data[0].sections || [],
-          updatedAt: new Date(data[0].updated_at).getTime()
-        });
+    if (supabaseClient && supabaseUser) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('learn_items')
+          .insert({
+            user_id: supabaseUser.id,
+            title,
+            category: 'storytelling',
+            status: 'unread',
+            sections,
+            updated_at: new Date().toISOString()
+          })
+          .select();
+        if (error) throw error;
+        if (data && data[0]) {
+          newId = data[0].id;
+          learnItems.unshift({
+            id: newId,
+            title: data[0].title,
+            category: data[0].category,
+            status: data[0].status,
+            sections: data[0].sections || [],
+            updatedAt: new Date(data[0].updated_at).getTime()
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Failed to save to database. Exporting locally...');
       }
-    } catch (e) {
-      console.error(e);
-      alert('Failed to save to database. Exporting locally...');
+    }
+
+    if (!newId) {
+      newId = Date.now();
+      learnItems.unshift({
+        id: newId,
+        title,
+        category: 'storytelling',
+        status: 'unread',
+        sections,
+        updatedAt: Date.now()
+      });
+      saveLearn();
+    }
+
+    // Set the open script flag for the learn page
+    sessionStorage.setItem('open_script_id', newId);
+
+    // Restore Story Finder inputs
+    document.getElementById('sfSendBtn').disabled = false;
+    document.getElementById('sfChatInput').disabled = false;
+    document.getElementById('sfChatInput').placeholder = 'Type your answer to the coach...';
+
+    // Return to landing state in Story Finder
+    document.getElementById('sfActiveSessionState').style.display = 'none';
+    showQuickLogPanel();
+    sfActiveStoryType = null;
+    sfHistory = [];
+
+    // Redirect to learn page
+    window.location.href = 'learn.html';
+  } catch (err) {
+    console.error('Export failed:', err);
+    if (buildBtn) {
+      buildBtn.disabled = false;
+      buildBtn.innerHTML = origText;
     }
   }
-
-  if (!newId) {
-    newId = Date.now();
-    learnItems.unshift({
-      id: newId,
-      title,
-      category: 'storytelling',
-      status: 'unread',
-      sections,
-      updatedAt: Date.now()
-    });
-    saveLearn();
-  }
-
-  // Set the open script flag for the learn page
-  sessionStorage.setItem('open_script_id', newId);
-
-  // Restore Story Finder inputs
-  document.getElementById('sfSendBtn').disabled = false;
-  document.getElementById('sfChatInput').disabled = false;
-  document.getElementById('sfChatInput').placeholder = 'Type your answer to the coach...';
-
-  // Return to landing state in Story Finder
-  document.getElementById('sfActiveSessionState').style.display = 'none';
-  showQuickLogPanel();
-  sfActiveStoryType = null;
-  sfHistory = [];
-
-  // Redirect to learn page
-  window.location.href = 'learn.html';
 }
 
 // ── INITIALIZE PAGE ───────────────────────────────────────────────────────────
