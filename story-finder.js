@@ -622,16 +622,37 @@ function renderSlLog() {
 
     el.querySelector('.entry-delete').addEventListener('click', (e) => {
       e.stopPropagation();
-      showSlConfirmModal('Delete Entry?', 'Are you sure you want to delete this entry? This action cannot be undone.', () => {
+      showSlConfirmModal('Delete Entry?', 'Are you sure you want to delete this entry? This action cannot be undone.', async () => {
         const remaining = getQlEntries().filter(en => String(en.id) !== String(entry.id));
         saveQlLocal(remaining);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
-          const dbId = /^\d+$/.test(entry.id) ? parseInt(entry.id, 10) : entry.id;
-          supabaseClient.from('learn_items').delete().eq('id', dbId)
-            .catch(err => console.warn('[QuickLog] Supabase delete failed:', err.message));
+          const dbId = /^\d+$/.test(String(entry.id)) ? parseInt(entry.id, 10) : entry.id;
+          console.log('[QuickLog] Attempting to delete DB ID:', dbId);
+          try {
+            const { error } = await supabaseClient.from('learn_items').delete().eq('id', dbId);
+            if (error) {
+              console.error('[QuickLog] Supabase delete failed:', error);
+              alert('Failed to delete from database: ' + error.message);
+              return;
+            }
+            console.log('[QuickLog] Supabase delete succeeded for ID:', dbId);
+          } catch (err) {
+            console.error('[QuickLog] Supabase delete exception:', err);
+            alert('Failed to delete from database: ' + err.message);
+            return;
+          }
           
           const globalIdx = learnItems.findIndex(item => String(item.id) === String(entry.id));
-          if (globalIdx !== -1) learnItems.splice(globalIdx, 1);
+          if (globalIdx !== -1) {
+            learnItems.splice(globalIdx, 1);
+            if (typeof saveLearn === 'function') saveLearn();
+          }
+        } else {
+          const globalIdx = learnItems.findIndex(item => String(item.id) === String(entry.id));
+          if (globalIdx !== -1) {
+            learnItems.splice(globalIdx, 1);
+            if (typeof saveLearn === 'function') saveLearn();
+          }
         }
         renderSlLog();
         updateSlStreakBox();
@@ -681,17 +702,35 @@ function renderSlLog() {
     clearBtn.className = 'clear-all';
     clearBtn.textContent = 'Clear all entries';
     clearBtn.addEventListener('click', () => {
-      showSlConfirmModal('Clear All Entries?', 'This will permanently delete every logged entry. Continue?', () => {
+      showSlConfirmModal('Clear All Entries?', 'This will permanently delete every logged entry. Continue?', async () => {
         localStorage.removeItem(QL_STORAGE_KEY);
         if (supabaseClient && supabaseUser && supabaseUser.id !== 'offline-user') {
-          supabaseClient.from('learn_items').delete().eq('category', 'storylab').eq('user_id', supabaseUser.id)
-            .catch(err => console.warn('[QuickLog] Supabase clear failed:', err.message));
+          try {
+            const { error } = await supabaseClient.from('learn_items').delete().eq('category', 'storylab').eq('user_id', supabaseUser.id);
+            if (error) {
+              console.error('[QuickLog] Supabase clear failed:', error);
+              alert('Failed to clear database items: ' + error.message);
+              return;
+            }
+          } catch (err) {
+            console.error('[QuickLog] Supabase clear exception:', err);
+            alert('Failed to clear database items: ' + err.message);
+            return;
+          }
           
           for (let i = learnItems.length - 1; i >= 0; i--) {
             if (learnItems[i].category === 'storylab') {
               learnItems.splice(i, 1);
             }
           }
+          if (typeof saveLearn === 'function') saveLearn();
+        } else {
+          for (let i = learnItems.length - 1; i >= 0; i--) {
+            if (learnItems[i].category === 'storylab') {
+              learnItems.splice(i, 1);
+            }
+          }
+          if (typeof saveLearn === 'function') saveLearn();
         }
         renderSlLog();
         updateSlStreakBox();
@@ -958,11 +997,11 @@ function closeSlConfirmModal() {
   slConfirmCallback = null;
 }
 
-function executeSlConfirm() {
+async function executeSlConfirm() {
   console.log('[SL] executeSlConfirm called, callback:', typeof slConfirmCallback);
   try {
     if (typeof slConfirmCallback === 'function') {
-      slConfirmCallback();
+      await slConfirmCallback();
     }
   } catch (err) {
     console.error('[SL] Delete callback threw:', err);
