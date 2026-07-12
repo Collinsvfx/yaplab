@@ -959,29 +959,17 @@ function closeSlConfirmModal() {
 }
 
 function executeSlConfirm() {
-  if (typeof slConfirmCallback === 'function') {
-    slConfirmCallback();
+  console.log('[SL] executeSlConfirm called, callback:', typeof slConfirmCallback);
+  try {
+    if (typeof slConfirmCallback === 'function') {
+      slConfirmCallback();
+    }
+  } catch (err) {
+    console.error('[SL] Delete callback threw:', err);
+  } finally {
+    closeSlConfirmModal();
   }
-  closeSlConfirmModal();
 }
-
-// Wire up modal buttons immediately using DOMContentLoaded (reliable, no global scope needed)
-document.addEventListener('DOMContentLoaded', function() {
-  var cancelBtn = document.getElementById('slConfirmCancelBtn');
-  var confirmBtn = document.getElementById('slConfirmActionBtn');
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      closeSlConfirmModal();
-    });
-  }
-  if (confirmBtn) {
-    confirmBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      executeSlConfirm();
-    });
-  }
-});
 
 
 function confirmExitStorySession() {
@@ -1765,3 +1753,26 @@ function exportStoryToWord(entry) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// ── MODAL BUTTON WIRING ───────────────────────────────────────────────────────
+// This script is a synchronous <script> at the bottom of <body>, so the DOM
+// is already fully parsed here. Wire modal buttons directly — no DOMContentLoaded needed.
+(function wireSlConfirmModal() {
+  var cancelBtn = document.getElementById('slConfirmCancelBtn');
+  var confirmBtn = document.getElementById('slConfirmActionBtn');
+  console.log('[SL] Modal wiring: cancelBtn=', cancelBtn, 'confirmBtn=', confirmBtn);
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      console.log('[SL] Cancel clicked');
+      closeSlConfirmModal();
+    });
+  }
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      console.log('[SL] Delete confirm clicked');
+      executeSlConfirm();
+    });
+  }
+})();
