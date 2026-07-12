@@ -952,13 +952,11 @@ function showSlConfirmModal(title, message, onConfirm) {
   slConfirmCallback = onConfirm;
   document.getElementById('slConfirmModal').style.display = 'flex';
 }
-window.showSlConfirmModal = showSlConfirmModal;
 
 function closeSlConfirmModal() {
   document.getElementById('slConfirmModal').style.display = 'none';
   slConfirmCallback = null;
 }
-window.closeSlConfirmModal = closeSlConfirmModal;
 
 function executeSlConfirm() {
   if (typeof slConfirmCallback === 'function') {
@@ -966,7 +964,25 @@ function executeSlConfirm() {
   }
   closeSlConfirmModal();
 }
-window.executeSlConfirm = executeSlConfirm;
+
+// Wire up modal buttons immediately using DOMContentLoaded (reliable, no global scope needed)
+document.addEventListener('DOMContentLoaded', function() {
+  var cancelBtn = document.getElementById('slConfirmCancelBtn');
+  var confirmBtn = document.getElementById('slConfirmActionBtn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeSlConfirmModal();
+    });
+  }
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      executeSlConfirm();
+    });
+  }
+});
+
 
 function confirmExitStorySession() {
   document.getElementById('sfConfirmModal').style.display = 'none';
@@ -1652,19 +1668,6 @@ function initStoryFinderPage() {
       if (e.key === 'Enter') {
         sendStoryMessage();
       }
-    });
-  }
-
-  const cancelBtn = document.getElementById('slConfirmCancelBtn');
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => {
-      closeSlConfirmModal();
-    });
-  }
-  const confirmBtn = document.getElementById('slConfirmActionBtn');
-  if (confirmBtn) {
-    confirmBtn.addEventListener('click', () => {
-      executeSlConfirm();
     });
   }
 }

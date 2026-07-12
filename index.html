@@ -353,8 +353,8 @@
     <div id="slConfirmTitle" style="font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--text); text-align:center;">Delete Entry?</div>
     <div id="slConfirmMessage" style="font-size:13px; color:var(--text-soft); line-height:1.6; text-align:center;">Are you sure you want to delete this entry? This action cannot be undone.</div>
     <div style="display:flex; justify-content:center; gap:12px; margin-top:8px;">
-      <button class="btn btn-secondary" id="slConfirmCancelBtn" onclick="closeSlConfirmModal()" style="font-family:'IBM Plex Mono', monospace; font-size:11px; padding:8px 16px; font-weight:600; border: 1px solid var(--ink-border); background: none; color: var(--text-soft); border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Cancel</button>
-      <button class="btn" id="slConfirmActionBtn" onclick="executeSlConfirm()" style="font-family:'IBM Plex Mono', monospace; background:var(--danger); color:#fff; font-size:11px; padding:8px 16px; border:none; font-weight:600; border-radius:8px; cursor:pointer; text-transform: uppercase; letter-spacing: 0.5px;">Delete</button>
+      <button type="button" id="slConfirmCancelBtn" style="font-family:'IBM Plex Mono', monospace; font-size:11px; padding:8px 16px; font-weight:600; border: 1px solid rgba(255,255,255,0.15); background: none; color: rgba(255,255,255,0.6); border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">Cancel</button>
+      <button type="button" id="slConfirmActionBtn" style="font-family:'IBM Plex Mono', monospace; background:#e53e3e; color:#fff; font-size:11px; padding:8px 16px; border:none; font-weight:600; border-radius:8px; cursor:pointer; text-transform: uppercase; letter-spacing: 0.5px;">Delete</button>
     </div>
   </div>
 </div>
@@ -462,6 +462,6 @@
 </div>
 
 <script src="app.js"></script>
-<script src="story-finder.js?v=1.0.3"></script>
+<script src="story-finder.js?v=1.0.4"></script>
 </body>
 </html>
