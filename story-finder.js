@@ -946,24 +946,27 @@ function closeSfConfirmModal() {
 
 let slConfirmCallback = null;
 
-window.showSlConfirmModal = function(title, message, onConfirm) {
+function showSlConfirmModal(title, message, onConfirm) {
   document.getElementById('slConfirmTitle').textContent = title;
   document.getElementById('slConfirmMessage').textContent = message;
   slConfirmCallback = onConfirm;
   document.getElementById('slConfirmModal').style.display = 'flex';
-};
+}
+window.showSlConfirmModal = showSlConfirmModal;
 
-window.closeSlConfirmModal = function() {
+function closeSlConfirmModal() {
   document.getElementById('slConfirmModal').style.display = 'none';
   slConfirmCallback = null;
-};
+}
+window.closeSlConfirmModal = closeSlConfirmModal;
 
-window.executeSlConfirm = function() {
+function executeSlConfirm() {
   if (typeof slConfirmCallback === 'function') {
     slConfirmCallback();
   }
-  window.closeSlConfirmModal();
-};
+  closeSlConfirmModal();
+}
+window.executeSlConfirm = executeSlConfirm;
 
 function confirmExitStorySession() {
   document.getElementById('sfConfirmModal').style.display = 'none';
@@ -1655,13 +1658,13 @@ function initStoryFinderPage() {
   const cancelBtn = document.getElementById('slConfirmCancelBtn');
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
-      window.closeSlConfirmModal();
+      closeSlConfirmModal();
     });
   }
   const confirmBtn = document.getElementById('slConfirmActionBtn');
   if (confirmBtn) {
     confirmBtn.addEventListener('click', () => {
-      window.executeSlConfirm();
+      executeSlConfirm();
     });
   }
 }
